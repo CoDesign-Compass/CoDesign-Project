@@ -25,8 +25,17 @@ to be added
 ## Product Backlog
 to be added
 ## Milestone Timeline
-to be added
+|Milestone|Sprint|Due Date|
+|----|----|----|
+|Setup and user story, persona, scenario, product vision|Sprint 1|21 Aug 2025|
+|Prototype & UI Design|Sprint 1|28 Aug 2025|
+|Mobile & Web UI Implementation|Sprint 2|2 Oct 2025|
+|Interaction Implementation|Sprint 3|23 Oct 2025|
 ## Sprints
-to be added
+|Sprint|Description|
+|----|----|
+|Sprint 1||
+|Sprint 2||
+|Sprint 3||
 ## Meeting Records
 to be added
