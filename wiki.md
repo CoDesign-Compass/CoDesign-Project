@@ -25,16 +25,15 @@ to be added
 ## Consolidated Risk Log
 [Function Feasibility Investigation](https://github.com/AriaFung/CoDesign-Project/blob/main/docs/Function%20Feasibility%20Investigation.markdown)
 ## Milestone Timeline
-|Milestone|Due Date|
-|----|----|
-|2025 S2|---|
-|Setup and user story, persona, scenario, product vision|21 Aug 2025|
-|Prototype & UI Design|25 Sep 2025|
-|Mobile & Web UI Implementation|23 Oct 2025|
+|Milestone|Sprint|Due Date|
+|----|----|----|
+|2025 S2|---|---|
+|Setup and user story, persona, scenario, product vision|Sprint 1|21 Aug 2025|
+|Prototype & UI Design|Sprint 1,2|25 Sep 2025|
+|Mobile & Web UI Implementation|Sprint 2,3|23 Oct 2025|
 |2026 S1|---|
-|Interaction Implementation|12 March 2026|
-|Back-end implementation|7 May 2026|
-|Test & Report|28 May 2026|
+|Interaction Implementation|Sprint 4|12 March 2026|
+|Back-end implementation & Test|Sprint 5,6|7 May 2026|
 ## Sprints
 |Sprint|Description|
 |----|----|
