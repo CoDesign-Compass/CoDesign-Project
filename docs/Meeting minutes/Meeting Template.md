@@ -18,3 +18,4 @@ Ricky Chen, Jingwen Zhang, Yu Pan, Jiaxin Li, Shuo Li, Aria Fung, Zhimeng Zhu, S
 ## Task Allocations
 * 
 
+[Meeting minute allocation](https://docs.google.com/spreadsheets/d/1S0wbxD3qdw5VT001IVuKAfbjTX7lGPsIckci2tuJUc4/edit?usp=sharing)
