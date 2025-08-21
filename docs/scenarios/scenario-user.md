@@ -1,5 +1,5 @@
 # Scenario 1: Improving access to regional family support services
-## Actor: Mia, 35, a young single mother living in a suburb of Canberra
+ **Actor**: Mia, 35, a young single mother living in a suburb of Canberra
 ## Preconditions:
 Mia receives a participation link forwarded by the community parenting group and clicks on it.
 
@@ -50,7 +50,7 @@ The system does not record any previous profiles; this is a one-time feedback pr
   A new profile will be required for future participation.
 
 # Scenario 2: Improvement of mental health service process experience
-## Actor (User): Jordan, 22, a college student, neurodiversity, and interested in policy and mental health issues.
+ **Actor**: Jordan, 22, a college student, neurodiversity, and interested in policy and mental health issues.
 ## Preconditions:
    Jordan receives an email and clicks on the link.
 
