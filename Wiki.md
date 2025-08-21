@@ -25,12 +25,17 @@ to be added
 ## Product Backlog
 to be added
 ## Milestone Timeline
-|Milestone|Sprint|Due Date|
-|----|----|----|
-|Setup and user story, persona, scenario, product vision|Sprint 1|21 Aug 2025|
-|Prototype & UI Design|Sprint 1|28 Aug 2025|
-|Mobile & Web UI Implementation|Sprint 2|2 Oct 2025|
-|Interaction Implementation|Sprint 3|23 Oct 2025|
+|Milestone|Due Date|
+|----|----|
+|S2-2025|---|
+|Setup and user story, persona, scenario, product vision|21 Aug 2025|
+|Prototype & UI Design|25 Sep 2025|
+|Mobile & Web UI Implementation|23 Oct 2025|
+|S1-2026|---|
+|Interaction Implementation|12 March 2026|
+|Back-end implementation|7 May 2026|
+|Test+Report|28 May 2026|
+
 ## Sprints
 |Sprint|Description|
 |----|----|
