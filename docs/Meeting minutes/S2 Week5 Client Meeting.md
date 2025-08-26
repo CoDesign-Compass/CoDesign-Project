@@ -15,10 +15,10 @@ Ricky Chen, Jingwen Zhang, Yu Pan, Jiaxin Li, Shuo Li, Aria Fung, Zhimeng Zhu, H
 ## Discussion Topics
 | **Time** | **Item** | **Presenter** | **Notes** |
 |-----------|----------|---------------|-----------|
-| 10:00-10:30 | Recap of last week's meeting and project progress | All members | Reviewed the requirements and key takeaways from the previous meeting. |
-| 10:30-11:15 | Discussion on AI pricing and pros/cons | Tech Team | Analyzed costs, performance, and suitability of each AI to determine the most viable option. |
-| 11:15-11:45 | Discussion on frontend theme colors and structure | Design Team | Shortlisted several theme color palettes and discussed layout structure. |
-| 11:45-12:00 | Planning next steps | All members | Agreed to prepare an initial UI draft within two weeks for client review. |
+| 13:00-13:15 | Recap of last week's meeting and project progress | All members | Reviewed the requirements and key takeaways from the previous meeting. |
+| 13:15-13:25 | Discussion on AI pricing and pros/cons | Tech Team | Analyzed costs, performance, and suitability of each AI to determine the most viable option. |
+| 13:25-13:45 | Discussion on frontend theme colors and structure | Design Team | Shortlisted several theme color palettes and discussed layout structure. |
+| 13:45-14:00 | Planning next steps | All members | Agreed to prepare an initial UI draft within two weeks for client review. |
 
 ## Action Items
 - Prepare a table summarizing AI options with pricing, performance, and pros/cons.  
