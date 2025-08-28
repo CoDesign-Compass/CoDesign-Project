@@ -1,5 +1,5 @@
 ## S2 Week 6 Tutor meeting – Sprint interview
-## Date: 27 Aug, 2025
+## Date: 28 Aug, 2025
 Time: 12:05 (approx. 20 min)
 
 ## Participants
