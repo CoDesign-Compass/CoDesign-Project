@@ -3,20 +3,20 @@ This is the central documentation hub for CoDesign Compass.
 ## Table of contents
 |Section|Contents|
 |---|---|
-|Project Overview|1. Project Introduction<br>2. Project Vision<br>3. Technologies Overview<br>4. Team Members and Responsibilities|
-|Web Design|5. User Stories, Personas, and Scenarios|
-|Planning & Execution|6. Product Backlog<br>7. Consolidated Risk Log<br>8.Milestone Timeline|
-|Sprint Retrospectives|9. Sprints|
-|Meeting Minutes|10. Meeting Records|
-|Logs|11.Risk Log<br>12.Reflection Log|
+|Project Overview|1. Project Introduction<br>2. Project Vision<br>3.Programming Language|
+|Web Design|4. User Stories, Personas, and Scenarios|
+|Planning & Execution|5. Product Backlog<br>6. Consolidated Risk Log<br>7.Milestone Timeline|
+|Sprint Retrospectives|8. Sprints|
+|Meeting Minutes|9. Meeting Records|
+|Logs|11.Risk Log<br>10.Reflection Log|
 ## Project Introduction
 [Project Introduction](https://github.com/AriaFung/CoDesign-Project/blob/main/docs/Persona%2C%20Product%20Vison%20and%20Project%20Introduction/Project%20Introduction.md)
 ## Project Vision
 [Product Vision](https://github.com/AriaFung/CoDesign-Project/blob/main/docs/Persona%2C%20Product%20Vison%20and%20Project%20Introduction/Product%20Vision.md)
-## Technologies Overview
-to be added
-## Team Members and Responsibilities
-to be added
+## Programming Language
+Frontend: CSS, HTML, React
+<br>Backend: Java
+<br>Database: firebase
 ## User Stories, Personas, and Scenarios
 [User Stories](https://github.com/AriaFung/CoDesign-Project/tree/main/docs/User%20Story)
 <br>[Personas](https://github.com/AriaFung/CoDesign-Project/blob/main/docs/Persona%2C%20Product%20Vison%20and%20Project%20Introduction/Persona.md)
