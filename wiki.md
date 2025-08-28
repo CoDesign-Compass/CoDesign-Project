@@ -3,12 +3,11 @@ This is the central documentation hub for CoDesign Compass.
 ## Table of contents
 |Section|Contents|
 |---|---|
-|Project Overview|1. Project Introduction<br>2. Project Vision<br>3.Programming Language|
+|Project Overview|1. Project Introduction<br>2. Project Vision<br>3. Programming Language|
 |Web Design|4. User Stories, Personas, and Scenarios|
-|Planning & Execution|5. Product Backlog<br>6. Consolidated Risk Log<br>7.Milestone Timeline|
-|Sprint Retrospectives|8. Sprints|
-|Meeting Minutes|9. Meeting Records|
-|Logs|11.Risk Log<br>10.Reflection Log|
+|Planning & Execution|5. Product Backlog<br>6. Risk Log<br>7. Reflection Log<br>8. Milestone Timeline|
+|Sprint Retrospectives|9. Sprints|
+|Meeting Minutes|10. Meeting Records|
 ## Project Introduction
 [Project Introduction](https://github.com/AriaFung/CoDesign-Project/blob/main/docs/Persona%2C%20Product%20Vison%20and%20Project%20Introduction/Project%20Introduction.md)
 ## Project Vision
@@ -23,8 +22,10 @@ Frontend: CSS, HTML, React
 <br>Scenarios: [user](https://github.com/AriaFung/CoDesign-Project/blob/main/docs/scenarios/scenario-user.md), [admin](https://github.com/AriaFung/CoDesign-Project/blob/main/docs/scenarios/scenario-admin.md)
 ## Product Backlog
 [Codesign Compass](https://github.com/users/AriaFung/projects/1)
-## Consolidated Risk Log
-[Function Feasibility Investigation](https://github.com/AriaFung/CoDesign-Project/blob/main/docs/Function%20Feasibility%20Investigation.markdown)
+## Risk Log
+[Risk Log](https://github.com/AriaFung/CoDesign-Project/blob/main/docs/Risk%20Log.md)
+## Reflection Log
+[Reflection Log](https://docs.google.com/spreadsheets/d/1j3KESnjifrTIJHNH4RRaIiC9WncQWomgvNMwD6_TI6w/edit?gid=0#gid=0)
 ## Milestone Timeline
 |Milestone|Sprint|Due Date|
 |----|----|----|
@@ -53,7 +54,3 @@ Frontend: CSS, HTML, React
 |week 10||
 |week 11||
 |week 12||
-## Risk Log
-[Risk Log](https://github.com/AriaFung/CoDesign-Project/blob/main/docs/Risk%20Log.md)
-## Reflection Log
-[Reflection Log](https://docs.google.com/spreadsheets/d/1j3KESnjifrTIJHNH4RRaIiC9WncQWomgvNMwD6_TI6w/edit?gid=0#gid=0)
