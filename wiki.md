@@ -8,6 +8,7 @@ This is the central documentation hub for CoDesign Compass.
 |Planning & Execution|5. Product Backlog<br>6. Risk Log<br>7. Reflection Log<br>8. Milestone Timeline|
 |Sprint Retrospectives|9. Sprints|
 |Meeting Minutes|10. Meeting Records|
+|Monitor|11.Team velocity|
 ## Project Introduction
 [Project Introduction](https://github.com/AriaFung/CoDesign-Project/blob/main/docs/Persona%2C%20Product%20Vison%20and%20Project%20Introduction/Project%20Introduction.md)
 ## Project Vision
@@ -15,7 +16,7 @@ This is the central documentation hub for CoDesign Compass.
 ## Programming Language
 Frontend: CSS, HTML, React
 <br>Backend: Java
-<br>Database: firebase
+<br>Database: Firebase
 ## User Stories, Personas, and Scenarios
 [User Stories](https://github.com/AriaFung/CoDesign-Project/tree/main/docs/User%20Story)
 <br>[Personas](https://github.com/AriaFung/CoDesign-Project/blob/main/docs/Persona%2C%20Product%20Vison%20and%20Project%20Introduction/Persona.md)
@@ -27,21 +28,21 @@ Frontend: CSS, HTML, React
 ## Reflection Log
 [Reflection Log](https://docs.google.com/spreadsheets/d/1j3KESnjifrTIJHNH4RRaIiC9WncQWomgvNMwD6_TI6w/edit?gid=0#gid=0)
 ## Milestone Timeline
-|Milestone|Sprint|Due Date|
-|----|----|----|
-|2025 S2|---|---|
-|Setup and user story, persona, scenario, product vision|Sprint 1|21 Aug 2025|
-|Prototype & UI Design|Sprint 1,2|25 Sep 2025|
-|Mobile & Web UI Implementation|Sprint 2,3|23 Oct 2025|
-|2026 S1|---|
-|Interaction Implementation|Sprint 4|12 March 2026|
-|Back-end implementation & Test|Sprint 5,6|7 May 2026|
+|Milestone|Sprint|Due Date|Note|
+|----|----|----|---|
+|2025 S2|---|---|---|
+|Setup and user story, persona, scenario, product vision|Sprint 1|21 Aug 2025||
+|Prototype & UI Design|Sprint 1,2|25 Sep 2025|need to adopt Material Design 3 (from sprint 1 feedback of tutor)|
+|Mobile & Web UI Implementation|Sprint 3|23 Oct 2025||
+|2026 S1|---|---|---|
+|Interaction Implementation|Sprint 4|12 March 2026||
+|Back-end implementation & Test|Sprint 5,6|7 May 2026||
 ## Sprints
-|Sprint|Description|
-|----|----|
-|Sprint 1|Set up; understand the needs of client; user stories,persona and scenario; UI prototype|
-|Sprint 2||
-|Sprint 3||
+|Sprint|Goals|Due Date|Sprint Retro Meeting|
+|----|----|----|---|
+|Sprint 1|1.Set up<br>2.deliver user story, persona, scenario, product vision<br>3.Deliever a low-fidelity UI prototype|21 Aug 2025||
+|Sprint 2|Adopt Material Design 3 (MD3) across the prototype|25 Sep 2025||
+|Sprint 3||23 Oct 2025||
 ## Meeting Records
 |2025 S2|meeting minutes|
 |---|---|
@@ -54,3 +55,23 @@ Frontend: CSS, HTML, React
 |week 10||
 |week 11||
 |week 12||
+## Team velocity
+### Sprint 1
+| Task  | Estimate (Story Points) | Notes |
+|------|-------|----|
+| 9 Meeting Minutes                       | 4 SP                     | Each week needs 3 meeting minutes; structured but requires clarity and consistency |
+| Low-Fidelity UI Prototype                 | 6 SP                     | Involved designing user flows, building in Figma, and incorporating feedback |
+| User Story + Persona + Scenario           | 7 SP                     | Required user research, persona development, and scenario mapping     |
+| Product Vision                            | 2 SP                     | Clarified overall goals and positioning; mostly narrative work        |
+| Initial Project Setup (GitHub, ReadMe, etc.) | 3 SP                  | Repository setup, initial structure, and basic collaboration guidelines |
+| **Total**                                 | **22 SP**                | Use this as an early velocity benchmark for planning future sprints   |
+### Sprint 2
+| Task| Estimate (Story Points) | Notes |
+|----|----|---|
+||||
+|**Total** |||
+### Sprint 3
+| Task| Estimate (Story Points) | Notes |
+|----|----|---|
+||||
+|**Total** |||
