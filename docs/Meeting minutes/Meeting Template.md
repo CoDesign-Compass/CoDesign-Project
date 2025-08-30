@@ -1,3 +1,4 @@
+[Meeting minute allocation](https://docs.google.com/spreadsheets/d/1S0wbxD3qdw5VT001IVuKAfbjTX7lGPsIckci2tuJUc4/edit?usp=sharing)
 # S2 Week x xxx Meeting
 ## Date
 
@@ -12,10 +13,18 @@ Ricky Chen, Jingwen Zhang, Yu Pan, Jiaxin Li, Shuo Li, Aria Fung, Zhimeng Zhu, S
 |      |      |           |       |
 |      |      |           |       |
 ## Action Items
-* 
+|Action Items|Assignee|Due Date|
+|---|---|---|
+||||
 ## Decisions
-* 
-## Task Allocations
-* 
+|Decision|Outcome|
+|---|---|
+|||
 
-[Meeting minute allocation](https://docs.google.com/spreadsheets/d/1S0wbxD3qdw5VT001IVuKAfbjTX7lGPsIckci2tuJUc4/edit?usp=sharing)
+**Client Sign-off**(for client meeting)
+## Task Allocations
+|Task|Assignee|Due Date|
+|---|---|---|
+||||
+
+
