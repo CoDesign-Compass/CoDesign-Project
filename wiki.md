@@ -32,7 +32,7 @@ Frontend: CSS, HTML, React
 |----|----|----|---|
 |2025 S2|---|---|---|
 |Setup and user story, persona, scenario, product vision|Sprint 1|21 Aug 2025||
-|Prototype & UI Design|Sprint 1,2|25 Sep 2025|need to adopt Material Design 3 (from sprint 1 feedback of tutor)|
+|Prototype & UI Design|Sprint 1,2|2 Oct 2025|need to adopt Material Design 3 (from sprint 1 feedback of tutor)|
 |Mobile & Web UI Implementation|Sprint 3|23 Oct 2025||
 |2026 S1|---|---|---|
 |Interaction Implementation|Sprint 4|12 March 2026||
@@ -41,7 +41,7 @@ Frontend: CSS, HTML, React
 |Sprint|Goals|Due Date|Sprint Retro Meeting|
 |----|----|----|---|
 |Sprint 1|1.Set up<br>2.deliver user story, persona, scenario, product vision<br>3.Deliever a low-fidelity UI prototype|21 Aug 2025||
-|Sprint 2|Adopt Material Design 3 (MD3) across the prototype|25 Sep 2025||
+|Sprint 2|Adopt Material Design 3 (MD3) across the prototype|2 Oct 2025||
 |Sprint 3||23 Oct 2025||
 ## Meeting Records
 |2025 S2|meeting minutes|
