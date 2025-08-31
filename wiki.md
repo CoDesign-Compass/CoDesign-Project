@@ -71,7 +71,7 @@ Frontend: CSS, HTML, React
 |||
 |**Total** ||
 ### Sprint 3
-| Task| Estimate (Story Points) | Notes |
+| Task| Estimate (Story Points) |
 |----|----|
 |||
 |**Total** ||
