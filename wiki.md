@@ -57,21 +57,21 @@ Frontend: CSS, HTML, React
 |week 12||
 ## Team velocity
 ### Sprint 1
-| Task  | Estimate (Story Points) | Notes |
-|------|-------|----|
-| 9 Meeting Minutes                       | 4 SP                     | Each week needs 3 meeting minutes; structured but requires clarity and consistency |
-| Low-Fidelity UI Prototype                 | 6 SP                     | Involved designing user flows, building in Figma, and incorporating feedback |
-| User Story + Persona + Scenario           | 7 SP                     | Required user research, persona development, and scenario mapping     |
-| Product Vision                            | 2 SP                     | Clarified overall goals and positioning; mostly narrative work        |
-| Initial Project Setup (GitHub, ReadMe, etc.) | 3 SP                  | Repository setup, initial structure, and basic collaboration guidelines |
-| **Total**                                 | **22 SP**                | Use this as an early velocity benchmark for planning future sprints   |
+| Task  | Estimate (Story Points) |
+|------|-------|
+| 9 Meeting Minutes | 4 SP |
+| Low-Fidelity UI Prototype| 8 SP | 
+| User Story + Persona + Scenario| 7 SP |
+| Product Vision, Product Discription and Analysis| 3 SP |
+| Initial Project Setup (GitHub, ReadMe, etc.) | 3 SP |
+| **Total**| **22 SP**|
 ### Sprint 2
-| Task| Estimate (Story Points) | Notes |
-|----|----|---|
-||||
-|**Total** |||
+| Task| Estimate (Story Points) | 
+|----|----|
+|||
+|**Total** ||
 ### Sprint 3
 | Task| Estimate (Story Points) | Notes |
-|----|----|---|
-||||
-|**Total** |||
+|----|----|
+|||
+|**Total** ||
