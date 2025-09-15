@@ -20,13 +20,13 @@ Frontend: CSS, HTML, React
 ## Team Members
 |Name|Role|
 |----|----|
-|Jingwen Zhang|responsible for maintaining the project's organizational artefacts (Wiki, README, issues, PBI board, milestones); UI designer; developer; write meeting minutes; maintain documents(reflction log,risk log and so on); reviewer|
-|Aria Fung|UI designer; developer; write meeting minutes; maintain documents(reflction log,risk log and so on); reviewer|
-|Jiaxin Li|UI designer; developer; write meeting minutes; maintain documents(reflction log,risk log and so on); reviewer|
-|Shuo Li|UI designer; developer; write meeting minutes; maintain documents(reflction log,risk log and so on); reviewer|
-|Zhimeng Zhu|UI designer; developer; write meeting minutes; maintain documents(reflction log,risk log and so on); reviewer|
-|Ricky Chen|UI designer; developer; write meeting minutes; maintain documents(reflction log,risk log and so on); reviewer|
-|Yu Pan|UI designer; developer; write meeting minutes; maintain documents(reflction log,risk log and so on); reviewer|
+|Jingwen Zhang|responsible for maintaining the project's organizational artefacts (Wiki, README, issues, PBI board, milestones); UI designer; developer; update meeting minutes; create and update templates; create scenarios; create reflection log; reviewer|
+|Aria Fung|UI designer; developer; update meeting minutes; create scenarios; create risk log; reviewer|
+|Jiaxin Li|UI designer; developer; update meeting minutes; create Function Feasibility Investigation; reviewer|
+|Shuo Li|UI designer; developer; update meeting minutes; create Persona, Product Vison and Project Introduction; reviewer|
+|Zhimeng Zhu|UI designer; developer; update meeting minutes; create Persona, Product Vison and Project Introduction; reviewer|
+|Ricky Chen|UI designer; developer;update meeting minutes; create initial meeting minutes templates; create user stories; reviewer|
+|Yu Pan|UI designer; developer; update meeting minutes; create Function Feasibility Investigation; reviewer|
 ## User Stories, Personas, and Scenarios
 [User Stories](https://github.com/AriaFung/CoDesign-Project/tree/main/docs/User%20Story)
 <br>[Personas](https://github.com/AriaFung/CoDesign-Project/blob/main/docs/Persona%2C%20Product%20Vison%20and%20Project%20Introduction/Persona.md)
