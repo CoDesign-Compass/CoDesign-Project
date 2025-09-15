@@ -1,5 +1,6 @@
 # CoDesign-Project
 
+
 ## Project Introduction
 
 ### Background
@@ -26,3 +27,6 @@ CoDesignCompass aims to provide a simple, secure, and user-friendly platform to 
 - Engaged participants who are comfortable using online tools and want a structured, safe way to contribute detailed feedback, optionally track their input, and receive updates or small incentives.
 - Privacy-conscious or casual participants who prefer quick, anonymous contributions without logging in or sharing personal information.
 - Administrators and facilitators who need to manage secure publication of issues, collect anonymised responses reliably, and analyse patterns to identify emerging themes and gaps.
+
+## Wiki
+For detailed project documentation, including product backlog, user stories, risk log, and sprint retrospectives, please refer to our [wiki.md](https://github.com/AriaFung/CoDesign-Project/blob/main/wiki.md)
