@@ -15,7 +15,7 @@
 - **Name**: Michael  
 - **Age**: 63  
 - **Role**: Retired Veteran  
-- **Background**: Lives in regional New South Wales; spends time gardening, fishing, and attending local RSL club activities. Education ended after high school; not very tech-savvy; uses iPad mainly for news, emails, and occasional forum browsing.  
+- **Background**: Lives in Gold Coast; spends time gardening, fishing, and attending local RSL club activities. Education ended after high school; not very tech-savvy; uses iPad mainly for news, emails, and occasional forum browsing.  
 - **Goals**: Contribute his experiences and perspectives on policy issues in a quick and anonymous way.  
 - **Motivations**: Appreciates simple, no-login access; can answer questions without tracking or follow-up; able to share views efficiently.  
 - **Frustrations/Pain Points**: Online systems often too complex; dislikes giving personal info; concerned about privacy and security; prefers straightforward, low-effort interaction.
