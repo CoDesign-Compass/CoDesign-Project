@@ -12,9 +12,9 @@ The following is the UI design for admin side, for more details,please come to [
 ![componenent](images/admin-side/componenent.png)
 #### Mobile Version
 For more details and prototype flow,please come to [Codesign-admin side](https://www.figma.com/design/suJKLz1E8vvZfPvlhEDYhy/Codesign-admin-side?node-id=8-96&p=f&t=oq42ghN4njCTLuyB-0)
-**Light**
+<br>**Light**
 ![mobile-light](images/admin-side/mobile-light.png)
-**Dark**
+<br>**Dark**
 ![mobile-dark](images/admin-side/mobile-dark.png)
 
 
