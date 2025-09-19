@@ -17,7 +17,7 @@ For more details and prototype flow,please come to [Codesign-admin side](https:/
 <br>**Dark**
 ![mobile-dark](images/admin-side/mobile-dark.png)
 ### User side
-The following is the UI design for admin side, for more details,please come to [Codesign-user side](https://www.figma.com/design/uRo050ulyRaJAeWVkk0HEj/DashBoard-Layout?node-id=0-1&p=f&t=Wx1NQXHDRrdGkBqU-0)
+The following is the UI design for user side, for more details,please come to [Codesign-user side](https://www.figma.com/design/uRo050ulyRaJAeWVkk0HEj/DashBoard-Layout?node-id=0-1&p=f&t=Wx1NQXHDRrdGkBqU-0)
 
 
 
