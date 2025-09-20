@@ -2,9 +2,8 @@
 ## Date
 ## Loaction
 The Hive, Building 108, ANU
-
 ## Participants
-Ricky Chen, Jingwen Zhang, Yu Pan, Jiaxin Li, Shuo Li, Aria Fung, Zhimeng Zhu, Saswat Panda(tutor) / Heidi Prowse (Client)
+Ricky Chen, Jingwen Zhang, Yu Pan, Jiaxin Li, Shuo Li, Aria Fung, Zhimeng Zhu, Saswat Panda(tutor) / Heidi Prowse (client), Deep Gandhecha(client)
 ## Goals
 * 
 ## Discussion Topics
