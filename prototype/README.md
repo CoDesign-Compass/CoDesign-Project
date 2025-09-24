@@ -21,8 +21,24 @@ For more details and prototype flow,please come to [Codesign-admin side](https:/
 For more details and prototype flow,please come to [Codesign-admin side](https://www.figma.com/design/suJKLz1E8vvZfPvlhEDYhy/Codesign-admin-side?node-id=0-1&p=f&t=LAQjHdTZ3AjWwYQN-0)
 ![issue](images/admin-side/issue.png)
 ![dashBoard](images/admin-side/dashBoard.png)
+
+
 ### User side
 The following is the UI design for user side, for more details,please come to [Codesign-user side](https://www.figma.com/design/uRo050ulyRaJAeWVkk0HEj/DashBoard-Layout?node-id=0-1&p=f&t=Wx1NQXHDRrdGkBqU-0)
 
+#### Tokens & Componenet
+![design-reference](images/user-side/design_reference.png)
+![colour](images/user-side/color_basic.png)
+![dark-colour](images/user-side/color_night.png)
+![text-mobile](images/user-side/text_mobile.png)
+![text-pc](images/user-side/text_pc.png)
+![componenent](images/user-side/components.png)
 
+#### Mobile Version
+<br>**Light**
+![mobile-light](images/user-side/day_mobile.png)
+<br>**Dark**
+![mobile-dark](images/user-side/night_mobile.png)
 
+#### Desktop Version
+![pc](images/user-side/text_pc.png)
