@@ -1,44 +1,91 @@
-## This is guide for prototype of Compass Codesign.
-### Admin side
-The following is the UI design for admin side, for more details,please come to [Codesign-admin side](https://www.figma.com/design/suJKLz1E8vvZfPvlhEDYhy/Codesign-admin-side?node-id=8-96&p=f&t=oq42ghN4njCTLuyB-0)
-#### Tokens & Componenet
-![colour](images/admin-side/colour.png)
-![dark-colour](images/admin-side/dark-colour.png)
-![light-colour](images/admin-side/light-colour.png)
-![radius](images/admin-side/radius.png)
-![spacing](images/admin-side/spacing.png)
-![elevation](images/admin-side/elevation.png)
-![textType](images/admin-side/textType.png)
-![componenent](images/admin-side/componenent.png)
-#### Mobile Version
-For more details and prototype flow,please come to [Codesign-admin side](https://www.figma.com/design/suJKLz1E8vvZfPvlhEDYhy/Codesign-admin-side?node-id=8-96&p=f&t=oq42ghN4njCTLuyB-0)
-<br>**Light**
-![mobile-light](images/admin-side/mobile-light.png)
-<br>**Dark**
-![mobile-dark](images/admin-side/mobile-dark.png)
+# 🧭 Compass Codesign Prototype Guide
 
-#### Desktop Version
-For more details and prototype flow,please come to [Codesign-admin side](https://www.figma.com/design/suJKLz1E8vvZfPvlhEDYhy/Codesign-admin-side?node-id=0-1&p=f&t=LAQjHdTZ3AjWwYQN-0)
-![issue](images/admin-side/issue.png)
-![dashBoard](images/admin-side/dashBoard.png)
+This guide provides an overview of the UI design for both the Admin and User sides of the Compass Codesign prototype.
 
+---
 
-### User side
-The following is the UI design for user side, for more details,please come to [Codesign-user side](https://www.figma.com/design/uRo050ulyRaJAeWVkk0HEj/DashBoard-Layout?node-id=0-1&p=f&t=Wx1NQXHDRrdGkBqU-0)
+## 🔑 Admin Side
 
-#### Tokens & Componenet
-![design-reference](images/user-side/design_reference.png)
-![colour](images/user-side/color_basic.png)
-![dark-colour](images/user-side/color_night.png)
-![text-mobile](images/user-side/text_mobile.png)
-![text-pc](images/user-side/text_pc.png)
-![componenent](images/user-side/components.png)
+This section details the design system and layouts for the administrative interface.
 
-#### Mobile Version
-<br>**Light**
-![mobile-light](images/user-side/day_mobile.png)
-<br>**Dark**
-![mobile-dark](images/user-side/night_mobile.png)
+🔗 **View the full prototype and design flow on Figma: [Codesign - Admin Side](https://www.figma.com/design/suJKLz1E8vvZfPvlhEDYhy/Codesign-admin-side)**
 
-#### Desktop Version
-![pc](images/user-side/text_pc.png)
+### Design System (Tokens & Components)
+
+Here are the foundational elements of the admin interface design.
+
+* **Color Palettes:** Light, Dark, and Accent Colors
+    ![Colour Palette](images/admin-side/colour.png)
+    ![Dark Colour Palette](images/admin-side/dark-colour.png)
+    ![Light Colour Palette](images/admin-side/light-colour.png)
+* **Core Styles:** Radius, Spacing, Elevation, and Typography
+    ![Radius Values](images/admin-side/radius.png)
+    ![Spacing System](images/admin-side/spacing.png)
+    ![Elevation Shadows](images/admin-side/elevation.png)
+    ![Typography Scale](images/admin-side/textType.png)
+* **Components:** A collection of reusable UI elements.
+    ![UI Components](images/admin-side/componenent.png)
+
+### Mobile Version
+
+A responsive layout designed for smaller screens, available in both light and dark themes.
+
+**☀️ Light Mode**
+![Mobile Light Mode Preview](images/admin-side/mobile-light.png)
+
+**🌙 Dark Mode**
+![Mobile Dark Mode Preview](images/admin-side/mobile-dark.png)
+
+### Desktop Version
+
+The full-featured interface for larger screens, showcasing key pages like the issue tracker and dashboard.
+
+* **Issues Page**
+    ![Desktop Issues Page](images/admin-side/issue.png)
+* **Dashboard**
+    ![Desktop Dashboard](images/admin-side/dashBoard.png)
+
+---
+
+## 👥 User Side
+
+This section details the design system and layouts for the public-facing user interface.
+
+🔗 **View the full prototype and design flow on Figma: [Codesign - User Side](https://www.figma.com/design/uRo050ulyRaJAeWVkk0HEj/DashBoard-Layout)**
+
+### Design System (Tokens & Components)
+
+Here are the foundational elements of the user interface design.
+
+* **Design References & Colors:**
+    ![Design Reference Moodboard](images/user-side/design_reference.png)
+    ![Base Colour Palette](images/user-side/color_basic.png)
+    ![Night Mode Colour Palette](images/user-side/color_night.png)
+
+---
+
+* **Typography:** Separate scales for mobile and desktop for optimal readability.
+    ![Mobile Typography](images/user-side/text_mobile.png) | ![Desktop Typography](images/user-side/text_pc.png)
+
+---
+
+* **Components:** A collection of reusable UI elements.
+    ![UI Components](images/user-side/components.png)
+
+---
+
+### Mobile Version
+
+The user-facing interface optimized for mobile devices.
+
+**☀️ Light Mode**
+![User Mobile Light Mode](images/user-side/day_mobile.png)
+
+**🌙 Dark Mode**
+![User Mobile Dark Mode](images/user-side/night_mobile.png)
+
+### Desktop Version
+
+The primary user experience for desktop users.
+
+![Desktop Version Preview](images/user-side/desktop.png)
