@@ -55,28 +55,31 @@ This section details the design system and layouts for the public-facing user in
 
 ### Design System (Tokens & Components)
 
-Here are the foundational elements of the user interface design.
+Here are the foundational elements of the user interface design.  
 
-* **Design References & Colors:**
+
+* **Design References & Colors:**  
+
     ![Design Reference Moodboard](images/user-side/design_reference.png)
     ![Base Colour Palette](images/user-side/color_basic.png)
     ![Night Mode Colour Palette](images/user-side/color_night.png)
 
 ---
 
-* **Typography:** Separate scales for mobile and desktop for optimal readability.
-    ![Mobile Typography](images/user-side/text_mobile.png) | ![Desktop Typography](images/user-side/text_pc.png)
+* **Typography:** Separate scales for mobile and desktop for optimal readability.  
 
----
+    ![Mobile Typography](images/user-side/text_mobile.png)
+    ![Desktop Typography](images/user-side/text_pc.png)  
 
-* **Components:** A collection of reusable UI elements.
-    ![UI Components](images/user-side/components.png)
 
----
+* **Components:** A collection of reusable UI elements.  
+
+    ![UI Components](images/user-side/components.png)  
+
 
 ### Mobile Version
 
-The user-facing interface optimized for mobile devices.
+The user-facing interface optimized for mobile devices.  
 
 **☀️ Light Mode**
 ![User Mobile Light Mode](images/user-side/day_mobile.png)
