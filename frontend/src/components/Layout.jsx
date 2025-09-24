@@ -11,13 +11,10 @@ export default function Layout({ children }) {
                 }}
             >
                 <img
-                    src="/logo192.png" // 先用 React 默认 logo 占位，后面换成你们的 logo
+                    src="/logo192.png" // 占位，用你们的 logo 文件替换
                     alt="Purpose Media Logo"
-                    style={{ height: "50px", marginBottom: "0.5rem" }}
+                    style={{ height: "50px" }}
                 />
-                <h2 style={{ color: "#ffe071", margin: 0 }}>
-                    Lived Experience Profile Builder
-                </h2>
             </header>
 
             {/* Main content */}
