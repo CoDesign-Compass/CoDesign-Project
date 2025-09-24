@@ -103,11 +103,11 @@ This section highlights additional design work focused on interaction and access
     - **Disabled** – reduced emphasis for unavailable actions  
 
 * **Key Buttons Examples:**  
-![BackButton](images/user-side/BackButton.png)
-![JoinUsButton](images/user-side/JoinUsButton.png)
-![LoginButton](images/user-side/LoginButton.png)
-![NextButton](images/user-side/NextButton.png)
-![SignUpButton](images/user-side/SignUpButton.png)
-![SubmitButton](images/user-side/SubmitButton.png)
-![StartButton](images/user-side/StartButton.png)
+<img src="images/user-side/BackButton.png" alt="BackButton" width="100"/>
+<img src="images/user-side/JoinUsButton.png" alt="JoinUsButton" width="100"/>
+<img src="images/user-side/LoginButton.png" alt="LoginButton" width="100"/>
+<img src="images/user-side/NextButton.png" alt="NextButton" width="100"/>
+<img src="images/user-side/SignUpButton.png" alt="SignUpButton" width="100"/>
+<img src="images/user-side/SubmitButton.png" alt="SubmitButton" width="100"/>
+<img src="images/user-side/StartButton.png" alt="StartButton" width="100"/>
 
