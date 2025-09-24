@@ -16,6 +16,11 @@ For more details and prototype flow,please come to [Codesign-admin side](https:/
 ![mobile-light](images/admin-side/mobile-light.png)
 <br>**Dark**
 ![mobile-dark](images/admin-side/mobile-dark.png)
+
+#### Desktop Version
+For more details and prototype flow,please come to [Codesign-admin side](https://www.figma.com/design/suJKLz1E8vvZfPvlhEDYhy/Codesign-admin-side?node-id=0-1&p=f&t=LAQjHdTZ3AjWwYQN-0)
+![issue](images/admin-side/issue.png)
+![dashBoard](images/admin-side/dashBoard.png)
 ### User side
 The following is the UI design for user side, for more details,please come to [Codesign-user side](https://www.figma.com/design/uRo050ulyRaJAeWVkk0HEj/DashBoard-Layout?node-id=0-1&p=f&t=Wx1NQXHDRrdGkBqU-0)
 
