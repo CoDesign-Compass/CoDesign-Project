@@ -92,3 +92,22 @@ The user-facing interface optimized for mobile devices.
 The primary user experience for desktop users.
 
 ![Desktop Version Preview](images/user-side/desktop.png)
+
+### Button States 
+
+This section highlights additional design work focused on interaction and accessibility.  
+
+* **Button States (MD3 Spec):**  
+    - **Default** – clear, ready-to-use state  
+    - **Pressed** – visual feedback on interaction  
+    - **Disabled** – reduced emphasis for unavailable actions  
+
+* **Key Buttons Examples:**  
+![BackButton](images/user-side/BackButton.png)
+![JoinUsButton](images/user-side/JoinUsButton.png)
+![LoginButton](images/user-side/LoginButton.png)
+![NextButton](images/user-side/NextButton.png)
+![SignUpButton](images/user-side/SignUpButton.png)
+![SubmitButton](images/user-side/SubmitButton.png)
+![StartButton](images/user-side/StartButton.png)
+
