@@ -5,10 +5,10 @@ This is the central documentation hub for CoDesign Compass.
 |---|---|
 |Project Overview|1. Project Introduction<br>2. Project Vision<br>3. Programming Language<br>4.Team Members|
 |Web Design|5. User Stories, Personas, and Scenarios|
-|Planning & Execution|6. Product Backlog<br>7. Risk Log<br>8. Reflection Log<br>9. Milestone Timeline|
-|Sprint Retrospectives|10. Sprints|
-|Meeting Minutes|11. Meeting Records|
-|Monitor|12.Team velocity|
+|Planning & Execution|6. Product Backlog<br>7. Risk Log<br>8. Reflection Log<br>9. Project Challenges<br>10. Milestone Timeline|
+|Sprint Retrospectives|11. Sprints|
+|Meeting Minutes|12. Meeting Records|
+|Monitor|13.Team velocity|
 ## Project Introduction
 [Project Introduction](https://github.com/AriaFung/CoDesign-Project/blob/main/docs/Persona%2C%20Product%20Vison%20and%20Project%20Introduction/Project%20Introduction.md)
 ## Project Vision
@@ -37,6 +37,8 @@ Frontend: CSS, HTML, React
 [Risk Log](https://github.com/AriaFung/CoDesign-Project/blob/main/docs/Risk%20Log.md)
 ## Reflection Log
 [Reflection Log](https://docs.google.com/spreadsheets/d/1j3KESnjifrTIJHNH4RRaIiC9WncQWomgvNMwD6_TI6w/edit?gid=0#gid=0)
+## Project Challenges
+[Project Challenges](https://docs.google.com/spreadsheets/d/16jc8d0YwhQucPDjBy0_emXc9xg4NuJ7S2xdiqBO-79M/edit?gid=0#gid=0)
 ## Milestone Timeline
 |Milestone|Sprint|Due Date|Note|
 |----|----|----|---|
