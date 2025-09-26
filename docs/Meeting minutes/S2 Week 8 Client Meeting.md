@@ -1,4 +1,4 @@
-# S2 Week x xxx Meeting
+# S2 Week 8 Client Meeting
 ## Date
 
 25 Sep, 2025
