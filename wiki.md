@@ -63,7 +63,7 @@ Frontend: CSS, HTML, React
 |week 5|[S2 Week5 Client Meeting](https://github.com/AriaFung/CoDesign-Project/blob/main/docs/Meeting%20minutes/S2%20Week5%20Client%20Meeting.md)<br>[S2 Week5 Tutoring Meeting](https://github.com/AriaFung/CoDesign-Project/blob/main/docs/Meeting%20minutes/S2%20Week%205%20Tutoring%20Meeting.md)<br>[S2 Week5 Team Meeting](https://github.com/AriaFung/CoDesign-Project/blob/main/docs/Meeting%20minutes/S2%20Week5%20Team%20Metting.md)|
 |week 6|[S2 Week6 Client Meeting](https://github.com/AriaFung/CoDesign-Project/blob/main/docs/Meeting%20minutes/S2%20Week%206%20Client%20Meeting.md)<br>[S2 Week6 Tutoring Meeting](https://github.com/AriaFung/CoDesign-Project/blob/main/docs/Meeting%20minutes/S2%20Week%206%20Tutor%20meeting.md)<br>[S2 Week6 Team Meeting](https://github.com/AriaFung/CoDesign-Project/blob/main/docs/Meeting%20minutes/S2%20Week%206%20Tutor%20meeting.md)|
 |week 7|[S2 Week7 Client Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S2%20Week%207%20Client%20Meeting.md)<br>[S2 Week7 Tutoring Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S2%20Week%207%20Tutoring%20Meeting.md)<br>[S2 Week7 Team Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S2%20Week%207%20Team%20Meeting%20.md)|
-|week 8||
+|week 8|[S2 Week8 Client Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S2%20Week%208%20Client%20Meeting.md)<br>[S2 Week8 Team Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S2%20Week%208%20Team%20Meeting.md)||
 |week 9||
 |week 10||
 |week 11||
