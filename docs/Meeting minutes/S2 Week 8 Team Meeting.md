@@ -32,15 +32,15 @@ Overall grade target: 70+.
 Reflection log will consolidate issues, improvements, and feedback.
 
 ## Task Allocations & Action Item
-|Action Items|Assignee|Due Date|
-|---|---|---|
-|Develop Profile page|Ricky, Zhimeng|Week 9|
-|Develop Login Page|Aria|Week 9|
-|Develop "Why & What" page|Yu, Jiaxin|Week 9|
-|Develop Start & End pages|Jingwen|Week 9|
-|Prepare Logo and global theme (colors, fonts)|Shuo|Week 9|
-|Prepare PPT|Yu, Aria, Ricky, Jingwen|Week 9|
-|Add CI/CD|Zhimeng|Week 9|
-|Create and update reflection log/checklists|Zhimeng|Week 9|
-|Sprint Review preparation|Team|Week 9|
+|Action Items|Assignee|Due Date|Issue|
+|---|---|---|---|
+|Develop Profile page|Ricky, Zhimeng|Wed, Week 9|#43|
+|Develop Login Page|Aria|Wed, Week 9|#52|
+|Develop "Why & What" page|Yu, Jiaxin|Wed, Week 9|#53|
+|Develop Start & End pages|Jingwen|Wed, Week 9|#44|
+|Prepare Logo and global theme (colors, fonts)|Shuo|Wed, Week 9|#45|
+|Prepare PPT|Yu, Aria, Ricky, Jingwen|Wed, Week 9|#46|
+|Add CI/CD|Zhimeng|Wed, Week 9|#51|
+|Create and update reflection log/checklists|Zhimeng|Wed, Week 9|#42|
+|Sprint Review preparation|Team|Wed, Week 9||
 
