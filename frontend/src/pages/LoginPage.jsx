@@ -4,8 +4,8 @@ export default function Login({ mode = "create", onSubmit }){
     const [form, setForm] = useState({
         username:" ",
         email: " ",
-        password: " ",
-        confirm: " ",
+        password: "",
+        confirm: "",
         subscribe: true,
     });
 
