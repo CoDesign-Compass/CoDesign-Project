@@ -24,7 +24,7 @@ Frontend: CSS, HTML, React
 |Aria Fung|UI designer; developer; update meeting minutes; create scenarios; create risk log; reviewer; maintain logs|
 |Jiaxin Li|UI designer; developer; update meeting minutes; create Function Feasibility Investigation; reviewer; maintain logs|
 |Shuo Li|UI designer; developer; create Persona, Product Vison and Project Introduction; reviewer; maintain logs|
-|Zhimeng Zhu|UI designer; developer; update meeting minutes; create Persona, Product Vison and Project Introduction; reviewer; maintain logs|
+|Zhimeng Zhu|team meeting leader;UI designer; developer; update meeting minutes; create Persona, Product Vison and Project Introduction; reviewer; maintain logs|
 |Ricky Chen|UI designer; developer;update meeting minutes; create initial meeting minutes templates; create user stories; reviewer; maintain logs|
 |Yu Pan|UI designer; developer; update meeting minutes; create Function Feasibility Investigation; reviewer; maintain logs|
 ## User Stories, Personas, and Scenarios
@@ -50,11 +50,11 @@ Frontend: CSS, HTML, React
 |Interaction Implementation|Sprint 4|12 March 2026||
 |Back-end implementation & Test|Sprint 5,6|7 May 2026||
 ## Sprints
-|Sprint|Goals|Due Date|Sprint Review&Retro Meeting|
-|----|----|----|---|
-|Sprint 1|1.Set up<br>2.deliver user story, persona, scenario, product vision<br>3.Deliever a low-fidelity UI prototype|21 Aug 2025|--|
-|Sprint 2|1.Adopt Material Design 3 (MD3) across the prototype<br>2.Implement frontend UI work without interaction(user end)|2 Oct 2025||
-|Sprint 3||23 Oct 2025||
+|Sprint|Goals|Due Date|Sprint Review&Retro Meeting|Pre slides|
+|----|----|----|---|---|
+|Sprint 1|1.Set up<br>2.deliver user story, persona, scenario, product vision<br>3.Deliever a low-fidelity UI prototype|21 Aug 2025|--|--|
+|Sprint 2|1.Adopt Material Design 3 (MD3) across the prototype<br>2.Implement frontend UI work without interaction(user end)|2 Oct 2025||[sprint 2 slides](canva.com/design/DAGz8eY40TQ/qhAQETG0Ld8WvToFRh5nmQ/edit?utm_source=shareButton&utm_medium=email&utm_campaign=designshare)|
+|Sprint 3||23 Oct 2025|||
 ## Meeting Records
 [Scribe Record](https://docs.google.com/spreadsheets/d/1S0wbxD3qdw5VT001IVuKAfbjTX7lGPsIckci2tuJUc4/edit?gid=0#gid=0)
 |2025 S2|meeting minutes|
@@ -81,8 +81,14 @@ Frontend: CSS, HTML, React
 ### Sprint 2
 | Task| Estimate (Story Points) | 
 |----|----|
-|||
-|**Total** ||
+|Meeting minutes|2 SP|
+|Risk log & reflection log|2 SP|
+|Prepare presentation slides|4 SP|
+|Refine Figma Prototype (following MD3)|10 SP|
+|User Pages Framework Construction |4 SP|
+|Implement frontend UI work without interaction(user end pages)|20 SP|
+|Add CI/CD|2 SP|
+|**Total** |44 SP|
 ### Sprint 3
 | Task| Estimate (Story Points) |
 |----|----|
