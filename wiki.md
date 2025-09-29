@@ -53,7 +53,7 @@ Frontend: CSS, HTML, React
 |Sprint|Goals|Due Date|Sprint Review&Retro Meeting|Pre slides|
 |----|----|----|---|---|
 |Sprint 1|1.Set up<br>2.deliver user story, persona, scenario, product vision<br>3.Deliever a low-fidelity UI prototype|21 Aug 2025|--|--|
-|Sprint 2|1.Adopt Material Design 3 (MD3) across the prototype<br>2.Implement frontend UI work without interaction(user end)|2 Oct 2025||[sprint 2 slides](canva.com/design/DAGz8eY40TQ/qhAQETG0Ld8WvToFRh5nmQ/edit?utm_source=shareButton&utm_medium=email&utm_campaign=designshare)|
+|Sprint 2|1.Adopt Material Design 3 (MD3) across the prototype<br>2.Implement frontend UI work without interaction(user end)|2 Oct 2025||[sprint 2 slides](https://www.canva.com/design/DAGz8eY40TQ/qhAQETG0Ld8WvToFRh5nmQ/edit?utm_content=DAGz8eY40TQ&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)|
 |Sprint 3||23 Oct 2025|||
 ## Meeting Records
 [Scribe Record](https://docs.google.com/spreadsheets/d/1S0wbxD3qdw5VT001IVuKAfbjTX7lGPsIckci2tuJUc4/edit?gid=0#gid=0)
