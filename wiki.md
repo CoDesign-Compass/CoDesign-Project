@@ -41,15 +41,16 @@ Frontend: CSS, HTML, React
 ## Project Challenges
 [Project Challenges](https://docs.google.com/spreadsheets/d/16jc8d0YwhQucPDjBy0_emXc9xg4NuJ7S2xdiqBO-79M/edit?gid=0#gid=0)
 ## Milestone Timeline
-|Milestone|Sprint|Due Date|Note|
-|----|----|----|---|
-|2025 S2|---|---|---|
-|Setup and user story, persona, scenario, product vision|Sprint 1|21 Aug 2025||
-|Prototype & UI Design|Sprint 1,2|2 Oct 2025|need to adopt Material Design 3 (from sprint 1 feedback of tutor)|
-|Mobile & Web UI Implementation|Sprint 3|23 Oct 2025||
-|2026 S1|---|---|---|
-|Interaction Implementation|Sprint 4|12 March 2026||
-|Back-end implementation & Test|Sprint 5,6|7 May 2026||
+|Milestone|Sprint|Due Date|
+|----|----|----|
+|2025 S2|---|---|
+|Setup and user story, persona, scenario, product vision|Sprint 1|21 Aug 2025|
+|Sprint 1: Prototype & UI Design|Sprint 1|21 Aug 2025|
+|Sprint 2: MD3 & Implement front-end UI interface for client-end(excluding interactive functionality)|Sprint 2|2 Oct 2025|
+|Mobile & Web UI Implementation|Sprint 3|23 Oct 2025|
+|2026 S1|---|---|
+|Interaction Implementation|Sprint 4|12 March 2026|
+|Back-end implementation & Test|Sprint 5,6|7 May 2026|
 ## Sprints
 |Sprint|Goals|Due Date|Sprint Review&Retro Meeting|Pre slides|
 |----|----|----|---|---|
