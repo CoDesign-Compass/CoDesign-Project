@@ -23,18 +23,21 @@ jobs:
         with:
           node-version: '20' 
           cache: 'npm'
+          cache-dependency-path: front-end/package-lock.json
 
       - name: Install dependencies 
         run: npm install # Install project dependencies
+        working-directory: ./front-end
 
       - name: Run Build
         run: npm run build # Build the React app
+        working-directory: ./front-end
 
       - name: Upload production artifact 
         uses: actions/upload-artifact@v4 # Save the generated static files
         with:
           name: production-build
-          path: build
+          path: front-end/build
 
   # ------------------------------------
   # Task 2: CD - Deploy to GitHub Pages
@@ -49,10 +52,10 @@ jobs:
         uses: actions/download-artifact@v4 # 1. download the artifact from previous job
         with:
           name: production-build
-          path: build
+          path: ./build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3 # 2. deploy to GitHub Pages
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }} # use the automatically generated token
-          publish_dir: ./build
+          publish_dir: production-build
