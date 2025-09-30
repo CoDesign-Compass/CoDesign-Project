@@ -1,4 +1,3 @@
-import Layout from "../components/Layout";
 
 export default function WhyPage() {
     const questions = Array(5).fill("Write in your own words. No names or identifiers.");
@@ -9,7 +8,10 @@ export default function WhyPage() {
                 <p><strong>Why does this issue matter to you?</strong></p>
 
                 {questions.map((placeholder, i) => (
-                    <div key={i} style={{ display: "flex", gap: "10px", marginBottom: "1rem" }}>
+                    <div
+                        key={i}
+                        style={{ display: "flex", gap: "10px", marginBottom: "1rem" }}
+                    >
                         <input
                             type="text"
                             placeholder={placeholder}
@@ -20,17 +22,20 @@ export default function WhyPage() {
                                 border: "1px solid #ccc"
                             }}
                         />
-                        <button
-                            style={{
-                                background: "#ffe071",
-                                border: "none",
-                                borderRadius: "6px",
-                                padding: "0.75rem 1rem",
-                                cursor: "pointer"
-                            }}
-                        >
-                            I don’t know.
-                        </button>
+                        {/* 只有第一个输入框 (i===0) 不显示按钮 */}
+                        {i > 0 && (
+                            <button
+                                style={{
+                                    background: "#ffe071",
+                                    border: "none",
+                                    borderRadius: "6px",
+                                    padding: "0.75rem 1rem",
+                                    cursor: "pointer"
+                                }}
+                            >
+                                I don’t know.
+                            </button>
+                        )}
                     </div>
                 ))}
             </div>
