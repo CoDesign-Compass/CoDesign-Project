@@ -36,7 +36,8 @@ Frontend: CSS, HTML, React
 ## Risk Log
 [Risk Log](https://github.com/AriaFung/CoDesign-Project/blob/main/docs/Risk%20Log.md)
 ## Reflection Log
-[Reflection Log](https://docs.google.com/spreadsheets/d/1j3KESnjifrTIJHNH4RRaIiC9WncQWomgvNMwD6_TI6w/edit?gid=0#gid=0)
+[Reflection Log(8/28-9/18)](https://docs.google.com/spreadsheets/d/1j3KESnjifrTIJHNH4RRaIiC9WncQWomgvNMwD6_TI6w/edit?gid=0#gid=0)
+<br>After 9/18, move Reflection Log to [Reflective Execution](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Reflective%20Execution.md)
 ## Project Challenges
 [Project Challenges](https://docs.google.com/spreadsheets/d/16jc8d0YwhQucPDjBy0_emXc9xg4NuJ7S2xdiqBO-79M/edit?gid=0#gid=0)
 ## Milestone Timeline
