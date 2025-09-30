@@ -2,12 +2,11 @@ import { useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 
 /**
- * WelcomePage (5 sections)
- * 1) Logo
- * 2) Banner image + Title
- * 3) Start button block (navigate)
- * 4) Login block (navigate)
- * 5) Help "?" button (bottom-right)
+ * WelcomePage (4 sections)
+ * 1) Banner image + Title
+ * 2) Start button block (navigate)
+ * 3) Login block (navigate)
+ * 4) Help "?" button (bottom-right)
  */
 export default function WelcomePage() {
   const [open, setOpen] = useState(false);
@@ -28,17 +27,15 @@ export default function WelcomePage() {
 
   return (
     <div className="Welcome page" style={{
-        background: "#000",
+        background: "#303030",
         display: "flex",
         flexDirection: "column",
       }}>
 
-      {/* 1) Logo */}
-      <section style={{ margin: "40px auto", display: "grid", placeItems: "center"}}>
-        <img src="/logo.png" alt="Information" style={{ height: 50 }} />
+      <section style={{ margin: "50px auto", display: "grid", placeItems: "center"}}>
       </section>
 
-      {/* 2) banner + Title */}
+      {/* 1) banner + Title */}
       <section className="banner" style={{
           margin: 0,
           width: "100%",
@@ -57,7 +54,7 @@ export default function WelcomePage() {
         </div>
       </section>
 
-      {/* 3) Start button block */}
+      {/* 2) Start button block */}
       <section className="start-button" style={{marginBottom:"40px",marginTop:"80px", display: "grid", placeItems: "center"}}>
         <button
           /*onClick change colour*/
@@ -69,7 +66,7 @@ export default function WelcomePage() {
         </button>
       </section>
 
-      {/* 4) Login block */}
+      {/* 3) Login block */}
       <section className="login-link" style={{display: "grid",marginBottom:"50px", placeItems: "center" }}>
         <div >
           <button
@@ -91,7 +88,7 @@ export default function WelcomePage() {
         </div>
       </section>
 
-      {/* 5) Help / "?" button */}
+      {/* 4) Help / "?" button */}
       <div style={{ display: "flex", justifyContent: "flex-end", margin: "20px 30px 20px" }}>
         <div ref={popRef} style={{ position: "relative" }}>
           <button
