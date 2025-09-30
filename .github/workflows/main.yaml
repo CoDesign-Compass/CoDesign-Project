@@ -29,8 +29,6 @@ jobs:
 
       - name: Run Build
         run: npm run build # Build the React app
-        env:
-          # REACT_APP_API_URL: ${{ secrets.PROD_API_URL }} 
 
       - name: Upload production artifact 
         uses: actions/upload-artifact@v4 # Save the generated static files
