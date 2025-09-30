@@ -5,7 +5,7 @@ export default function Layout({ children }) {
     const navigate = useNavigate();
 
     // 定义页面顺序
-    const pages = ["/profile", "/why", "/how", "/thankyou"];
+    const pages = ["/","/profile", "/why", "/how", "/thankyou"];
     const currentIndex = pages.indexOf(location.pathname);
 
     const goBack = () => {
@@ -28,7 +28,6 @@ export default function Layout({ children }) {
                     backgroundColor: "#fff",
                     padding: "1rem",
                     textAlign: "center",
-                    borderBottom: "1px solid #eee"
                 }}
             >
                 <img
@@ -39,7 +38,7 @@ export default function Layout({ children }) {
             </header>
 
             {/* Main content */}
-            <main style={{ minHeight: "70vh", padding: "2rem" }}>
+            <main style={{ minHeight: "70vh"}}>
                 {children}
             </main>
 
