@@ -3,11 +3,10 @@ import { useState, useRef, useEffect } from "react";
 
 /**
  * ThankyouPage (5 sections)
- * 1) Logo
- * 2) Banner image + Title
- * 3) Subscribe block
- * 4) Join us block (navigate)
- * 5) Help "?" button (bottom-right)
+ * 1) Banner image + Title
+ * 2) Subscribe block
+ * 3) Join us block (navigate)
+ * 4) Help "?" button (bottom-right)
  */
 export default function ThankPage() {
   const [open, setOpen] = useState(false);
@@ -32,24 +31,22 @@ export default function ThankPage() {
   const onSubmit = (e) => {
     e.preventDefault();
     if (!email) return;
-    localStorage.setItem("email", email);   // 这里换成你的提交逻辑即可
+    localStorage.setItem("email", email);
     alert("Email saved: " + email);
     setEmail("");
   };
 
   return (
     <div className="Welcome page" style={{
-        background: "#000",
+        background: "#303030",
         display: "flex",
         flexDirection: "column",
       }}>
 
-      {/* 1) Logo */}
-      <section style={{ margin: "40px auto", display: "grid", placeItems: "center"}}>
-        <img src="/logo.png" alt="Information" style={{ height: 50 }} />
+      <section style={{ margin: "50px auto", display: "grid", placeItems: "center"}}>
       </section>
 
-      {/* 2) banner + Title */}
+      {/* 1) banner + Title */}
       <section className="banner" style={{
           margin: 0,
           width: "100%",
@@ -71,7 +68,7 @@ export default function ThankPage() {
         </div>
       </section>
 
-      {/* 3) subscribe block */}
+      {/* 2) subscribe block */}
       <section style={{
         margin: "32px auto",
         textAlign: "centre",
@@ -196,7 +193,7 @@ export default function ThankPage() {
       </div>
       </section>
 
-      {/* 4) Join button block */}
+      {/* 3) Join button block */}
       <section className="join-button" style={{margin:"30px", display: "grid", placeItems: "center"}}>
         <button
          /*onClick change colour*/
@@ -217,7 +214,7 @@ export default function ThankPage() {
         </button>
       </section>
 
-      {/* 5) Help / "?" button */}
+      {/* 4) Help / "?" button */}
       <div style={{ display: "flex", justifyContent: "flex-end", margin: "20px 30px 10px" }}>
         <div ref={popRef} style={{ position: "relative" }}>
           <button
