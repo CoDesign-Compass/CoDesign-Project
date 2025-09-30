@@ -25,17 +25,17 @@ jobs:
 
       - name: Install dependencies 
         run: npm ci # Install project dependencies
-        working-directory: front-end
+        working-directory: frontend
 
       - name: Run Build
         run: npm run build # Build the React app
-        working-directory: front-end
+        working-directory: frontend
 
       - name: Upload production artifact 
         uses: actions/upload-artifact@v4 # Save the generated static files
         with:
           name: production-build
-          path: front-end/build
+          path: frontend/build
 
   # ------------------------------------
   # Task 2: CD - Deploy to GitHub Pages
@@ -56,4 +56,4 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3 # 2. deploy to GitHub Pages
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }} # use the automatically generated token
-          publish_dir: build_artifact/front-end/build
+          publish_dir: build_artifact/frontend/build
