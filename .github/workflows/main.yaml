@@ -4,7 +4,7 @@ name: React CI/CD to GitHub Pages
 
 on:
   push:
-    branches: [ "main", "51-add-cicd" ] # listen to main 和 51-add-cicd branches
+    branches: [ "main" ] # listen to main 和 51-add-cicd branches
   pull_request:
     branches: [ "main" ]
 
@@ -40,20 +40,20 @@ jobs:
   # ------------------------------------
   # Task 2: CD - Deploy to GitHub Pages
   # ------------------------------------
-  deploy:
-    needs: build_and_test
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/51-add-cicd'
+  # deploy:
+  #   needs: build_and_test
+  #   if: github.ref == 'refs/heads/main'
 
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download production artifact
-        uses: actions/download-artifact@v4 # 1. download the artifact from previous job
-        with:
-          name: production-build
-          path: build_artifact
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Download production artifact
+  #       uses: actions/download-artifact@v4 # 1. download the artifact from previous job
+  #       with:
+  #         name: production-build
+  #         path: build_artifact
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3 # 2. deploy to GitHub Pages
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }} # use the automatically generated token
-          publish_dir: build_artifact/frontend/build
+  #     - name: Deploy to GitHub Pages
+  #       uses: peaceiris/actions-gh-pages@v3 # 2. deploy to GitHub Pages
+  #       with:
+  #         github_token: ${{ secrets.GITHUB_TOKEN }} # use the automatically generated token
+  #         publish_dir: build_artifact/frontend/build
