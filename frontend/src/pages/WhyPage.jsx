@@ -4,7 +4,6 @@ export default function WhyPage() {
     const questions = Array(5).fill("Write in your own words. No names or identifiers.");
 
     return (
-        <Layout>
             <div style={{ maxWidth: "600px", margin: "0 auto" }}>
                 <h2>Step 2 of 5</h2>
                 <p><strong>Why does this issue matter to you?</strong></p>
@@ -35,6 +34,5 @@ export default function WhyPage() {
                     </div>
                 ))}
             </div>
-        </Layout>
     );
 }
