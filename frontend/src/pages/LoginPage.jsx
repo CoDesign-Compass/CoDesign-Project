@@ -1,139 +1,370 @@
-import React, { useState } from "react";
+// frontend/src/pages/LoginPage.jsx
+import React, { useEffect, useRef, useState } from "react";
 
-export default function Login({ mode = "create", onSubmit }){
-    const [form, setForm] = useState({
-        username:" ",
-        email: " ",
-        password: "",
-        confirm: "",
-        subscribe: true,
-    });
+export default function LoginPage({ mode = "create", onSubmit: onSubmitProp }) {
+  const [form, setForm] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirm: "",
+    subscribe: false, 
+  });
+  const [showPw, setShowPw] = useState(false);
 
-    const isCreate = mode === "create";
-
-    const handleChange = (k) => (e) =>
-        setForm((s) => ({...s, [k]: e.target.type === "checkbox" ? e.target.checked : e.target.value }));
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if(isCreate && form.password !== form.confirm){
-            alert("Password do not match.");
-            return;
-        }
-        onSubmit?.(form);
+  // Help bubble
+  const [open, setOpen] = useState(false);
+  const popRef = useRef(null);
+  useEffect(() => {
+    const onDown = (e) => {
+      if (popRef.current && !popRef.current.contains(e.target)) setOpen(false);
     };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, []);
 
-    return (
-        <div className="c-login" data-testid="login-page">
-            <header className="c-login__header">
-                <div className="c-login__logo" aria-label="Purpose Media logo" />
-                 <div className="c-login__banner">
-                     <h1 className="c-login__title">{isCreate ? "Create Account" : "Sign In"}</h1>
+  const change = (k) => (e) =>
+    setForm((f) => ({
+      ...f,
+      [k]: e.target.type === "checkbox" ? e.target.checked : e.target.value,
+    }));
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (mode === "create" && form.password !== form.confirm) {
+      alert("Passwords do not match.");
+      return;
+    }
+    onSubmitProp?.(form);
+  };
+
+  return (
+    <div
+      className="CreateAccount page"
+      style={{
+        minHeight: "100svh",
+        background: "#303030",
+        color: "#303030",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      {/* hide label helper class from user */}
+      <style>{`
+        .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,1px,1px);white-space:nowrap;border:0;}
+        .input{width:100%;height:44px;border-radius:8px;border:1px solid #d8d8d8;background:#fff;color:#111;padding:0 44px 0 12px;font-size:16px;outline:none;}
+        .input:focus{border-color:#7aa2ff;}
+      `}</style>
+
+      {/* Logo */}
+      <header style={{ background: "#303030", boxShadow: "0 1px 0 rgba(0,0,0,.06)" }}>
+        <div style={{ height: 80, display: "grid", placeItems: "center" }}>
+          <img src="/logo.png" alt="Purpose Media" style={{ height: 50 }} />
+        </div>
+      </header>
+
+      {/* dark background */}
+      <div style={{ background: "#303030", color: "#fff" }}>
+        <section
+          style={{
+            width: "100vw",
+            marginLeft: "calc(50% - 50vw)", 
+            marginRight: "calc(50% - 50vw)",
+            height: 120,
+            backgroundImage: "url(/Banner.png)", 
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            display: "grid",
+            placeItems: "center",
+            textAlign: "center",
+          }}
+        >
+          <h1
+            style={{
+              margin: 0,
+              fontSize: 44, 
+              color: "#BFC8FF",
+              letterSpacing: 1,
+              textShadow: "0 1px 2px rgba(0,0,0,.35)",
+            }}
+          >
+            Create Account
+          </h1>
+        </section>
+
+        {/* body of the form */}
+        <main style={{ 
+            width:"100%", 
+            display:"grid", 
+            placeItems:"center", 
+            padding:"28px 12px 32px" }}>
+
+          <form
+            onSubmit={handleSubmit}
+            noValidate
+            style={{
+              width: "min(560px, 92vw)",
+              display: "grid",
+              gap: 16,
+            }}
+          >
+            {/* Username */}
+            {mode === "create" && (
+              <div style={{ display: "grid", gap: 6 }}>
+                <label className="sr-only" htmlFor="username">
+                  Username
+                </label>
+                <div style={{ position: "relative" }}>
+                  <input
+                    id="username"
+                    className="input"
+                    value={form.username}
+                    onChange={change("username")}
+                    placeholder="Username"
+                    autoComplete="username"
+                  />
+                  {!!form.username && (
+                    <button
+                      type="button"
+                      aria-label="Clear"
+                      onClick={() => setForm((f) => ({ ...f, username: "" }))}
+                      style={suffixBtn(12)}
+                    >
+                      ×
+                    </button>
+                  )}
                 </div>
-            </header>
+              </div>
+            )}
 
-            <main className="c-login__main">
-                 <section className="c-card c-login__form-card">
-                    <form className="c-form" onSubmit={handleSubmit} noValidate>
-                        {isCreate && (
-                            <FormField
-                                id="username"
-                                label="Username"
-                                value={form.username}
-                                onChange={handleChange("username")}
-                                autoComplete="username"
-                            />
-                             )}
+            {/* Email */}
+            <div style={{ display: "grid", gap: 6 }}>
+              <label className="sr-only" htmlFor="email">
+                Email
+              </label>
+              <div style={{ position: "relative" }}>
+                <input
+                  id="email"
+                  type="email"
+                  className="input"
+                  value={form.email}
+                  onChange={change("email")}
+                  placeholder="Email"
+                  autoComplete="email"
+                />
+                {!!form.email && (
+                  <button
+                    type="button"
+                    aria-label="Clear"
+                    onClick={() => setForm((f) => ({ ...f, email: "" }))}
+                    style={suffixBtn(12)}
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+            </div>
 
-                            <FormField
-                                id="email"
-                                type="email"
-                                label="Email"
-                                value={form.email}
-                                onChange={handleChange("email")}
-                                autoComplete="email"
-                                />
+            {/* Password */}
+            <div style={{ display: "grid", gap: 6 }}>
+              <label className="sr-only" htmlFor="password">
+                Password
+              </label>
+              <div style={{ position: "relative" }}>
+                <input
+                  id="password"
+                  type={showPw ? "text" : "password"}
+                  className="input"
+                  value={form.password}
+                  onChange={change("password")}
+                  placeholder="Password"
+                  autoComplete={mode === "create" ? "new-password" : "current-password"}
+                />
+                {/* Show/Hide text button */}
+                <button
+                  type="button"
+                  onClick={() => setShowPw((s) => !s)}
+                  style={{
+                    position: "absolute",
+                    right: 12,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    background: "transparent",
+                    border: "none",
+                    color: "#7a7a7a",
+                    cursor: "pointer",
+                    fontSize: 15,
+                  }}
+                >
+                  {showPw ? "Hide" : "Show"}
+                </button>
+                {/* clear all */}
+                {!!form.password && (
+                  <button
+                    type="button"
+                    aria-label="Clear"
+                    onClick={() => setForm((f) => ({ ...f, password: "" }))}
+                    style={suffixBtn(56)} 
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+            </div>
 
-                                <FormField
-                                id="password"
-                                type="password"
-                                label="Password"
-                                value={form.password}
-                                onChange={handleChange("password")}
-                                autoComplete={isCreate ? "new-password" : "current-password"}
-                                />
+            {/* Confirm Password */}
+            {mode === "create" && (
+              <div style={{ display: "grid", gap: 6 }}>
+                <label className="sr-only" htmlFor="confirm">
+                  Confirm Password
+                </label>
+                <div style={{ position: "relative" }}>
+                  <input
+                    id="confirm"
+                    type="password"
+                    className="input"
+                    value={form.confirm}
+                    onChange={change("confirm")}
+                    placeholder="Confirm Password"
+                    autoComplete="new-password"
+                  />
+                  {!!form.confirm && (
+                    <button
+                      type="button"
+                      aria-label="Clear"
+                      onClick={() => setForm((f) => ({ ...f, confirm: "" }))}
+                      style={suffixBtn(12)}
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
 
-                                {isCreate && (
-                                    <FormField
-                                        id="confirm"
-                                        type="password"
-                                        label="Confirm Password"
-                                        value={form.confirm}
-                                        onChange={handleChange("confirm")}
-                                        autoComplete="new-password"
-                                    />
-                                )}
+            {/* subscribr（untick by default） */}
+            <label
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                marginTop: 4,
+                fontSize: 14,
+                color: "#ddd",
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={form.subscribe}
+                onChange={change("subscribe")}
+                style={{ width: 16, height: 16, accentColor: "#ffe070", cursor: "pointer" }}
+              />
+              <span>Keep me updated with the latest information</span>
+            </label>
 
-                                {isCreate && (
-                                    <label className="c-check" htmlFor="subscribe">
-                                        <input
-                                        id="subscribe"
-                                        type="checkbox"
-                                        className="c-check__input"
-                                        checked={form.subscribe}
-                                        onChange={handleChange("subscribe")}
-                                        />
-                                        <span className="c-check__label">Keep me updated with the latest information</span>
-                                    </label>
-                                )}
+            {/* Sign Up button） */}
+            <div style={{ display: "grid", justifyItems: "center", marginTop: 10 }}>
+              <button
+                type="submit"
+                style={{
+                  minWidth: 240,
+                  padding: "14px 28px",
+                  borderRadius: 16,
+                  background: "#2f2f2f",
+                  border: "4px solid #ffe070",
+                  color: "#fff",
+                  cursor: "pointer",
+                  boxShadow: "0 2px 0 rgba(0,0,0,.25), inset 0 0 0 1px rgba(0,0,0,.08)",
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 32, 
+                    lineHeight: 1.1,
+                    fontWeight: 500,
+                    textDecoration: "underline",
+                    textDecorationColor: "#fff",
+                    textDecorationThickness: "2px",
+                    textUnderlineOffset: "6px",
+                  }}
+                >
+                  Sign Up
+                </span>
+              </button>
+            </div>
+          </form>
+        </main>
 
-                                <div className="c-form__actions">
-                                <button className="c-btn c-btn--primary" type="submit" data-testid="submit">
-                                    {isCreate ? "Sign Up" : "Sign In"}
-                                </button>
-                                </div>
-                            </form>
-                            </section>
-                            <aside className="c-login__aside">
-                            <div className="c-placeholder c-placeholder--outline">Right column placeholder</div>
-                            </aside>
-                        </main>
-                        <button className="c-help" aria-label="Help">?</button>
-                        </div>
+        {/* lower right Help button */}
+        <div
+            ref={popRef}
+            style={{
+                position: "fixed",
+                right: 24,
+                bottom: 24,
+                zIndex: 1000
+            }}
+        >
+            <button
+                aria-label="Help"
+                title="Help"
+                onClick={() => setOpen((v) => !v)}
+                style={{ border: "none", background: "transparent", padding: 0, cursor: "pointer" }}
+            >
+              <img src="/Information.png" alt="Information" style={{ height: 30, display: "block" }} />
+            </button>
+            {open && (
+              <div
+                role="tooltip"
+                style={{
+                  position: "absolute",
+                  bottom: "calc(100% + 8px)",
+                  right: 0,
+                  width: "min(320px, 86vw)",
+                  background: "#ffe070",
+                  color: "#303030",
+                  padding: "12px 14px",
+                  borderRadius: 8,
+                  boxShadow: "0 8px 24px rgba(0,0,0,.18)",
+                  zIndex: 1000,
+                }}
+              >
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: -6,
+                    right: 14,
+                    width: 12,
+                    height: 12,
+                    background: "#fff",
+                    transform: "rotate(45deg)",
+                    boxShadow: "-1px 1px 2px rgba(0,0,0,.05)",
+                  }}
+                />
+                <div style={{ lineHeight: 1.55 }}>
+                  <p>Need help? Contact us anytime.</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+    </div>
   );
 }
 
-function FormField({
-    id,
-  label,
-  type = "text",
-  value,
-  onChange,
-  placeholder,
-  autoComplete,
-}){
-    return (
-        <div className="c-field">
-            <label className="c-field__label" htmlFor={id}>
-            {label}
-             </label>
-            <div className="c-field__control">
-                <input
-                id={id}
-                className="c-field__input"
-                type={type}
-                value={value}
-                onChange={onChange}
-                placeholder={placeholder || label}
-                autoComplete={autoComplete}
-                aria-invalid={false}
-            />
-            <div className="c-field__suffix" aria-hidden="true" />
-      </div>
-      <p className="c-field__error" role="alert" hidden>
-      </p>
-    </div>
-    )
+/*clear all button(×) */
+function suffixBtn(rightPx) {
+  return {
+    position: "absolute",
+    right: rightPx,
+    top: "50%",
+    transform: "translateY(-50%)",
+    width: 28,
+    height: 28,
+    border: "none",
+    background: "transparent",
+    cursor: "pointer",
+    fontSize: 18,
+    color: "grey",
+    lineHeight: 1,
+  };
 }
-
-    
