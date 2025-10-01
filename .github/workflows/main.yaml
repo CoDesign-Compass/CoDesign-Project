@@ -1,0 +1,59 @@
+# .github/workflows/deploy.yml
+
+name: React CI/CD to GitHub Pages
+
+on:
+  push:
+    branches: [ "main" ] # listen to main 和 51-add-cicd branches
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  # ------------------------------------
+  # Task 1: CI - Build and Test
+  # ------------------------------------
+  build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code 
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies 
+        run: npm ci # Install project dependencies
+        working-directory: frontend
+
+      - name: Run Build
+        run: npm run build # Build the React app
+        working-directory: frontend
+
+      - name: Upload production artifact 
+        uses: actions/upload-artifact@v4 # Save the generated static files
+        with:
+          name: production-build
+          path: frontend/build
+
+  # ------------------------------------
+  # Task 2: CD - Deploy to GitHub Pages
+  # ------------------------------------
+  # deploy:
+  #   needs: build_and_test
+  #   if: github.ref == 'refs/heads/main'
+
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Download production artifact
+  #       uses: actions/download-artifact@v4 # 1. download the artifact from previous job
+  #       with:
+  #         name: production-build
+  #         path: build_artifact
+
+  #     - name: Deploy to GitHub Pages
+  #       uses: peaceiris/actions-gh-pages@v3 # 2. deploy to GitHub Pages
+  #       with:
+  #         github_token: ${{ secrets.GITHUB_TOKEN }} # use the automatically generated token
+  #         publish_dir: build_artifact/frontend/build
