@@ -28,8 +28,11 @@ export default function Layout({ children }) {
             {/* Header */}
             <header
                 style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    position: "relative",
                     padding: "1rem",
-                    textAlign: "center",
                 }}
             >
                 <img
@@ -37,7 +40,7 @@ export default function Layout({ children }) {
                     alt="Purpose Media Logo"
                     style={{ height: "50px" }}
                 />
-                <button onClick={toggleTheme} style={{ float: "right", marginLeft: "20px", padding: "0.5rem 1rem", borderRadius: "6px", border: "none", background: "black", color: "white" }}>
+                <button onClick={toggleTheme} style={{ position: "absolute", right: "1rem", padding: "0.5rem 1rem", borderRadius: "6px", border: "none", background: "black", color: "white" }}>
                     Switch to {theme === 'light' ? 'Dark' : 'Light'} Mode
                 </button>
             </header>

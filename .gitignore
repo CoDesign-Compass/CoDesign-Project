@@ -1,2 +1,3 @@
 # misc
-.vscode
+# VS Code specific settings
+/.vscode
