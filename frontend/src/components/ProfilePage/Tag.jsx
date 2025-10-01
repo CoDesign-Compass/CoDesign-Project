@@ -1,8 +1,18 @@
-import React from "react";
+import React, { useMemo } from "react";
 
-const Tag = ({ label, color = "default", isSelected, onClick }) => {
-  // 根据isSelected状态和颜色prop生成class
-  const className = `tag ${isSelected ? "selected" : ""} tag-color-${color}`;
+const COLORS = ["yellow", "blue", "red", "purple", "green", "pink", "teal"];
+
+const Tag = ({ label, color, isSelected, onClick }) => {
+  // 如果没指定颜色，随机分配
+  const assignedColor = useMemo(() => {
+    if (color) return color;
+    const randomIndex = Math.floor(Math.random() * COLORS.length);
+    return COLORS[randomIndex];
+  }, [color]);
+
+  const className = `tag ${
+    isSelected ? "selected" : ""
+  } tag-color-${assignedColor}`;
 
   return (
     <button className={className} onClick={onClick}>
