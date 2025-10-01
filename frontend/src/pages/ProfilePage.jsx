@@ -34,7 +34,7 @@ export default function ProfilePage() {
   const filteredTags = initialTags.filter((tag) => tag.category === activeTab);
 
   return (
-    <div className="profile-page" data-theme="" style={{ padding: 24 }}>
+    <div className="profile-page" style={{ padding: 24 }}>
       <h1 className="main-title">Lived Experience Profile Builder</h1>
 
       <div className="name-input-wrapper">

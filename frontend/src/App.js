@@ -1,5 +1,6 @@
 
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { ThemeProvider } from "./context/ThemeContext"; 
 import WelcomePage from "./pages/WelcomePage";
 import ProfilePage from "./pages/ProfilePage";
 import WhyPage from "./pages/WhyPage";
@@ -10,6 +11,7 @@ import LoginPage from "./pages/LoginPage";
 
 function App() {
     return (
+        <ThemeProvider>
         <Router>
             <Routes>
                 <Route path="/" element={<Layout><WelcomePage /></Layout>} />
@@ -21,6 +23,7 @@ function App() {
                 <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
         </Router>
+        </ThemeProvider>
     );
 }
 
