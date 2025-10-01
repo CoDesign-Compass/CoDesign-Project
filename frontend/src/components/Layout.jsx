@@ -1,4 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
+import { useTheme } from '../context/ThemeContext'
 
 export default function Layout({ children }) {
     const location = useLocation();
@@ -7,6 +8,8 @@ export default function Layout({ children }) {
     // 定义页面顺序
     const pages = ["/","/profile", "/why", "/how", "/thankyou"];
     const currentIndex = pages.indexOf(location.pathname);
+
+    const { theme, toggleTheme } = useTheme();
 
     const goBack = () => {
         if (currentIndex > 0) {
@@ -25,9 +28,11 @@ export default function Layout({ children }) {
             {/* Header */}
             <header
                 style={{
-                    backgroundColor: "#fff",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    position: "relative",
                     padding: "1rem",
-                    textAlign: "center",
                 }}
             >
                 <img
@@ -35,6 +40,9 @@ export default function Layout({ children }) {
                     alt="Purpose Media Logo"
                     style={{ height: "50px" }}
                 />
+                <button onClick={toggleTheme} style={{ position: "absolute", right: "1rem", padding: "0.5rem 1rem", borderRadius: "6px", border: "none", background: "black", color: "white" }}>
+                    Switch to {theme === 'light' ? 'Dark' : 'Light'} Mode
+                </button>
             </header>
 
             {/* Main content */}
