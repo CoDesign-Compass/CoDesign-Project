@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import React, { useState } from "react";
 
 import CategoryTabs from "../components/ProfilePage/CategoryTabs";
@@ -24,9 +23,9 @@ export default function ProfilePage() {
   const handleTagClick = (tagLabel) => {
     setSelectedTags((prevSelected) => {
       if (prevSelected.includes(tagLabel)) {
-        return prevSelected.filter((t) => t !== tagLabel); // 如果已选中，则取消选中
+        return prevSelected.filter((t) => t !== tagLabel);
       } else {
-        return [...prevSelected, tagLabel]; // 如果未选中，则添加
+        return [...prevSelected, tagLabel];
       }
     });
   };
