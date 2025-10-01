@@ -1,4 +1,3 @@
-// frontend/src/pages/LoginPage.jsx
 import React, { useEffect, useRef, useState } from "react";
 
 export default function LoginPage({ mode = "create", onSubmit: onSubmitProp }) {
