@@ -70,6 +70,7 @@ export default function LoginPage({ mode = "create", onSubmit: onSubmitProp }) {
         >
           <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,.25)" }} />
           <h1
+            className="hero-title"
             style={{
               margin: 0,
               fontSize: 44,
@@ -89,7 +90,7 @@ export default function LoginPage({ mode = "create", onSubmit: onSubmitProp }) {
             .input:focus{border-color:#7aa2ff;}
           `}</style>
 
-          <form onSubmit={handleSubmit} noValidate style={{ width: "min(560px, 92vw)", display: "grid", gap: 16 }}>
+          <form className="form-wrap" onSubmit={handleSubmit} noValidate style={{ width: "min(560px, 92vw)", display: "grid", gap: 16, margin: "0 auto" }}>
             {mode === "create" && (
               <Field id="username" placeholder="Username" value={form.username}
                 onChange={change("username")} onClear={() => setForm((f) => ({ ...f, username: "" }))} />
@@ -132,7 +133,7 @@ export default function LoginPage({ mode = "create", onSubmit: onSubmitProp }) {
                 onChange={change("confirm")} onClear={() => setForm((f) => ({ ...f, confirm: "" }))} />
             )}
 
-            <label style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 4, fontSize: 14, color: "#ddd" }}>
+            <label style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 4, fontSize: 14, color: "var(--text-color)", opacity: 0.9 }}>
               <input
                 type="checkbox"
                 checked={form.subscribe}
@@ -144,6 +145,7 @@ export default function LoginPage({ mode = "create", onSubmit: onSubmitProp }) {
 
             <div style={{ display: "grid", justifyItems: "center", marginTop: 10 }}>
               <button
+                className="cta-btn"
                 type="submit"
                 style={{
                   minWidth: 240, padding: "12px 24px", borderRadius: 14,
@@ -220,3 +222,4 @@ function suffixBtn(rightPx) {
     lineHeight: 1,
   };
 }
+

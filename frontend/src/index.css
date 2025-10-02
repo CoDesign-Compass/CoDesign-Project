@@ -9,3 +9,21 @@ body {
   margin: 0;
   padding: 20px;
 }
+
+*, *::before, *::after { box-sizing: border-box; }
+
+@media (max-width: 600px){
+
+  .input{
+    text-align: center;
+    padding-right: 64px;  
+  }
+  .input::placeholder{
+    text-align: center;
+  }
+
+  .hero-title { font-size: 32px; }
+  .form-wrap  { width: min(540px, 94vw); }
+  .cta-btn    { min-width: 200px; }
+}
+
