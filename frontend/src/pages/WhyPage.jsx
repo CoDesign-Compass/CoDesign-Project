@@ -19,27 +19,7 @@ export default function WhyPage() {
                         Lorem ipsum dolor sit amet consectetur adipisicing elit?
                     </p>
 
-                    {/* Step indicator */}
-                    <div style={{ margin: "1rem 0" }}>
-                        <p style={{ fontWeight: "bold" }}>Step 1 of 5</p>
-                        <div
-                            style={{
-                                backgroundColor: "#eee",
-                                borderRadius: "5px",
-                                height: "8px",
-                                width: "100%"
-                            }}
-                        >
-                            <div
-                                style={{
-                                    backgroundColor: "#ffe071",
-                                    height: "100%",
-                                    borderRadius: "5px",
-                                    width: "20%" // 1/5 进度
-                                }}
-                            />
-                        </div>
-                    </div>
+
 
                 {/* Buttons: Agree / Disagree / I don't know */}
                 <div style={{ display: "flex", gap: "10px", marginTop: "1rem" }}>
