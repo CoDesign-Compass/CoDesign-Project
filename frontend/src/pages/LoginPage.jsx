@@ -36,11 +36,12 @@ export default function LoginPage({ mode = "create", onSubmit: onSubmitProp }) {
     onSubmitProp?.(form);
   };
 
+  const container = { width: "min(960px, 92vw)", margin: "0 auto" };
+  
   return (
     <div
       className="CreateAccount page"
       style={{
-        minHeight: "100svh",
         background: "#303030",
         color: "#303030",
         display: "flex",
@@ -54,12 +55,7 @@ export default function LoginPage({ mode = "create", onSubmit: onSubmitProp }) {
         .input:focus{border-color:#7aa2ff;}
       `}</style>
 
-      {/* Logo */}
-      <header style={{ background: "#303030", boxShadow: "0 1px 0 rgba(0,0,0,.06)" }}>
-        <div style={{ height: 80, display: "grid", placeItems: "center" }}>
-          <img src="/logo.png" alt="Purpose Media" style={{ height: 50 }} />
-        </div>
-      </header>
+    
 
       {/* dark background */}
       <div style={{ background: "#303030", color: "#fff" }}>
@@ -72,11 +68,16 @@ export default function LoginPage({ mode = "create", onSubmit: onSubmitProp }) {
             backgroundImage: "url(/Banner.png)", 
             backgroundSize: "cover",
             backgroundPosition: "center",
+            position: "relative",
             display: "grid",
             placeItems: "center",
             textAlign: "center",
           }}
         >
+          <div style={{
+            position:"absolute", inset:0, background:"rgba(0,0,0,.25)"
+         }}/>
+
           <h1
             style={{
               margin: 0,
@@ -95,7 +96,7 @@ export default function LoginPage({ mode = "create", onSubmit: onSubmitProp }) {
             width:"100%", 
             display:"grid", 
             placeItems:"center", 
-            padding:"28px 12px 32px" }}>
+            padding:"32px 12px 40px" }}>
 
           <form
             onSubmit={handleSubmit}
@@ -266,10 +267,10 @@ export default function LoginPage({ mode = "create", onSubmit: onSubmitProp }) {
                 type="submit"
                 style={{
                   minWidth: 240,
-                  padding: "14px 28px",
-                  borderRadius: 16,
+                  padding: "12px 24px",
+                  borderRadius: 14,
                   background: "#2f2f2f",
-                  border: "4px solid #ffe070",
+                  border: "3px solid #ffe070",
                   color: "#fff",
                   cursor: "pointer",
                   boxShadow: "0 2px 0 rgba(0,0,0,.25), inset 0 0 0 1px rgba(0,0,0,.08)",
@@ -277,13 +278,13 @@ export default function LoginPage({ mode = "create", onSubmit: onSubmitProp }) {
               >
                 <span
                   style={{
-                    fontSize: 32, 
+                    fontSize: 22, 
                     lineHeight: 1.1,
                     fontWeight: 500,
                     textDecoration: "underline",
                     textDecorationColor: "#fff",
-                    textDecorationThickness: "2px",
-                    textUnderlineOffset: "6px",
+                    textDecorationThickness: "1.5px",
+                    textUnderlineOffset: "4px",
                   }}
                 >
                   Sign Up
@@ -294,15 +295,9 @@ export default function LoginPage({ mode = "create", onSubmit: onSubmitProp }) {
         </main>
 
         {/* lower right Help button */}
-        <div
-            ref={popRef}
-            style={{
-                position: "fixed",
-                right: 24,
-                bottom: 24,
-                zIndex: 1000
-            }}
-        >
+
+       <div style={{ ...container, display: "flex", justifyContent: "flex-end", padding: "0 0 16px" }}>
+          <div ref={popRef} style={{ position: "relative" }}>
             <button
                 aria-label="Help"
                 title="Help"
@@ -311,6 +306,7 @@ export default function LoginPage({ mode = "create", onSubmit: onSubmitProp }) {
             >
               <img src="/Information.png" alt="Information" style={{ height: 30, display: "block" }} />
             </button>
+            
             {open && (
               <div
                 role="tooltip"
@@ -346,6 +342,7 @@ export default function LoginPage({ mode = "create", onSubmit: onSubmitProp }) {
             )}
           </div>
         </div>
+      </div>
     </div>
   );
 }
