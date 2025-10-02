@@ -3,9 +3,19 @@
   --bg-color: #ffffff; /* background color */
   --text-em-color: #303030; /* emphasized text color */
   --text-color: #d9d9d9; /* text color */
+  --text-all-black: #303030; /* all black text */
   --btn-bg: #303030; /* button background */
   --btn-border: #555; /* button border */
   --btn-text: #c9c9f6; /* button text */
+  --btn-blue-bg: #a2d2ff; /* blue button background */
+  --btn-mint-bg: #b5ead7; /* mint button background */
+  --btn-peach-bg: #feba6f; /* peach button background */
+  --btn-pink-bg: #ffc6ff; /* pink button background */
+  --btn-lavender-bg: #c9c9f6; /* lavender button background */
+  --btn-coral-bg: #f28c85; /* coral button background */
+  --surface: #2f2f2f;
+  --muted-surface: #303030;
+  --heading: #ffe070; /* heading color */
 }
 
 /* dark mode */
@@ -13,9 +23,17 @@
   --bg-color: #303030;
   --text-em-color: #d9d9d9; /* emphasized text color */
   --text-color: #d9d9d9;
-  --btn-bg: #F3F3F3;
-   --btn-border: #FFE071;
+  --text-all-black: #303030; /* all black text */
+  --btn-bg: #f3f3f3;
+  --btn-border: #ffe071;
   --btn-text: #c9c9f6;
+  --btn-blue-bg: #a2d2ff; /* blue button background */
+  --btn-mint-bg: #9fbab0; /* mint button background */
+  --btn-peach-bg: #feba6f; /* peach button background */
+  --btn-pink-bg: #ffadad; /* pink button background */
+  --btn-lavender-bg: #c9c9f6; /* lavender button background */
+  --btn-coral-bg: #f28c85; /* coral button background */
+  --heading: #c9c9f6; /* heading color */
 }
 
 /* ===============================
