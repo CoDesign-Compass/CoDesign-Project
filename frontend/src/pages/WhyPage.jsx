@@ -4,7 +4,7 @@ export default function WhyPage() {
 
     return (
             <div style={{ maxWidth: "600px", margin: "0 auto" }}>
-                <h2>Step 2 of 5</h2>
+                <h2>Step 1 of 5</h2>
                 <p><strong>Why does this issue matter to you?</strong></p>
 
                 {questions.map((placeholder, i) => (
