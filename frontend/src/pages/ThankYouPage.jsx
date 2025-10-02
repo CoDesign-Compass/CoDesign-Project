@@ -47,7 +47,11 @@ export default function ThankPage() {
       }}
     >
       <section
-        style={{ margin: "40px auto", display: "grid", placeItems: "center" }}
+        style={{
+          margin: "clamp(18px, 4vw, 40px)",
+          display: "grid",
+          placeItems: "center",
+        }}
       ></section>
 
       {/* 1) banner + Title */}
@@ -207,7 +211,11 @@ export default function ThankPage() {
 
         <div
           className="checkBox"
-          style={{ marginTop: "", display: "grid", gap: 14 }}
+          style={{
+            marginTop: "clamp(18px, 3vw, 30px)",
+            display: "grid",
+            gap: 14,
+          }}
         >
           <label style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <input
@@ -262,7 +270,11 @@ export default function ThankPage() {
       {/* 3) Join button block */}
       <section
         className="join-button"
-        style={{ margin: "30px auto", display: "grid", placeItems: "center" }}
+        style={{
+          margin: "clamp(18px, 3vw, 30px)",
+          display: "grid",
+          placeItems: "center",
+        }}
       >
         <button
           /*onClick change colour*/

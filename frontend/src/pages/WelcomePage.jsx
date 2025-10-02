@@ -36,7 +36,11 @@ export default function WelcomePage() {
       }}
     >
       <section
-        style={{ margin: "40px auto", display: "grid", placeItems: "center" }}
+        style={{
+          margin: "clamp(18px, 4vw, 40px)",
+          display: "grid",
+          placeItems: "center",
+        }}
       ></section>
 
       {/* 1) banner + Title */}
