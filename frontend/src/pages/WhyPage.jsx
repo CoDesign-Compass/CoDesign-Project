@@ -32,7 +32,7 @@ export default function WhyPage() {
                         >
                             <div
                                 style={{
-                                    backgroundColor: "#000000",
+                                    backgroundColor: "#ffe071",
                                     height: "100%",
                                     borderRadius: "5px",
                                     width: "20%" // 1/5 进度
@@ -40,7 +40,50 @@ export default function WhyPage() {
                             />
                         </div>
                     </div>
+
+                {/* Buttons: Agree / Disagree / I don't know */}
+                <div style={{ display: "flex", gap: "10px", marginTop: "1rem" }}>
+                    <button
+                        style={{
+                            flex: 1,
+                            backgroundColor: "#b2f2bb", // 浅绿色
+                            border: "none",
+                            borderRadius: "6px",
+                            padding: "0.75rem",
+                            fontWeight: "bold",
+                            cursor: "pointer"
+                        }}
+                    >
+                        Agree
+                    </button>
+                    <button
+                        style={{
+                            flex: 1,
+                            backgroundColor: "#ffa8a8", // 浅红色
+                            border: "none",
+                            borderRadius: "6px",
+                            padding: "0.75rem",
+                            fontWeight: "bold",
+                            cursor: "pointer"
+                        }}
+                    >
+                        Disagree
+                    </button>
+                    <button
+                        style={{
+                            flex: 1,
+                            backgroundColor: "#e9ecef", // 灰色
+                            border: "none",
+                            borderRadius: "6px",
+                            padding: "0.75rem",
+                            fontWeight: "bold",
+                            cursor: "pointer"
+                        }}
+                    >
+                        I don’t know
+                    </button>
                 </div>
+            </div>
 
                 {/* Question Section */}
                 <p>
