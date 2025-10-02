@@ -29,7 +29,7 @@ export default function WelcomePage() {
 
   return (
     <div
-      className="Welcome page"
+      className="welcome-page"
       style={{
         display: "flex",
         flexDirection: "column",
@@ -45,7 +45,7 @@ export default function WelcomePage() {
         style={{
           margin: 0,
           width: "100%",
-          height: 200,
+          height: "clamp(140px, 30vh, 260px)",
           backgroundImage: "url(/Banner.png)",
           backgroundSize: "cover",
           backgroundPosition: "center",
@@ -58,9 +58,11 @@ export default function WelcomePage() {
           <h1
             style={{
               margin: 0,
-              fontSize: "96px",
+              fontSize: "clamp(36px, 8vw, 96px)",
               color: theme === "light" ? "#303030" : "#A7D3FC",
-              fontFamily: "Yeseva One",
+              fontFamily: "Yeseva One, serif",
+              lineHeight: 1.1,
+              paddingInline: "4vw",
             }}
           >
             Codesign Compass
@@ -72,8 +74,7 @@ export default function WelcomePage() {
       <section
         className="start-button"
         style={{
-          marginBottom: "40px",
-          marginTop: "80px",
+          marginTop: "clamp(32px, 8vw, 80px)",
           display: "grid",
           placeItems: "center",
         }}
@@ -83,14 +84,18 @@ export default function WelcomePage() {
           /*cursor change colour */
           onClick={onStart}
           style={{
-            fontSize: "36px",
+            fontSize: "clamp(20px, 3.2vw, 36px)",
             borderRadius: 8,
-            padding: "5px 20px",
+            padding: "clamp(6px, 1vw, 10px) clamp(16px, 3vw, 24px)",
             cursor: "pointer",
             border: "none",
             background: "#7F7FBC",
-            fontFamily: "Yeseva One",
+            fontFamily: "Yeseva One, serif",
+            transition: "opacity 0.2s ease",
+            opacity: 0.85,
           }}
+          onMouseEnter={(e) => (e.currentTarget.style.opacity = 1)}
+          onMouseLeave={(e) => (e.currentTarget.style.opacity = 0.85)}
         >
           Start
         </button>
@@ -99,24 +104,35 @@ export default function WelcomePage() {
       {/* 3) Login block */}
       <section
         className="login-link"
-        style={{ display: "grid", marginBottom: "50px", placeItems: "center" }}
+        style={{
+          display: "grid",
+          margin: "clamp(24px, 6vw, 50px)",
+          placeItems: "center",
+        }}
       >
         <div>
           <button
-            /*onClick change colour*/
-            /*cursor change colour */
             onClick={onLogin}
             style={{
-              fontSize: "20px",
+              fontSize: "clamp(14px, 2.4vw, 20px)",
               cursor: "pointer",
               border: "none",
               color: theme === "light" ? "black" : "white",
               background: "transparent",
               textDecoration: "underline",
               textUnderlineOffset: "4px",
+              padding: "clamp(4px, 1vw, 10px) clamp(16px, 3vw, 25px)",
               textDecorationThickness: "1.5px",
-              fontFamily: "Poppins",
+              fontFamily: "Poppins, sans-serif",
+              transition: "background 0.2s ease",
+              borderRadius: 8,
             }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.background = "rgba(131, 124, 124, 0.48)")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.background = "transparent")
+            }
           >
             LOGIN
           </button>
@@ -128,7 +144,7 @@ export default function WelcomePage() {
         style={{
           display: "flex",
           justifyContent: "flex-end",
-          margin: "20px 30px 20px",
+          margin: "20px clamp(16px, 4vw, 30px)",
         }}
       >
         <div ref={popRef} style={{ position: "relative" }}>
@@ -181,7 +197,7 @@ export default function WelcomePage() {
               <div
                 style={{
                   lineHeight: 1.55,
-                  fontFamily: "Poppins",
+                  fontFamily: "Poppins, sans-serif",
                   color: "#303030",
                 }}
               >

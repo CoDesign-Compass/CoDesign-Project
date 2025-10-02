@@ -40,7 +40,7 @@ export default function ThankPage() {
 
   return (
     <div
-      className="Welcome page"
+      className="thankyou-page"
       style={{
         display: "flex",
         flexDirection: "column",
@@ -56,7 +56,7 @@ export default function ThankPage() {
         style={{
           margin: 0,
           width: "100%",
-          height: 200,
+          height: "clamp(140px, 30vh, 260px)",
           backgroundImage: "url(/Banner.png)",
           backgroundSize: "cover",
           backgroundPosition: "center",
@@ -69,9 +69,11 @@ export default function ThankPage() {
           <h1
             style={{
               margin: 0,
-              fontSize: "96px",
+              fontSize: "clamp(36px, 8vw, 96px)",
               color: theme === "light" ? "#303030" : "#A7D3FC",
-              fontFamily: "Yeseva One",
+              fontFamily: "Yeseva One, serif",
+              lineHeight: 1.1,
+              paddingInline: "4vw",
             }}
           >
             Thanks
@@ -79,7 +81,7 @@ export default function ThankPage() {
           <h2
             style={{
               marginTop: -5,
-              fontSize: "40px",
+              fontSize: "clamp(30px, 3.2vw, 40px)",
               color: theme === "light" ? "#303030" : "#A7D3FC",
               fontFamily: "Yeseva One",
             }}
@@ -93,7 +95,7 @@ export default function ThankPage() {
       <section
         style={{
           margin: "32px auto",
-          textAlign: "centre",
+          textAlign: "center",
         }}
       >
         <div className="GiftInformation">
@@ -102,10 +104,10 @@ export default function ThankPage() {
               margin: 0,
               color: "#ffe070",
               textAlign: "center",
-              fontSize: "16px",
+              fontSize: "clamp(14px, 2.4vw, 20px)",
               lineHeight: 1.4,
               fontWeight: 700,
-              fontFamily: "Poppins",
+              fontFamily: "Poppins, sans-serif",
             }}
           >
             Give us your email for $10 Coles voucher or more
@@ -116,7 +118,7 @@ export default function ThankPage() {
           style={{
             display: "flex",
             justifyContent: "center",
-            margin: "24px 0",
+            margin: "clamp(14px, 4vw, 24px) 0",
           }}
         >
           <form
@@ -125,10 +127,15 @@ export default function ThankPage() {
               display: "flex",
               alignItems: "center",
               gap: 12,
-              flexWrap: "nowrap",
+              flexWrap: "wrap",
             }}
           >
-            <div style={{ position: "relative", flex: "0 0 300px" }}>
+            <div
+              style={{
+                position: "relative",
+                flex: "0 0 300px",
+              }}
+            >
               <input
                 type="email"
                 placeholder="Email"
@@ -136,14 +143,14 @@ export default function ThankPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 style={{
                   width: "100%",
-                  height: 46,
+                  height: "clamp(30px, 3vw, 46px)",
                   borderRadius: 8,
                   border: "1px solid #cfcfcf",
                   background: "#fff",
                   position: "relative",
-                  fontSize: 18,
+                  fontSize: "clamp(12px, 2vw, 18px)",
                   outline: "none",
-                  fontFamily: "Poppins",
+                  fontFamily: "Poppins, sans-serif",
                 }}
                 required
               />
@@ -162,11 +169,11 @@ export default function ThankPage() {
                     border: "none",
                     background: "transparent",
                     cursor: "pointer",
-                    fontSize: 18,
+                    fontSize: "clamp(12px, 4vw, 18px)",
                     color: "grey",
                     lineHeight: 1,
                     zIndex: 1,
-                    fontFamily: "Poppins",
+                    fontFamily: "Poppins, sans-serif",
                   }}
                 >
                   x
@@ -179,16 +186,19 @@ export default function ThankPage() {
               style={{
                 margin: "5px",
                 flex: "0 0 auto",
-                fontSize: 16,
+                fontSize: "clamp(12px, 1.5vw, 16px)",
                 borderRadius: 8,
-                padding: "10px 14px",
+                padding: "clamp(5px, 1vw, 10px) clamp(7px, 1.5vw, 14px)",
                 cursor: "pointer",
                 border: "1.5px solid #ffe070",
                 color: theme === "light" ? "#303030" : "white",
                 background: "#7F7FBC",
                 whiteSpace: "nowrap",
-                fontFamily: "Poppins",
+                fontFamily: "Poppins, sans-serif",
+                opacity: 0.85,
               }}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = 1)}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = 0.85)}
             >
               Submit
             </button>
@@ -197,7 +207,7 @@ export default function ThankPage() {
 
         <div
           className="checkBox"
-          style={{ marginTop: 18, display: "grid", gap: 14 }}
+          style={{ marginTop: "", display: "grid", gap: 14 }}
         >
           <label style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <input
@@ -213,10 +223,10 @@ export default function ThankPage() {
             />
             <span
               style={{
-                fontSize: 16,
+                fontSize: "clamp(12px, 1.5vw, 16px)",
                 fontWeight: 600,
                 color: theme === "light" ? "black" : "white",
-                fontFamily: "Poppins",
+                fontFamily: "Poppins, sans-serif",
               }}
             >
               Send me a $10 Coles voucher
@@ -237,10 +247,10 @@ export default function ThankPage() {
             />
             <span
               style={{
-                fontSize: 16,
+                fontSize: "clamp(12px, 1.5vw, 16px)",
                 fontWeight: 600,
                 color: theme === "light" ? "black" : "white",
-                fontFamily: "Poppins",
+                fontFamily: "Poppins, sans-serif",
               }}
             >
               Keep me updated with the latest information
@@ -252,14 +262,14 @@ export default function ThankPage() {
       {/* 3) Join button block */}
       <section
         className="join-button"
-        style={{ margin: "30px", display: "grid", placeItems: "center" }}
+        style={{ margin: "30px auto", display: "grid", placeItems: "center" }}
       >
         <button
           /*onClick change colour*/
           /*cursor change colour */
           onClick={onLogin}
           style={{
-            fontSize: "30px",
+            fontSize: "clamp(18px, 3.2vw, 30px)",
             borderRadius: 8,
             padding: "5px 20px",
             cursor: "pointer",
@@ -269,8 +279,11 @@ export default function ThankPage() {
             textDecoration: "underline",
             textUnderlineOffset: "4px",
             textDecorationThickness: "1.5px",
-            fontFamily: "Poppins",
+            fontFamily: "Poppins, sans-serif",
+            opacity: 0.85,
           }}
+          onMouseEnter={(e) => (e.currentTarget.style.opacity = 1)}
+          onMouseLeave={(e) => (e.currentTarget.style.opacity = 0.85)}
         >
           Join Us
         </button>
@@ -281,7 +294,7 @@ export default function ThankPage() {
         style={{
           display: "flex",
           justifyContent: "flex-end",
-          margin: "20px 30px 10px",
+          margin: "20px clamp(16px, 4vw, 30px)",
         }}
       >
         <div ref={popRef} style={{ position: "relative" }}>
@@ -334,7 +347,7 @@ export default function ThankPage() {
               <div
                 style={{
                   lineHeight: 1.55,
-                  fontFamily: "Poppins",
+                  fontFamily: "Poppins, sans-serif",
                   color: "#303030",
                 }}
               >
