@@ -2,7 +2,7 @@
 :root[data-theme="light"] {
   --bg-color: #ffffff; /* background color */
   --text-em-color: #303030; /* emphasized text color */
-  --text-color: #d9d9d9; /* text color */
+  --text-color: #303030; /* text color */
   --text-all-black: #303030; /* all black text */
   --btn-bg: #303030; /* button background */
   --btn-border: #555; /* button border */
