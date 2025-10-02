@@ -88,8 +88,6 @@ export default function WelcomePage() {
         }}
       >
         <button
-          /*onClick change colour*/
-          /*cursor change colour */
           onClick={onStart}
           style={{
             fontSize: "clamp(20px, 3.2vw, 36px)",

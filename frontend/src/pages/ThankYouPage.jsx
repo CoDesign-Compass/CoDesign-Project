@@ -304,8 +304,6 @@ export default function ThankPage() {
         }}
       >
         <button
-          /*onClick change colour*/
-          /*cursor change colour */
           onClick={onLogin}
           style={{
             fontSize: "clamp(18px, 3.2vw, 30px)",
