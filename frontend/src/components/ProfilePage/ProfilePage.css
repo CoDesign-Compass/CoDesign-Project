@@ -7,16 +7,6 @@
   flex-direction: column;
   align-items: center;
 }
-.profile-page {
-  width: 1280px;
-  height: 832px;
-  flex-shrink: 0;
-
-  margin: 0 auto; /* 水平居中 */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
 
 /* --- Title and Input Box --- */
 .main-title {
@@ -36,17 +26,14 @@
   margin: 20px 0;
 }
 
-/* 输入框 */
 .name-input {
-  width: 150px;
-  height: 40px; /* 固定高度 */
-  padding: 0 14px; /* 左右内边距 */
-  border-radius: 20px; /* 圆角一致 */
+  width: 100%;
+  padding: 12px;
+  border-radius: 20px;
   border: 1px solid #555;
   background-color: #333;
   color: #fff;
   font-size: 1rem;
-  line-height: 40px; /* 保证文字垂直居中 */
 }
 
 .clear-button {
@@ -123,22 +110,6 @@
   background-color: #e0dace;
 }
 
-.search-tags-row {
-  display: flex;
-  justify-content: space-between; /* 左右分布 */
-  align-items: flex-start; /* 顶部对齐 */
-  gap: 30px; /* 中间留点间距 */
-  margin-top: 20px;
-}
-
-.search-box {
-  flex: 0 0 280px; /* 固定宽度，不会被挤 */
-}
-
-.tags-box {
-  flex: 1; /* 占据剩余空间 */
-}
-
 /* --- Right Panel: Tag Grid --- */
 .right-panel {
   width: 100%;
@@ -156,83 +127,16 @@
   padding: 8px 12px;
   border-radius: 16px;
   border: 1px solid #666;
+  background-color: #444;
+  color: #fff;
   cursor: pointer;
   font-size: 0.9rem;
   transition: all 0.2s ease;
 }
 
-.tag:hover {
-  transform: scale(1.15); /* 放大一点 */
-  filter: brightness(0.8); /* 稍微变暗 */
-}
-
-.tag-color-yellow {
-  background-color: #f0e442;
-  color: #333;
-}
-.tag-color-yellow.selected {
-  background-color: #333;
-  color: #f0e442;
-}
-
-/* 蓝色 */
-.tag-color-blue {
-  background-color: #a0c4ff;
-  color: #333;
-}
-.tag-color-blue.selected {
-  background-color: #333;
-  color: #a0c4ff;
-}
-
-/* 红色 */
-.tag-color-red {
-  background-color: #ffadad;
-  color: #333;
-}
-.tag-color-red.selected {
-  background-color: #333;
-  color: #ffadad;
-}
-
-/* 紫色 */
-.tag-color-purple {
-  background-color: #bdb2ff;
-  color: #333;
-}
-.tag-color-purple.selected {
-  background-color: #333;
-  color: #bdb2ff;
-}
-
-/* 绿色 */
-.tag-color-green {
-  background-color: #9ef01a;
-  color: #333;
-}
-.tag-color-green.selected {
-  background-color: #333;
-  color: #9ef01a;
-}
-
-/* 粉色 */
-.tag-color-pink {
-  background-color: #ffb6e9;
-  color: #333;
-}
-.tag-color-pink.selected {
-  background-color: #333;
-  color: #ffb6e9;
-}
-
-/* 青色 */
-.tag-color-teal {
-  background-color: #00cfc1;
-  color: #333;
-}
-.tag-color-teal.selected {
-  background-color: #333;
-  color: #00cfc1;
+.tag .checkmark {
+  margin-right: 6px;
+  font-weight: bold;
 }
 
 .tag.selected {
@@ -284,140 +188,6 @@
   .right-panel {
     flex: 1; /* Right panel takes up the remaining space */
   }
-}
-
-/* --- Name + Tabs 并列布局 --- */
-.name-and-tabs {
-  display: flex;
-  justify-content: center; /* 整个区域水平居中 */
-  align-items: center; /* 垂直居中对齐 */
-  gap: 20px; /* Name 和 Tabs 之间的间距 */
-  flex-wrap: wrap; /* 窄屏下换行 */
-  margin: 20px 0;
-}
-
-.name-and-tabs .name-input-wrapper {
-  margin: 0; /* 去掉原来上下 margin，避免影响对齐 */
-  max-width: 250px; /* 控制输入框不要太长 */
-}
-
-/* --- Top Bar (Search + Buttons) --- */
-.top-bar {
-  display: flex;
-  align-items: center; /* 垂直居中 */
-  gap: 20px; /* 左右间距 */
-  margin: 20px 0;
-}
-
-/* --- Category Tabs --- */
-.category-tabs-container {
-  display: flex;
-  gap: 12px;
-}
-
-.tab-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  border-radius: 20px;
-  border: 1px solid #666;
-  background-color: #333;
-  color: #fff;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.tab-item:hover {
-  background-color: #444;
-}
-
-.tab-item.active {
-  background-color: #f0e442;
-  color: #333;
-  border-color: #f0e442;
-  font-weight: bold;
-}
-
-/* 输入框宽度固定 */
-.top-bar .name-input-wrapper {
-  flex: 0 0 150px;
-}
-
-/* 按钮组 */
-.top-bar .category-tabs {
-  flex: 1; /* 占据剩余空间 */
-  display: flex;
-  justify-content: center; /* 水平居中 */
-  gap: 10px; /* 按钮之间的间距 */
-}
-
-/* --- Category Tabs --- */
-.category-tabs .tab {
-  height: 40px; /* 和输入框同高 */
-  padding: 0 16px; /* 左右 padding */
-  border-radius: 20px; /* 圆角一致 */
-  border: 1px solid #666;
-  background-color: #444;
-  color: #fff;
-  font-size: 0.95rem;
-  display: flex; /* 让文字居中 */
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.category-tabs .tab {
-  padding: 10px 16px;
-  border-radius: 20px;
-  border: 1px solid #666;
-  background-color: #444;
-  color: #fff;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.category-tabs .tab:hover {
-  background-color: #555;
-}
-
-.category-tabs .tab.active {
-  background-color: #f0e442;
-  color: #333;
-  border-color: #f0e442;
-  font-weight: bold;
-}
-
-/* --- (可选) 底部导航按钮，如果以后要加 --- */
-.navigation {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 30px;
-  width: 100%;
-  max-width: 600px;
-}
-
-.back-btn,
-.next-btn {
-  padding: 10px 20px;
-  border-radius: 20px;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: bold;
-}
-
-.back-btn {
-  background-color: #ccc;
-  color: #333;
-}
-
-.next-btn {
-  background-color: #f0e442;
-  color: #333;
 }
 
 /* --- Styles for other components (CategoryTabs, NavigationButtons) can be added below --- */
