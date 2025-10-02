@@ -359,7 +359,7 @@ export default function ThankPage() {
               style={{
                 position: "absolute",
                 bottom: "calc(100% + 8px)",
-                left: "calc(100% - 100px)",
+                left: "calc(100% - 130px)",
                 background: "#ffe070",
                 padding: "12px 12px",
                 transform: "translateX(-50%)",
