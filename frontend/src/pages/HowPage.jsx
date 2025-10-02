@@ -4,7 +4,6 @@ export default function HowPage() {
 
     return (
             <div style={{ maxWidth: "600px", margin: "0 auto" }}>
-                <h2>Step 3 of 5</h2>
                 <p><strong>How could this be improved?</strong></p>
 
                 {questions.map((placeholder, i) => (
