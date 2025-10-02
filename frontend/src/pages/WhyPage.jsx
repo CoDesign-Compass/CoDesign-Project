@@ -32,10 +32,10 @@ export default function WhyPage() {
                         >
                             <div
                                 style={{
-                                    backgroundColor: "#ffe071",
+                                    backgroundColor: "#000000",
                                     height: "100%",
                                     borderRadius: "5px",
-                                    width: "40%" // 2/5 进度
+                                    width: "20%" // 1/5 进度
                                 }}
                             />
                         </div>
