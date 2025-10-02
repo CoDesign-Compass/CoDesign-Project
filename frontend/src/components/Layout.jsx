@@ -1,101 +1,111 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useTheme } from '../context/ThemeContext'
+import { useTheme } from "../context/ThemeContext";
 
 export default function Layout({ children }) {
-    const location = useLocation();
-    const navigate = useNavigate();
+  const location = useLocation();
+  const navigate = useNavigate();
 
-    // 定义页面顺序
-    const pages = ["/","/profile", "/why", "/how", "/thankyou"];
-    const currentIndex = pages.indexOf(location.pathname);
+  // 定义页面顺序
+  const pages = ["/", "/profile", "/why", "/how", "/thankyou"];
+  const currentIndex = pages.indexOf(location.pathname);
 
-    const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
 
-    const goBack = () => {
-        if (currentIndex > 0) {
-            navigate(pages[currentIndex - 1]);
-        }
-    };
+  const goBack = () => {
+    if (currentIndex > 0) {
+      navigate(pages[currentIndex - 1]);
+    }
+  };
 
-    const goNext = () => {
-        if (currentIndex < pages.length - 1) {
-            navigate(pages[currentIndex + 1]);
-        }
-    };
+  const goNext = () => {
+    if (currentIndex < pages.length - 1) {
+      navigate(pages[currentIndex + 1]);
+    }
+  };
 
-    return (
-        <div className="app-layout" style={{ fontFamily: "sans-serif" }}>
-            {/* Header */}
-            <header
-                style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    position: "relative",
-                    padding: "1rem",
-                }}
-            >
-                <img
-                    src="/logo.png"
-                    alt="Purpose Media Logo"
-                    style={{ height: "50px" }}
-                />
-                <button onClick={toggleTheme} style={{ position: "absolute", right: "1rem", padding: "0.5rem 1rem", borderRadius: "6px", border: "none", background: "black", color: "white" }}>
-                    Switch to {theme === 'light' ? 'Dark' : 'Light'} Mode
-                </button>
-            </header>
+  return (
+    <div className="app-layout" style={{ fontFamily: "sans-serif" }}>
+      {/* Header */}
+      <header
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          position: "relative",
+          padding: "1rem",
+        }}
+      >
+        <img
+          src="/logo.png"
+          alt="Purpose Media Logo"
+          style={{ height: "50px" }}
+        />
+        <button
+          onClick={toggleTheme}
+          style={{
+            position: "absolute",
+            right: "1rem",
+            padding: "0.5rem 1rem",
+            borderRadius: "8px",
+            border: "1px solid #d8d8d8",
+            background: "transparent",
+            color: "var(--text-color)",
+            cursor: "pointer",
+          }}
+        >
+          Switch to {theme === "light" ? "Dark" : "Light"} Mode
+        </button>
+      </header>
 
-            {/* Main content */}
-            <main style={{ minHeight: "70vh"}}>
-                {children}
-            </main>
+      {/* Main content */}
+      <main style={{ minHeight: "70vh" }}>{children}</main>
 
-            {/* Footer with navigation */}
-            <footer
-                style={{
-                    backgroundColor: "#fff",
-                    padding: "1rem",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    borderTop: "1px solid #eee"
-                }}
-            >
-                {/* Back 按钮（第一页隐藏） */}
-                {currentIndex > 0 ? (
-                    <button
-                        onClick={goBack}
-                        style={{
-                            background: "black",
-                            color: "white",
-                            padding: "0.5rem 1rem",
-                            borderRadius: "6px",
-                            border: "none"
-                        }}
-                    >
-                        ← Back
-                    </button>
-                ) : (
-                    <div></div>
-                )}
+      {/* Footer with navigation */}
+      <footer
+        style={{
+          backgroundColor: "#fff",
+          padding: "1rem",
+          display: "flex",
+          justifyContent: "space-between",
+          borderTop: "1px solid #eee",
+        }}
+      >
+        {/* Back 按钮（第一页隐藏） */}
+        {currentIndex > 0 ? (
+          <button
+            onClick={goBack}
+            style={{
+              background: "black",
+              color: "white",
+              padding: "0.5rem 1rem",
+              borderRadius: "6px",
+              border: "none",
+            }}
+          >
+            ← Back
+          </button>
+        ) : (
+          <div></div>
+        )}
 
-                {/* Next 按钮（最后一页隐藏） */}
-                {currentIndex < pages.length - 1 ? (
-                    <button
-                        onClick={goNext}
-                        style={{
-                            background: "black",
-                            color: "white",
-                            padding: "0.5rem 1rem",
-                            borderRadius: "6px",
-                            border: "none"
-                        }}
-                    >
-                        Next →
-                    </button>
-                ) : (
-                    <div></div>
-                )}
-            </footer>
-        </div>
-    );
+        {/* Next 按钮（最后一页隐藏） */}
+        {currentIndex < pages.length - 1 ? (
+          <button
+            onClick={goNext}
+            style={{
+              background: "black",
+              color: "white",
+              padding: "0.5rem 1rem",
+              borderRadius: "6px",
+              border: "none",
+            }}
+          >
+            Next →
+          </button>
+        ) : (
+          <div></div>
+        )}
+      </footer>
+    </div>
+  );
 }
