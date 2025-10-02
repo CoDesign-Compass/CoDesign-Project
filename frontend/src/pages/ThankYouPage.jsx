@@ -44,6 +44,10 @@ export default function ThankPage() {
       style={{
         display: "flex",
         flexDirection: "column",
+        width: "100%",
+        margin: "0 auto",
+        paddingInline: "clamp(12px, 4vw, 24px)",
+        boxSizing: "border-box",
       }}
     >
       <section
@@ -73,7 +77,7 @@ export default function ThankPage() {
           <h1
             style={{
               margin: 0,
-              fontSize: "clamp(36px, 8vw, 96px)",
+              fontSize: "clamp(30px, 8vw, 96px)",
               color: theme === "light" ? "#303030" : "#A7D3FC",
               fontFamily: "Yeseva One, serif",
               lineHeight: 1.1,
@@ -85,7 +89,7 @@ export default function ThankPage() {
           <h2
             style={{
               marginTop: -5,
-              fontSize: "clamp(30px, 3.2vw, 40px)",
+              fontSize: "clamp(24px, 3.2vw, 40px)",
               color: theme === "light" ? "#303030" : "#A7D3FC",
               fontFamily: "Yeseva One",
             }}
@@ -131,13 +135,15 @@ export default function ThankPage() {
               display: "flex",
               alignItems: "center",
               gap: 12,
-              flexWrap: "wrap",
+              flexWrap: "nowrap",
+              width: "100%",
             }}
           >
             <div
               style={{
                 position: "relative",
-                flex: "0 0 300px",
+                flex: "1 1 clamp(220px, 70vw, 420px)",
+                minWidth: 0,
               }}
             >
               <input
@@ -180,7 +186,7 @@ export default function ThankPage() {
                     fontFamily: "Poppins, sans-serif",
                   }}
                 >
-                  x
+                  ×
                 </button>
               )}
             </div>
@@ -215,9 +221,17 @@ export default function ThankPage() {
             marginTop: "clamp(18px, 3vw, 30px)",
             display: "grid",
             gap: 14,
+            textAlign: "left",
           }}
         >
-          <label style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <label
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              gap: 12,
+            }}
+          >
             <input
               type="checkbox"
               checked={wantVoucher}
@@ -227,21 +241,31 @@ export default function ThankPage() {
                 height: 18,
                 accentColor: "#ffe070",
                 cursor: "pointer",
+                flexShrink: 0,
               }}
             />
             <span
               style={{
-                fontSize: "clamp(12px, 1.5vw, 16px)",
+                fontSize: "clamp(12px, 2vw, 16px)",
                 fontWeight: 600,
                 color: theme === "light" ? "black" : "white",
                 fontFamily: "Poppins, sans-serif",
+                lineHeight: 1.4,
               }}
             >
               Send me a $10 Coles voucher
             </span>
           </label>
 
-          <label style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <label
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              gap: 12,
+              flex: 1,
+            }}
+          >
             <input
               type="checkbox"
               checked={wantUpdates}
@@ -251,14 +275,17 @@ export default function ThankPage() {
                 height: 18,
                 accentColor: "#ffe070",
                 cursor: "pointer",
+                flexShrink: 0,
               }}
             />
             <span
               style={{
-                fontSize: "clamp(12px, 1.5vw, 16px)",
+                fontSize: "clamp(12px, 2vw, 16px)",
                 fontWeight: 600,
                 color: theme === "light" ? "black" : "white",
                 fontFamily: "Poppins, sans-serif",
+                lineHeight: 1,
+                flex: 1,
               }}
             >
               Keep me updated with the latest information
@@ -306,7 +333,7 @@ export default function ThankPage() {
         style={{
           display: "flex",
           justifyContent: "flex-end",
-          margin: "20px clamp(16px, 4vw, 30px)",
+          margin: "clamp(10px, 3vw, 20px) clamp(16px, 4vw, 30px)",
         }}
       >
         <div ref={popRef} style={{ position: "relative" }}>
@@ -324,7 +351,7 @@ export default function ThankPage() {
             <img
               src="/Information.png"
               alt="Information"
-              style={{ height: 30, display: "block" }}
+              style={{ height: "clamp(20px, 5vw, 32px)", display: "block" }}
             />
           </button>
 
@@ -334,28 +361,16 @@ export default function ThankPage() {
               style={{
                 position: "absolute",
                 bottom: "calc(100% + 8px)",
-                right: 0,
-                width: "min(320px, 86vw)",
+                left: "calc(100% - 100px)",
                 background: "#ffe070",
-                color: "#000",
-                padding: "12px 14px",
+                padding: "12px 12px",
+                transform: "translateX(-50%)",
+                width: "clamp(200px, 60vw, 360px)",
                 borderRadius: 8,
                 boxShadow: "0 8px 24px rgba(0,0,0,.18)",
                 zIndex: 1000,
               }}
             >
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: -6,
-                  right: 14,
-                  width: 12,
-                  height: 12,
-                  background: "#fff",
-                  transform: "rotate(45deg)",
-                  boxShadow: "-1px 1px 2px rgba(0,0,0,.05)",
-                }}
-              />
               <div
                 style={{
                   lineHeight: 1.55,

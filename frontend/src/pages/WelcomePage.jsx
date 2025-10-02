@@ -33,6 +33,10 @@ export default function WelcomePage() {
       style={{
         display: "flex",
         flexDirection: "column",
+        width: "100%",
+        margin: "0 auto",
+        paddingInline: "clamp(12px, 4vw, 24px)",
+        boxSizing: "border-box",
       }}
     >
       <section
@@ -148,7 +152,7 @@ export default function WelcomePage() {
         style={{
           display: "flex",
           justifyContent: "flex-end",
-          margin: "20px clamp(16px, 4vw, 30px)",
+          margin: "clamp(10px, 3vw, 20px) clamp(16px, 4vw, 30px)",
         }}
       >
         <div ref={popRef} style={{ position: "relative" }}>
@@ -166,7 +170,7 @@ export default function WelcomePage() {
             <img
               src="/Information.png"
               alt="Information"
-              style={{ height: 30, display: "block" }}
+              style={{ height: "clamp(20px, 5vw, 32px)", display: "block" }}
             />
           </button>
 
@@ -176,11 +180,11 @@ export default function WelcomePage() {
               style={{
                 position: "absolute",
                 bottom: "calc(100% + 8px)",
-                right: 0,
-                width: "min(320px, 86vw)",
+                left: "calc(100% - 90px)",
                 background: "#ffe070",
-                color: "#000",
-                padding: "12px 14px",
+                padding: "12px 12px",
+                transform: "translateX(-50%)",
+                width: "clamp(150px, 60vw, 360px)",
                 borderRadius: 8,
                 boxShadow: "0 8px 24px rgba(0,0,0,.18)",
                 zIndex: 1000,
@@ -188,18 +192,7 @@ export default function WelcomePage() {
             >
               <div
                 style={{
-                  position: "absolute",
-                  bottom: -6,
-                  right: 14,
-                  width: 12,
-                  height: 12,
-                  background: "#fff",
-                  transform: "rotate(45deg)",
-                  boxShadow: "-1px 1px 2px rgba(0,0,0,.05)",
-                }}
-              />
-              <div
-                style={{
+                  fontSize: "clamp(12px, 1.4vw, 16px)",
                   lineHeight: 1.55,
                   fontFamily: "Poppins, sans-serif",
                   color: "#303030",
