@@ -1,4 +1,4 @@
-# [Project Name] – Week [X] Team Meeting
+# S2 Week 9 Team Meeting
 
 ## Date  
 [2 Oct, 2025]
