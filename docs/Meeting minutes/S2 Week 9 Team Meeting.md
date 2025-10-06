@@ -1,20 +1,20 @@
 # S2 Week 9 Team Meeting
 
 ## Date  
-[2 Oct, 2025]
+2 Oct, 2025
 
 ## Location  
-[The Hive, Building 108, ANU]
+The Hive, Building 108, ANU
 
 ## Participants  
-[Ricky Chen, Jingwen Zhang, Yu Pan, Jiaxin Li, Aria Fung, Zhimeng Zhu]
+Ricky Chen, Jingwen Zhang, Yu Pan, Jiaxin Li, Aria Fung, Zhimeng Zhu
 
 ---
 
 ## Goals  
-* [Define Sprint report content and presentation format for this week]  
-* [Plan tasks for next week and next sprint]  
-* [Define and allocate team tasks for the upcoming week.]  
+* Define Sprint report content and presentation format for this week  
+* Plan tasks for next week and next sprint  
+* Define and allocate team tasks for the upcoming week.  
 
 ---
 
@@ -28,10 +28,10 @@
 ---
 
 ## Decisions  
-* [Continue improving and refining the current frontend pages to enhance usability and consistency.]  
-* [The next sprint will focus on developing the admin-side frontend pages. ]  
-* [Before starting admin development, the team will unify the admin page prototype style to ensure visual and structural consistency.]
-* [Responsive design considerations will be incorporated early to ensure compatibility across different devices.]
+* Continue improving and refining the current frontend pages to enhance usability and consistency.  
+* The next sprint will focus on developing the admin-side frontend pages.   
+* Before starting admin development, the team will unify the admin page prototype style to ensure visual and structural consistency.
+* Responsive design considerations will be incorporated early to ensure compatibility across different devices.
 ---
 
 ## Task Allocations & Action Items  
