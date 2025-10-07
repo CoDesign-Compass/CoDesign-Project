@@ -24,9 +24,9 @@ Frontend: CSS, HTML, React
 |Aria Fung|UI designer; developer; update meeting minutes; create scenarios; create risk log; reviewer; maintain logs|
 |Jiaxin Li|UI designer; developer; update meeting minutes; create Function Feasibility Investigation; reviewer; maintain logs|
 |Shuo Li|UI designer; developer; create Persona, Product Vison and Project Introduction; reviewer; maintain logs|
-|Zhimeng Zhu|team meeting leader;UI designer; developer; update meeting minutes; create Persona, Product Vison and Project Introduction; reviewer; maintain logs|
+|Zhimeng Zhu|Meeting leader;UI designer; developer; update meeting minutes; create Persona, Product Vison and Project Introduction; reviewer; maintain logs|
 |Ricky Chen|UI designer; developer;update meeting minutes; create initial meeting minutes templates; create user stories; reviewer; maintain logs|
-|Yu Pan|UI designer; developer; update meeting minutes; create Function Feasibility Investigation; reviewer; maintain logs|
+|Yu Pan|Spokenman; UI designer; developer; update meeting minutes; create Function Feasibility Investigation; reviewer; maintain logs|
 ## User Stories, Personas, and Scenarios
 [User Stories](https://github.com/AriaFung/CoDesign-Project/tree/main/docs/User%20Story)
 <br>[Personas](https://github.com/AriaFung/CoDesign-Project/blob/main/docs/Persona%2C%20Product%20Vison%20and%20Project%20Introduction/Persona.md)
@@ -55,7 +55,7 @@ Frontend: CSS, HTML, React
 |Sprint|Goals|Due Date|Sprint Review&Retro Meeting|Pre slides|
 |----|----|----|---|---|
 |Sprint 1|1.Set up<br>2.deliver user story, persona, scenario, product vision<br>3.Deliever a low-fidelity UI prototype|21 Aug 2025|--|--|
-|Sprint 2|1.Adopt Material Design 3 (MD3) across the prototype<br>2.Implement frontend UI work without interaction(user end)|2 Oct 2025||[sprint 2 slides](https://www.canva.com/design/DAGz8eY40TQ/qhAQETG0Ld8WvToFRh5nmQ/edit?utm_content=DAGz8eY40TQ&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)|
+|Sprint 2|1.Adopt Material Design 3 (MD3) across the prototype<br>2.Implement frontend UI work without interaction(user end)|2 Oct 2025|[Sprint 2 Retro](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/Sprint%202%20Retro.md)<br>[Sprint 2 review](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/Sprint%202%20Review.md)|[sprint 2 slides](https://www.canva.com/design/DAGz8eY40TQ/qhAQETG0Ld8WvToFRh5nmQ/edit?utm_content=DAGz8eY40TQ&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)|
 |Sprint 3||23 Oct 2025|||
 ## Meeting Records
 [Scribe Record](https://docs.google.com/spreadsheets/d/1S0wbxD3qdw5VT001IVuKAfbjTX7lGPsIckci2tuJUc4/edit?gid=0#gid=0)
@@ -66,7 +66,7 @@ Frontend: CSS, HTML, React
 |week 6|[S2 Week6 Client Meeting](https://github.com/AriaFung/CoDesign-Project/blob/main/docs/Meeting%20minutes/S2%20Week%206%20Client%20Meeting.md)<br>[S2 Week6 Tutoring Meeting](https://github.com/AriaFung/CoDesign-Project/blob/main/docs/Meeting%20minutes/S2%20Week%206%20Tutor%20meeting.md)<br>[S2 Week6 Team Meeting](https://github.com/AriaFung/CoDesign-Project/blob/main/docs/Meeting%20minutes/S2%20Week%206%20Tutor%20meeting.md)|
 |week 7|[S2 Week7 Client Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S2%20Week%207%20Client%20Meeting.md)<br>[S2 Week7 Tutoring Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S2%20Week%207%20Tutoring%20Meeting.md)<br>[S2 Week7 Team Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S2%20Week%207%20Team%20Meeting%20.md)|
 |week 8|[S2 Week8 Client Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S2%20Week%208%20Client%20Meeting.md)<br>[S2 Week8 Team Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S2%20Week%208%20Team%20Meeting.md)||
-|week 9||
+|week 9|[S2 Week9 Team Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S2%20Week%209%20Team%20Meeting.md)<br>[S2 Week9 Tutoring Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S2%20Week%209%20Tutoring%20Meeting.md)||
 |week 10||
 |week 11||
 |week 12||
@@ -83,14 +83,14 @@ Frontend: CSS, HTML, React
 ### Sprint 2
 | Task| Estimate (Story Points) | 
 |----|----|
-|Meeting minutes|2 SP|
-|Risk log & reflection log|2 SP|
+|Meeting minutes|3 SP|
+|Risk log & reflection log & project challenges|4 SP|
 |Prepare presentation slides|4 SP|
-|Refine Figma Prototype (following MD3)|10 SP|
+|Refine Figma Prototype (following MD3)|13 SP|
 |User Pages Framework Construction |4 SP|
-|Implement frontend UI work without interaction(user end pages)|20 SP|
+|Implement frontend UI work without interaction(user end pages)|34 SP|
 |Add CI/CD|2 SP|
-|**Total** |44 SP|
+|**Total** |61 SP|
 ### Sprint 3
 | Task| Estimate (Story Points) |
 |----|----|
