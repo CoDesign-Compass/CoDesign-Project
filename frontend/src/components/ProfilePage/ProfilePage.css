@@ -145,30 +145,99 @@
 }
 
 /* Different colored tags */
-.tag.selected.tag-color-yellow {
-  background-color: #f0e442;
+/* --- Tag Colors (normal = light tone, selected = dark tone) --- */
+
+/* Yellow */
+.tag.tag-color-yellow {
+  background-color: #fff9b0;
   color: #333;
-  border-color: #f0e442;
+  border-color: #e6da7f;
+}
+.tag.selected.tag-color-yellow {
+  background-color: #c2b400;
+  color: #fff;
+  border-color: #c2b400;
+}
+
+/* Blue */
+.tag.tag-color-blue {
+  background-color: #bde0fe;
+  color: #333;
+  border-color: #8ecae6;
 }
 .tag.selected.tag-color-blue {
-  background-color: #a0c4ff;
+  background-color: #023e8a;
+  color: #fff;
+  border-color: #023e8a;
+}
+
+/* Red */
+.tag.tag-color-red {
+  background-color: #ffc9c9;
   color: #333;
-  border-color: #a0c4ff;
+  border-color: #ff8fa3;
 }
 .tag.selected.tag-color-red {
-  background-color: #ffadad;
+  background-color: #b30000;
+  color: #fff;
+  border-color: #b30000;
+}
+
+/* Purple */
+.tag.tag-color-purple {
+  background-color: #e0c3fc;
   color: #333;
-  border-color: #ffadad;
+  border-color: #b197fc;
 }
 .tag.selected.tag-color-purple {
-  background-color: #bdb2ff;
+  background-color: #5a189a;
+  color: #fff;
+  border-color: #5a189a;
+}
+
+/* Green */
+.tag.tag-color-green {
+  background-color: #caffbf;
   color: #333;
-  border-color: #bdb2ff;
+  border-color: #b6f2a5;
+}
+.tag.selected.tag-color-green {
+  background-color: #007f5f;
+  color: #fff;
+  border-color: #007f5f;
+}
+
+/* Orange */
+.tag.tag-color-orange {
+  background-color: #ffd6a5;
+  color: #333;
+  border-color: #fcbf49;
+}
+.tag.selected.tag-color-orange {
+  background-color: #d47f00;
+  color: #fff;
+  border-color: #d47f00;
+}
+
+/* Pink */
+.tag.tag-color-pink {
+  background-color: #ffcad4;
+  color: #333;
+  border-color: #ffa6c1;
+}
+.tag.selected.tag-color-pink {
+  background-color: #b00056;
+  color: #fff;
+  border-color: #b00056;
 }
 
 /* --- Desktop Styles (using Media Query) --- */
 /* Apply the following styles when screen width is 768px or larger */
 @media (min-width: 768px) {
+  .profile-page {
+    max-width: calc(100% - 500px);
+    margin: 0 auto;
+  }
   .main-title {
     font-size: 2rem;
   }
@@ -190,4 +259,113 @@
   }
 }
 
+/* --- Tag Hover & Interaction Effects --- */
+
+/* 所有标签默认状态：轻微阴影 + 平滑过渡 */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: 16px;
+  border: 1px solid #666;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* hover 时轻微放大 + 阴影增强 */
+.tag:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* 选中状态阴影稍强，保持反色 */
+.tag.selected {
+  transform: scale(1.08);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+  font-weight: bold;
+}
+
+/* Checkmark 样式 */
+.tag .checkmark {
+  margin-right: 6px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
 /* --- Styles for other components (CategoryTabs, NavigationButtons) can be added below --- */
+/* --- Category Tabs --- */
+.category-tabs-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap; /* 移动端自动换行 */
+  gap: 10px;
+  margin: 25px 0;
+}
+
+.tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f7f7f7;
+  border: 2px solid #ccc;
+  border-radius: 14px;
+  padding: 12px 18px;
+  min-width: 120px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  color: #333;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* hover 动效 */
+.tab-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  border-color: #999;
+}
+
+/* 激活状态（选中） */
+.tab-item.active {
+  background: linear-gradient(135deg, #ffe680, #fff3b0);
+  border-color: #f0e442;
+  color: #222;
+  font-weight: bold;
+  box-shadow: 0 6px 14px rgba(240, 228, 66, 0.4);
+  transform: scale(1.05);
+}
+
+/* 图标部分 */
+.tab-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+  color: inherit;
+}
+
+/* 文字部分 */
+.tab-label {
+  font-size: 0.9rem;
+  text-align: center;
+  color: inherit;
+}
+
+/* --- 桌面端进一步美化布局 --- */
+@media (min-width: 768px) {
+  .category-tabs-container {
+    gap: 16px;
+  }
+
+  .tab-item {
+    min-width: 150px;
+    padding: 14px 22px;
+  }
+
+  .tab-label {
+    font-size: 1rem;
+  }
+}

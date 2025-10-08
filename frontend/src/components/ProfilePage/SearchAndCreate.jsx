@@ -1,27 +1,23 @@
+// SearchAndCreate.jsx
 import React from "react";
 
-const SearchAndCreate = () => {
-  const menuItems = [
-    "mental health",
-    "disability rights",
-    "aged care",
-    "elder support",
-  ];
+const SearchAndCreate = ({ inputValue, onInputChange, onCreate }) => {
   return (
     <div className="search-create-box">
       <div className="search-input-wrapper">
         <input
           type="text"
-          placeholder="Search & Create"
+          placeholder="Search or Create"
           className="search-input"
+          value={inputValue}
+          onChange={(e) => onInputChange(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && inputValue.trim() !== "") {
+              onCreate();
+            }
+          }}
         />
-        <span className="search-clear">×</span>
       </div>
-      <ul className="search-results">
-        {menuItems.map((item) => (
-          <li key={item}>{item}</li>
-        ))}
-      </ul>
     </div>
   );
 };
