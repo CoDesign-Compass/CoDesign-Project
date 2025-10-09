@@ -1,3 +1,4 @@
+import { Link, Outlet, useLocation } from "react-router-dom";
 import { Layout, Menu } from "tdesign-react";
 import {
     DashboardIcon,
@@ -8,7 +9,6 @@ import {
     ChartBarIcon,
     ChartLineIcon,
 } from "tdesign-icons-react";
-import { Link, Outlet, useLocation } from "react-router-dom";
 
 const { Header, Aside, Content } = Layout;
 
@@ -36,7 +36,14 @@ export default function AdminLayout() {
                     width: "220px",
                 }}
             >
-                <div style={{ textAlign: "center", fontWeight: "bold", fontSize: "1.2rem", marginBottom: "2rem" }}>
+                <div
+                    style={{
+                        textAlign: "center",
+                        fontWeight: "bold",
+                        fontSize: "1.2rem",
+                        marginBottom: "2rem",
+                    }}
+                >
                     CoDesignCompass
                 </div>
 
