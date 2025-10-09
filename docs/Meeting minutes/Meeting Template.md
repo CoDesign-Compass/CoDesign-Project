@@ -22,9 +22,9 @@ Ricky Chen, Jingwen Zhang, Yu Pan, Jiaxin Li, Shuo Li, Aria Fung, Zhimeng Zhu, S
 |---|---|---|
 ||||
 ## Client Sign-off (only for client meeting)
-| Deliverable Presented | Accepted by Client? | Comments |
-|----|----|----|
-||||
+| Decision(Last week) -> Outome(Last week) -> Client Sign-off |
+|---|
+||
 
 ## Task Allocations
 |Task|Assignee|Due Date|Issue|
