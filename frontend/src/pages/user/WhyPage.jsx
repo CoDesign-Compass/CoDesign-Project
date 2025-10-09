@@ -123,7 +123,7 @@ export default function WhyPage() {
         </div>
       ))}
 
-      {/* 当前问题（仅此框可编辑）+ 动画 */}
+      {/* Current question (only this field is editable) + animation */}
       <AnimatePresence mode="popLayout">
         <motion.div
           key={step}
@@ -157,7 +157,7 @@ export default function WhyPage() {
             }}
           />
 
-          {/* ✅ 从第二题（step > 0）才出现的 I don't know 按钮 */}
+          {/* "I don't know" button appears only from the second question (step > 0) */}
           {step > 0 && (
             <motion.button
               key="idk"
