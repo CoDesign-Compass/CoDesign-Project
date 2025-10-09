@@ -67,8 +67,8 @@ export default function WelcomePage() {
             style={{
               margin: 0,
               fontSize: "clamp(36px, 8vw, 96px)",
-              color: theme === "light" ? "#303030" : "#A7D3FC",
-              fontFamily: "Yeseva One, serif",
+              color: theme === "light" ? "#303030" : "#ffe070",
+              fontFamily: "Poppins, sans-serif",
               lineHeight: 1.1,
               paddingInline: "4vw",
             }}
@@ -96,7 +96,7 @@ export default function WelcomePage() {
             cursor: "pointer",
             border: "none",
             background: "#7F7FBC",
-            fontFamily: "Yeseva One, serif",
+            fontFamily: "Poppins, sans-serif",
             transition: "opacity 0.2s ease",
             opacity: 0.85,
           }}
