@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { Layout, Menu, MenuItem } from "tdesign-react";
+import { Layout, Menu } from "tdesign-react";
 import {
     DashboardIcon,
     AddIcon,
@@ -11,6 +11,7 @@ import {
 } from "tdesign-icons-react";
 
 const { Header, Aside, Content } = Layout;
+const { MenuItem } = Menu;
 
 export default function AdminLayout() {
     const location = useLocation();
@@ -36,24 +37,16 @@ export default function AdminLayout() {
                     width: "220px",
                 }}
             >
-                <div
-                    style={{
-                        textAlign: "center",
-                        fontWeight: "bold",
-                        fontSize: "1.2rem",
-                        marginBottom: "2rem",
-                    }}
-                >
+                <div style={{ textAlign: "center", fontWeight: "bold", fontSize: "1.2rem", marginBottom: "2rem" }}>
                     CoDesignCompass
                 </div>
 
-                <Menu
-                    value={location.pathname}
-                    style={{ border: "none", backgroundColor: "transparent" }}
-                >
+                <Menu value={location.pathname} style={{ border: "none", backgroundColor: "transparent" }}>
                     {menuItems.map((item) => (
                         <MenuItem key={item.path} value={item.path} icon={item.icon}>
-                            <Link to={item.path}>{item.name}</Link>
+                            <Link to={item.path} style={{ display: "block", width: "100%" }}>
+                                {item.name}
+                            </Link>
                         </MenuItem>
                     ))}
                 </Menu>
@@ -72,13 +65,7 @@ export default function AdminLayout() {
                     Admin Dashboard
                 </Header>
 
-                <Content
-                    style={{
-                        padding: "2rem",
-                        backgroundColor: "#fafafa",
-                        overflowY: "auto",
-                    }}
-                >
+                <Content style={{ padding: "2rem", backgroundColor: "#fafafa", overflowY: "auto" }}>
                     <Outlet />
                 </Content>
             </Layout>
