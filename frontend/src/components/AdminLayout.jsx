@@ -6,7 +6,7 @@ import {
     ChartIcon,
     AppIcon,
     ChartBarIcon,
-    LineIcon,
+    ChartLineIcon,
 } from "tdesign-icons-react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 
@@ -20,7 +20,7 @@ export default function AdminLayout() {
         { name: "New Issue", path: "/admin/new-issue", icon: <AddIcon /> },
         { name: "Issue Report", path: "/admin/issue-report", icon: <ChartIcon /> },
         { name: "Why Report", path: "/admin/why-report", icon: <ChartBarIcon /> },
-        { name: "How Report", path: "/admin/how-report", icon: <LineIcon /> },
+        { name: "How Report", path: "/admin/how-report", icon: <ChartLineIcon /> },
         { name: "Profile Report", path: "/admin/profile-report", icon: <AppIcon /> },
         { name: "Engagement Report", path: "/admin/engagement-report", icon: <ChartIcon /> },
         { name: "Manage Users", path: "/admin/manage-users", icon: <UserIcon /> },
