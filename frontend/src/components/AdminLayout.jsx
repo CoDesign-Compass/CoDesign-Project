@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { Layout, Menu } from "tdesign-react";
+import { Layout, Menu, MenuItem } from "tdesign-react";
 import {
     DashboardIcon,
     AddIcon,
@@ -52,9 +52,9 @@ export default function AdminLayout() {
                     style={{ border: "none", backgroundColor: "transparent" }}
                 >
                     {menuItems.map((item) => (
-                        <Menu.Item key={item.path} value={item.path} icon={item.icon}>
+                        <MenuItem key={item.path} value={item.path} icon={item.icon}>
                             <Link to={item.path}>{item.name}</Link>
-                        </Menu.Item>
+                        </MenuItem>
                     ))}
                 </Menu>
             </Aside>
