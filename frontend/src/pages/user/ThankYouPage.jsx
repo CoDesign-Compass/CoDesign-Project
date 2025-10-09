@@ -78,8 +78,8 @@ export default function ThankPage() {
             style={{
               margin: 0,
               fontSize: "clamp(30px, 8vw, 96px)",
-              color: theme === "light" ? "#303030" : "#A7D3FC",
-              fontFamily: "Yeseva One, serif",
+              color: theme === "light" ? "#303030" : "#ffe070",
+              fontFamily: "Poppins, sans-serif",
               lineHeight: 1.1,
               paddingInline: "4vw",
             }}
@@ -88,10 +88,10 @@ export default function ThankPage() {
           </h1>
           <h2
             style={{
-              marginTop: -5,
+              marginTop: 0,
               fontSize: "clamp(24px, 3.2vw, 40px)",
-              color: theme === "light" ? "#303030" : "#A7D3FC",
-              fontFamily: "Yeseva One",
+              color: theme === "light" ? "#303030" : "#ffe070",
+              fontFamily: "Poppins, sans-serif",
             }}
           >
             for sharing your experience
