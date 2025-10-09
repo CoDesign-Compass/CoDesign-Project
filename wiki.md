@@ -47,7 +47,7 @@ Frontend: CSS, HTML, React
 |Setup and user story, persona, scenario, product vision|Sprint 1|21 Aug 2025|
 |Sprint 1: Prototype & UI Design|Sprint 1|21 Aug 2025|
 |Sprint 2: MD3 & Implement front-end UI interface for client-end(excluding interactive functionality)|Sprint 2|2 Oct 2025|
-|Mobile & Web UI Implementation|Sprint 3|23 Oct 2025|
+|Sprint3: Admin System UI Implementation|Sprint 3|23 Oct 2025|
 |2026 S1|---|---|
 |Interaction Implementation|Sprint 4|12 March 2026|
 |Back-end implementation & Test|Sprint 5,6|7 May 2026|
