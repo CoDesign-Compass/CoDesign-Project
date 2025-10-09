@@ -1,13 +1,13 @@
 
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeContext"; 
-import WelcomePage from "./pages/WelcomePage";
-import ProfilePage from "./pages/ProfilePage";
-import WhyPage from "./pages/WhyPage";
-import HowPage from "./pages/HowPage";
-import ThankYouPage from "./pages/ThankYouPage";
+import WelcomePage from "./pages/user/WelcomePage";
+import ProfilePage from "./pages/user/ProfilePage";
+import WhyPage from "./pages/user/WhyPage";
+import HowPage from "./pages/user/HowPage";
+import ThankYouPage from "./pages/user/ThankYouPage";
 import Layout from "./components/Layout";
-import LoginPage from "./pages/LoginPage";
+import LoginPage from "./pages/user/LoginPage";
 
 function App() {
     return (
