@@ -1,5 +1,5 @@
 # Spring Review - Sprint X
-## Date
+## Time - Date
 ## Location
 The Hive, Building 108, ANU
 ## Participants
