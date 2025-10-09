@@ -68,7 +68,7 @@ export default function LoginPage({ mode = "create", onSubmit: onSubmitProp }) {
             textAlign: "center",
           }}
         >
-          <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,.25)" }} />
+          <div style={{ position: "absolute", inset: 0 }} />
           <h1
             className="hero-title"
             style={{
@@ -76,7 +76,7 @@ export default function LoginPage({ mode = "create", onSubmit: onSubmitProp }) {
               fontSize: 44,
               color: "var(--heading)",      
               letterSpacing: 1,
-              textShadow: "0 1px 2px rgba(0,0,0,.35)",
+              textShadow: "0 1px 2px rgba(0.3,0.5,0.7,.5)",
             }}
           >
             Create Account
@@ -149,12 +149,12 @@ export default function LoginPage({ mode = "create", onSubmit: onSubmitProp }) {
                 type="submit"
                 style={{
                   minWidth: 240, padding: "12px 24px", borderRadius: 14,
-                  background: "#2f2f2f", border: "3px solid #ffe070", color: "#fff", cursor: "pointer",
-                  boxShadow: "0 2px 0 rgba(0,0,0,.25), inset 0 0 0 1px rgba(0,0,0,.08)",
+                  background: "#2f2f2f", border: "2.5px solid #ffe070", color: "#fff", cursor: "pointer",
+                  boxShadow: "0 2px 0 rgba(0,0,0,.5), inset 0 0 0 1px rgba(0,0,0,.2)",
                 }}
               >
                 <span style={{
-                  fontSize: 22, lineHeight: 1.1, fontWeight: 500, textDecoration: "underline",
+                  fontSize: 22, lineHeight: 1.1, fontWeight: 500,
                   textDecorationColor: "#fff", textDecorationThickness: "1.5px", textUnderlineOffset: "4px",
                 }}>
                   Sign Up
