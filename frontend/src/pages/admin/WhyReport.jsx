@@ -9,28 +9,48 @@ export default function WhyReport() {
     ];
 
     return (
-        <div style={{ padding: "1rem 2rem" }}>
-            <Title tag="h2">Why Report</Title>
+        <div style={{ maxWidth: "900px", margin: "0 auto" }}>
+            <Title tag="h2" style={{ marginBottom: "1rem" }}>
+                Why Report
+            </Title>
 
             {/* Summary Card */}
-            <Card style={{ margin: "1rem 0", height: "180px", backgroundColor: "#f5f1fa" }}>
+            <Card
+                style={{
+                    marginBottom: "2rem",
+                    backgroundColor: "#f5f1fa",
+                    borderRadius: "12px",
+                    height: "180px",
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+                }}
+            >
                 <Paragraph>Summary visualization placeholder</Paragraph>
             </Card>
 
             <Divider />
-            <Title tag="h4">Featured</Title>
+            <Title tag="h4" style={{ marginBottom: "1rem" }}>
+                Featured
+            </Title>
 
-            {/* Report List */}
             <List
-                split={true}
-                items={reports.map((r, i) => ({
+                split={false}
+                items={reports.map((r) => ({
                     content: (
-                        <Space direction="vertical" size={0}>
-                            <strong>{r.title}</strong>
-                            <Paragraph>{r.desc}</Paragraph>
-                        </Space>
+                        <Card
+                            key={r.title}
+                            hoverable
+                            style={{
+                                marginBottom: "1rem",
+                                borderRadius: "10px",
+                                boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+                            }}
+                        >
+                            <Space direction="vertical" size={4}>
+                                <strong>{r.title}</strong>
+                                <Paragraph>{r.desc}</Paragraph>
+                            </Space>
+                        </Card>
                     ),
-                    action: <span style={{ fontSize: "20px", cursor: "pointer" }}>⋮</span>,
                 }))}
             />
         </div>
