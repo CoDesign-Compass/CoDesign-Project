@@ -3,9 +3,9 @@ const { Title, Paragraph } = Typography;
 
 export default function WhyReport() {
     const reports = [
-        { title: "Improvement Themes", desc: "Brief description of this report..." },
-        { title: "Barrier Analysis", desc: "Brief description of this report..." },
-        { title: "Suggestions & Recommendations", desc: "Brief description of this report..." },
+        { title: "Themes & Concerns", desc: "Brief description of this report..." },
+        { title: "Sentimental Analysis", desc: "Brief description of this report..." },
+        { title: "Actionable Insights & Recommendations Analysis", desc: "Brief description of this report..." },
     ];
 
     return (
