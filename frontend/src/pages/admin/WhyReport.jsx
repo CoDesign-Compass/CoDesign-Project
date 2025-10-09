@@ -10,7 +10,7 @@ export default function WhyReport() {
 
     return (
         <div style={{ padding: "1rem 2rem" }}>
-            <Title level={2}>Why Report</Title>
+            <Title tag="h2">Why Report</Title>
 
             {/* Summary Card */}
             <Card style={{ margin: "1rem 0", height: "180px", backgroundColor: "#f5f1fa" }}>
@@ -18,7 +18,7 @@ export default function WhyReport() {
             </Card>
 
             <Divider />
-            <Title level={4}>Featured</Title>
+            <Title tag="h4">Featured</Title>
 
             {/* Report List */}
             <List

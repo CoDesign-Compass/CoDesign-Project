@@ -10,14 +10,14 @@ export default function HowReport() {
 
     return (
         <div style={{ padding: "1rem 2rem" }}>
-            <Title level={2}>How Report</Title>
+            <Title tag="h2">How Report</Title>
 
             <Card style={{ margin: "1rem 0", height: "180px", backgroundColor: "#f5f1fa" }}>
                 <Paragraph>Summary visualization placeholder</Paragraph>
             </Card>
 
             <Divider />
-            <Title level={4}>Featured</Title>
+            <Title tag="h4">Featured</Title>
 
             <List
                 split={true}
