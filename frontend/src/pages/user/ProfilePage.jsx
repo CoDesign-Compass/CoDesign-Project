@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 
-import CategoryTabs from "../components/ProfilePage/CategoryTabs";
-import SearchAndCreate from "../components/ProfilePage/SearchAndCreate";
-import TagSelection from "../components/ProfilePage/TagSelection";
+import CategoryTabs from "../../components/ProfilePage/CategoryTabs";
+import SearchAndCreate from "../../components/ProfilePage/SearchAndCreate";
+import TagSelection from "../../components/ProfilePage/TagSelection";
 
-import "../components/ProfilePage/ProfilePage.css";
+import "../../components/ProfilePage/ProfilePage.css";
 
 const COLORS = ["yellow", "blue", "red", "purple", "green", "orange", "pink"];
 
