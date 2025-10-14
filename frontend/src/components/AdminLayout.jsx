@@ -1,74 +1,116 @@
+import React, { useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { Layout, Menu } from "tdesign-react";
-import {
-    DashboardIcon,
-    AddIcon,
-    UserIcon,
-    ChartIcon,
-    AppIcon,
-    ChartBarIcon,
-    ChartLineIcon,
-} from "tdesign-icons-react";
 
-const { Header, Aside, Content } = Layout;
-const { MenuItem } = Menu;
+/** 小图标（内联 svg） */
+const MenuIcon = (p) => (
+  <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" {...p}>
+    <path strokeWidth="2" strokeLinecap="round" d="M4 6h16M4 12h16M4 18h16"/>
+  </svg>
+);
+const CloseIcon = (p) => (
+  <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" {...p}>
+    <path strokeWidth="2" strokeLinecap="round" d="M6 6l12 12M18 6l-12 12"/>
+  </svg>
+);
 
-export default function AdminLayout() {
-    const location = useLocation();
+const navs = [
+  { name: "Dashboard",        path: "/admin/dashboard" },
+  { name: "New Issue",        path: "/admin/new-issue" },
+  { name: "Issue Report",     path: "/admin/issue-report" },
+  { name: "Why Report",       path: "/admin/why-report" },
+  { name: "How Report",       path: "/admin/how-report" },
+  { name: "Profile Report",   path: "/admin/profile-report" },
+  { name: "Engagement Report",path: "/admin/engagement-report" },
+  { name: "Manage Users",     path: "/admin/manage-users" },
+];
 
-    const menuItems = [
-        { name: "Dashboard", path: "/admin/dashboard", icon: <DashboardIcon /> },
-        { name: "New Issue", path: "/admin/new-issue", icon: <AddIcon /> },
-        { name: "Issue Report", path: "/admin/issue-report", icon: <ChartIcon /> },
-        { name: "Why Report", path: "/admin/why-report", icon: <ChartBarIcon /> },
-        { name: "How Report", path: "/admin/how-report", icon: <ChartLineIcon /> },
-        { name: "Profile Report", path: "/admin/profile-report", icon: <AppIcon /> },
-        { name: "Engagement Report", path: "/admin/engagement-report", icon: <ChartIcon /> },
-        { name: "Manage Users", path: "/admin/manage-users", icon: <UserIcon /> },
-    ];
+export default function AdminLayoutTail() {
+  const [open, setOpen] = useState(false);
+  const { pathname } = useLocation();
 
-    return (
-        <Layout style={{ height: "100vh", backgroundColor: "#fafafa" }}>
-            <Aside
-                style={{
-                    backgroundColor: "#fff7cc",
-                    borderRight: "1px solid #eee",
-                    padding: "1.5rem 0",
-                    width: "220px",
-                }}
-            >
-                <div style={{ textAlign: "center", fontWeight: "bold", fontSize: "1.2rem", marginBottom: "2rem" }}>
-                    CoDesignCompass
-                </div>
+  const NavList = ({ onClickItem }) => (
+    <nav className="mt-4 space-y-1">
+      {navs.map((n) => {
+        const active = pathname === n.path;
+        return (
+          <Link
+            key={n.path}
+            to={n.path}
+            onClick={onClickItem}
+            className={[
+              "block rounded-xl px-4 py-2.5 text-sm font-medium transition",
+              active
+                ? "bg-indigo-50 text-indigo-700 ring-1 ring-indigo-200"
+                : "text-gray-700 hover:bg-gray-50"
+            ].join(" ")}
+          >
+            {n.name}
+          </Link>
+        );
+      })}
+    </nav>
+  );
 
-                <Menu value={location.pathname} style={{ border: "none", backgroundColor: "transparent" }}>
-                    {menuItems.map((item) => (
-                        <MenuItem key={item.path} value={item.path} icon={item.icon}>
-                            <Link to={item.path} style={{ display: "block", width: "100%" }}>
-                                {item.name}
-                            </Link>
-                        </MenuItem>
-                    ))}
-                </Menu>
-            </Aside>
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* 顶部栏（移动端可见） */}
+      <header className="sticky top-0 z-30 flex items-center justify-between bg-white px-4 py-3 shadow-sm md:hidden">
+        <button
+          aria-label="Open menu"
+          onClick={() => setOpen(true)}
+          className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white p-2"
+        >
+          <MenuIcon />
+        </button>
+        <div className="text-base font-semibold">Admin</div>
+        <div className="h-8 w-8 rounded-lg bg-gray-100" />
+      </header>
 
-            <Layout>
-                <Header
-                    style={{
-                        backgroundColor: "#fff",
-                        borderBottom: "1px solid #eee",
-                        padding: "0.5rem 2rem",
-                        fontWeight: "bold",
-                        fontSize: "1.1rem",
-                    }}
-                >
-                    Admin Dashboard
-                </Header>
+      {/* 抽屉侧栏：移动端 */}
+      {open && (
+        <div className="fixed inset-0 z-40 md:hidden">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
+          <aside className="relative h-full w-72 bg-white p-4">
+            <div className="mb-2 flex items-center justify-between">
+              <div className="text-lg font-semibold">CoDesignCompass</div>
+              <button
+                aria-label="Close menu"
+                onClick={() => setOpen(false)}
+                className="rounded-lg border border-gray-200 bg-white p-2"
+              >
+                <CloseIcon />
+              </button>
+            </div>
+            <NavList onClickItem={() => setOpen(false)} />
+          </aside>
+        </div>
+      )}
 
-                <Content style={{ padding: "2rem", backgroundColor: "#fafafa", overflowY: "auto" }}>
-                    <Outlet />
-                </Content>
-            </Layout>
-        </Layout>
-    );
+      <div className="mx-auto grid w-full max-w-[1400px] grid-cols-1 md:grid-cols-[240px_1fr]">
+        {/* 左侧栏：桌面端可见 */}
+        <aside className="hidden md:block md:min-h-screen md:border-r md:border-gray-200 md:bg-white md:px-4 md:py-6">
+          <div className="px-2 text-lg font-semibold">CoDesignCompass</div>
+          <NavList />
+        </aside>
+
+        {/* 右侧内容区 */}
+        <main className="min-h-screen p-4 md:p-8">
+          {/* 右侧顶部条（桌面端） */}
+          <div className="mb-4 hidden items-center justify-between md:flex">
+            <div className="text-lg font-semibold">Admin Dashboard</div>
+            <div className="flex items-center gap-3">
+              <input
+                placeholder="Quick search…"
+                className="h-9 w-64 rounded-xl border border-gray-200 px-3 text-sm outline-none focus:ring-2 focus:ring-indigo-200"
+              />
+              <div className="h-9 w-9 rounded-full bg-gray-100" />
+            </div>
+          </div>
+
+          {/* 页面内容 */}
+          <Outlet />
+        </main>
+      </div>
+    </div>
+  );
 }
