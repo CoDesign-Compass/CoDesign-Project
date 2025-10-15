@@ -1,0 +1,40 @@
+# S2 Week 9 Team Meeting
+
+## Date  
+9 Oct, 2025
+
+## Location  
+The Hive, Building 108, ANU
+
+## Participants  
+Ricky Chen, Jingwen Zhang, Yu Pan, Jiaxin Li, Aria Fung, Zhimeng Zhu
+
+---
+
+## Goals  
+* Review Sprint 2 reflection and last week's work
+* Plan tasks for next week and this sprint  
+* Define and allocate team tasks for the upcoming week.  
+
+---
+
+## Discussion Topics  
+| Time  | Item                     | Presenter          | Notes                                                        |
+| ----- | ------------------------ | ------------------ | ------------------------------------------------------------ |
+| 10:20 | Review Sprint 2 reflection and last week's work | Team | Discuss the scores and feedback from Sprint 2, and reflect on areas for improvement.  |
+| 10:35 | Evaluate the current work progress and determine follow-up actions | Team | Assessed each member’s current workload and progress. Refine the relevant work for the next sprint based on the tutor's feedback, and improve the issue descriptions. |
+| 10:50 | Task Allocation | Team | Assigned tasks for the next sprint based on current progress. Ensured balanced workload distribution and clear ownership of each module. |
+
+---
+
+## Decisions  
+* One member continuously improves and optimizes the current front-end pages, making adjustments based on discussions.  
+* Other members focus on developing the admin-side frontend pages. Each person is responsible for developing one independent page. Developing the admin side using the tailadmin framework.
+* Developing the admin side using the tailadmin framework.
+---
+
+## Task Allocations & Action Items  
+| Action Items | Assignee | Due Date | Issue / Reference |
+|---------------|-----------|-----------|--------------------|
+| Developing the admin-side frontend pages | Ricky Chen, Shou Li, Yu Pan, Jiaxin Li, Aria Fung, Zhimeng Zhu | Wed, Week 11 |#91 #109 #97 #112|
+| Refine and improve user-side frontend pages | Jingwen Zhang | Wed, Week 11 |#74|
