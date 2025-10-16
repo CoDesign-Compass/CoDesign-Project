@@ -36,9 +36,9 @@ export default function Layout({ children }) {
         }}
       >
         <img
-          src="/logo.png"
+          src={theme === "light" ? "/logo_light.png" : "/logo_dark.png"}
           alt="Purpose Media Logo"
-          style={{ height: "50px" }}
+          style={{ height: "60px" }}
         />
         <button
           onClick={toggleTheme}
