@@ -27,6 +27,34 @@ export default function WelcomePage() {
     return () => document.removeEventListener("mousedown", onDown);
   }, []);
 
+  useEffect(() => {
+    const onDown = (e) => {
+      if (popRef.current && !popRef.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, []);
+
+  const [helpForm, setHelpForm] = useState({ email: "", message: "" });
+  const [helpSent, setHelpSent] = useState(false);
+  const [helpErr, setHelpErr] = useState("");
+
+  const handleHelpSubmit = (e) => {
+    e.preventDefault();
+    setHelpErr("");
+    const validEmail = /^\S+@\S+\.\S+$/.test(helpForm.email);
+    if (!validEmail) return setHelpErr("Please enter a valid email.");
+    if (helpForm.message.trim().length < 5) {
+      return setHelpErr("Tell us a bit more (≥ 5 characters).");
+    }
+
+    // TODO: connect backend
+    // e.g.: fetch("/api/help", { method:"POST", headers:{'Content-Type':'application/json'}, body: JSON.stringify(helpForm) })
+    // .then(() => setHelpSent(true))
+
+    setHelpSent(true);
+  };
+
   return (
     <div
       className="welcome-page"
@@ -190,20 +218,114 @@ export default function WelcomePage() {
             >
               <div
                 style={{
-                  fontSize: "clamp(12px, 1.4vw, 16px)",
                   lineHeight: 1.55,
                   fontFamily: "Poppins, sans-serif",
                   color: "#303030",
                 }}
-              >
-                <p>Welcome to Codesign Compass.</p>
-                <p>
-                  This is a simple, secure, and interactive web app that invites
-                  people with lived experience to shape a policy framework or
-                  service access pathway.
-                </p>
-                <p>Thank you for your participation.</p>
-              </div>
+              />
+              {helpSent ? (
+                <div style={{ lineHeight: 1.55 }}>
+                  <p style={{ margin: 0, fontWeight: 600 }}>Thanks! 🎉</p>
+                  <p style={{ margin: "6px 0 0" }}>
+                    We’ve received your message and will get back to you soon.
+                  </p>
+                </div>
+              ) : (
+                <form
+                  onSubmit={handleHelpSubmit}
+                  style={{ display: "grid", gap: 8 }}
+                >
+                  <label style={{ fontSize: 13 }}>
+                    Email address
+                    <input
+                      type="email"
+                      value={helpForm.email}
+                      onChange={(e) =>
+                        setHelpForm((f) => ({ ...f, email: e.target.value }))
+                      }
+                      placeholder="you@example.com"
+                      style={{
+                        width: "100%",
+                        height: 38,
+                        marginTop: 4,
+                        borderRadius: 6,
+                        border: "1px solid #d8c25b",
+                        background: "#fff9c6",
+                        padding: "0 10px",
+                        outline: "none",
+                      }}
+                    />
+                  </label>
+
+                  <label style={{ fontSize: 13 }}>
+                    Your question
+                    <textarea
+                      rows={3}
+                      value={helpForm.message}
+                      onChange={(e) =>
+                        setHelpForm((f) => ({ ...f, message: e.target.value }))
+                      }
+                      placeholder="Tell us what's going on…"
+                      style={{
+                        width: "100%",
+                        marginTop: 4,
+                        borderRadius: 6,
+                        border: "1px solid #d8c25b",
+                        background: "#fffef0",
+                        padding: "8px 10px",
+                        resize: "vertical",
+                        outline: "none",
+                      }}
+                    />
+                  </label>
+
+                  {helpErr && (
+                    <div style={{ color: "#9b1c1c", fontSize: 12 }}>
+                      {helpErr}
+                    </div>
+                  )}
+
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 8,
+                      justifyContent: "flex-end",
+                      marginTop: 2,
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setOpen(false)}
+                      style={{
+                        height: 32,
+                        padding: "0 10px",
+                        borderRadius: 6,
+                        border: "1px solid rgba(0,0,0,.15)",
+                        background: "#fff",
+                        color: "#303030",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      style={{
+                        height: 32,
+                        padding: "0 12px",
+                        borderRadius: 6,
+                        border: "none",
+                        background: "#303030",
+                        color: "#ffe070",
+                        cursor: "pointer",
+                        boxShadow: "0 1px 0 rgba(0,0,0,.2)",
+                      }}
+                    >
+                      Send
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
           )}
         </div>

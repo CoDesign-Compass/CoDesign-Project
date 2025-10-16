@@ -50,6 +50,7 @@ export default function WhyPage() {
             fontWeight: "bold",
             padding: "0.2rem 0.5rem",
             borderRadius: "4px",
+            color: "#000000",
           }}
         >
           Issue:
@@ -69,6 +70,7 @@ export default function WhyPage() {
               padding: "0.75rem",
               fontWeight: "bold",
               cursor: "pointer",
+              color: "#000000",
             }}
           >
             Agree
@@ -82,6 +84,7 @@ export default function WhyPage() {
               padding: "0.75rem",
               fontWeight: "bold",
               cursor: "pointer",
+              color: "#000000",
             }}
           >
             Disagree
@@ -95,6 +98,7 @@ export default function WhyPage() {
               padding: "0.75rem",
               fontWeight: "bold",
               cursor: "pointer",
+              color: "#000000",
             }}
           >
             I don’t know
@@ -174,6 +178,7 @@ export default function WhyPage() {
                 fontWeight: 600,
                 cursor: "pointer",
                 whiteSpace: "nowrap",
+                color: "#000000",
               }}
             >
               I don’t know
@@ -192,6 +197,7 @@ export default function WhyPage() {
               cursor: answers[step].trim() ? "pointer" : "not-allowed",
               opacity: answers[step].trim() ? 1 : 0.7,
               whiteSpace: "nowrap",
+              color: "#000000",
             }}
           >
             Next
