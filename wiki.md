@@ -94,5 +94,9 @@ Frontend: CSS, HTML, React
 ### Sprint 3
 | Task| Estimate (Story Points) |
 |----|----|
-|||
-|**Total** ||
+|Meeting minutes|3 SP|
+|Risk log & reflection log & project challenges|4 SP|
+|Admin System UI Implementation|24 SP|
+|Refine user side frontend based on client's feedback|8 SP|
+|Add PR template & update templates based on feedback|2 SP|
+|**Total** |41 SP|
