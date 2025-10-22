@@ -22,7 +22,9 @@ Ricky Chen, Jingwen Zhang, Yu Pan, Jiaxin Li, Shuo Li, Aria Fung, Zhimeng Zhu
 | ID  | Inferred Improvement | Status |
 | --- | -------------------- | ------ |
 |  1  | Refine user side UI according to client feedback|  Completed  |
-|  2  |Modify the frontend based on the client's feedback| Completed  |
+|  2  | Modify the frontend based on the client's feedback| Completed  |
+|  3  | Team collaboration improved — tasks were clearly divided between frontend and documentation, reducing overlap.| Completed  |
+
 
 ## What went well
 
@@ -30,6 +32,8 @@ Ricky Chen, Jingwen Zhang, Yu Pan, Jiaxin Li, Shuo Li, Aria Fung, Zhimeng Zhu
 | --- | ---- |
 |  1  |  Admin-end frontend pages were successfully implemented (layout and style) |
 |  2  |  Refined user-end frontend pages were successfully implemented (layout and style) |
+| 3   | The PR review workflow became smoother with better code readability and fewer merge conflicts.|
+
 
 ## Challenges
 
