@@ -2,11 +2,11 @@ import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
-import { MoreDotIcon } from "../../icons";
+import { MoreDotIcon } from "../icons";
 import { useState } from "react";
 
 export default function MonthlySalesChart() {
-  const options: ApexOptions = {
+  const options = {
     colors: ["#465fff"],
     chart: {
       fontFamily: "Outfit, sans-serif",
@@ -81,7 +81,7 @@ export default function MonthlySalesChart() {
         show: false,
       },
       y: {
-        formatter: (val: number) => `${val}`,
+        formatter: (val) => `${val}`,
       },
     },
   };

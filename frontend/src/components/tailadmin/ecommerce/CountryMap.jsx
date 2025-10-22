@@ -3,11 +3,11 @@ import { VectorMap } from "@react-jvectormap/core";
 import { worldMill } from "@react-jvectormap/world";
 
 // Define the component props
-interface CountryMapProps {
-  mapColor?: string;
-}
+// interface CountryMapProps {
+//   mapColor?: string;
+// }
 
-const CountryMap: React.FC<CountryMapProps> = ({ mapColor }) => {
+const CountryMap = ({ mapColor }) => {
   return (
     <VectorMap
       map={worldMill}
@@ -16,7 +16,7 @@ const CountryMap: React.FC<CountryMapProps> = ({ mapColor }) => {
         initial: {
           fill: "#465FFF",
           r: 4, // Custom radius for markers
-        } as any, // Type assertion to bypass strict CSS property checks
+        }, // Type assertion to bypass strict CSS property checks
       }}
       markersSelectable={true}
       markers={[

@@ -1,17 +1,17 @@
-import Chart from "react-apexcharts";
-import { ApexOptions } from "apexcharts";
-import { useState } from "react";
-import { Dropdown } from "../ui/dropdown/Dropdown";
-import { DropdownItem } from "../ui/dropdown/DropdownItem";
-import { MoreDotIcon } from "../../icons";
+import Chart from 'react-apexcharts'
+import { ApexOptions } from 'apexcharts'
+import { useState } from 'react'
+import { Dropdown } from '../ui/dropdown/Dropdown'
+import { DropdownItem } from '../ui/dropdown/DropdownItem'
+import { MoreDotIcon } from '../icons'
 
-export default function MonthlyTarget() {
-  const series = [75.55];
-  const options: ApexOptions = {
-    colors: ["#465FFF"],
+export default function AnalysisReport() {
+  const series = [75.55]
+  const options = {
+    colors: ['#465FFF'],
     chart: {
-      fontFamily: "Outfit, sans-serif",
-      type: "radialBar",
+      fontFamily: 'Outfit, sans-serif',
+      type: 'radialBar',
       height: 330,
       sparkline: {
         enabled: true,
@@ -22,11 +22,11 @@ export default function MonthlyTarget() {
         startAngle: -85,
         endAngle: 85,
         hollow: {
-          size: "80%",
+          size: '80%',
         },
         track: {
-          background: "#E4E7EC",
-          strokeWidth: "100%",
+          background: '#E4E7EC',
+          strokeWidth: '100%',
           margin: 5, // margin is in pixels
         },
         dataLabels: {
@@ -34,34 +34,34 @@ export default function MonthlyTarget() {
             show: false,
           },
           value: {
-            fontSize: "36px",
-            fontWeight: "600",
+            fontSize: '36px',
+            fontWeight: '600',
             offsetY: -40,
-            color: "#1D2939",
+            color: '#1D2939',
             formatter: function (val) {
-              return val + "%";
+              return val + '%'
             },
           },
         },
       },
     },
     fill: {
-      type: "solid",
-      colors: ["#465FFF"],
+      type: 'solid',
+      colors: ['#465FFF'],
     },
     stroke: {
-      lineCap: "round",
+      lineCap: 'round',
     },
-    labels: ["Progress"],
-  };
-  const [isOpen, setIsOpen] = useState(false);
+    labels: ['Progress'],
+  }
+  const [isOpen, setIsOpen] = useState(false)
 
   function toggleDropdown() {
-    setIsOpen(!isOpen);
+    setIsOpen(!isOpen)
   }
 
   function closeDropdown() {
-    setIsOpen(false);
+    setIsOpen(false)
   }
   return (
     <div className="rounded-2xl border border-gray-200 bg-gray-100 dark:border-gray-800 dark:bg-white/[0.03]">
@@ -69,10 +69,10 @@ export default function MonthlyTarget() {
         <div className="flex justify-between">
           <div>
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-              Monthly Target
+              Analysis Report
             </h3>
             <p className="mt-1 text-gray-500 text-theme-sm dark:text-gray-400">
-              Target you’ve set for each month
+              Actionable Insights & Recommendations Analysis
             </p>
           </div>
           <div className="relative inline-block">
@@ -114,15 +114,14 @@ export default function MonthlyTarget() {
           </span>
         </div>
         <p className="mx-auto mt-10 w-full max-w-[380px] text-center text-sm text-gray-500 sm:text-base">
-          You earn $3287 today, it's higher than last month. Keep up your good
-          work!
+          1000 Participants Targeted for the Month
         </p>
       </div>
 
       <div className="flex items-center justify-center gap-5 px-6 py-3.5 sm:gap-8 sm:py-5">
         <div>
           <p className="mb-1 text-center text-gray-500 text-theme-xs dark:text-gray-400 sm:text-sm">
-            Target
+            Monthly
           </p>
           <p className="flex items-center justify-center gap-1 text-base font-semibold text-gray-800 dark:text-white/90 sm:text-lg">
             $20K
@@ -147,7 +146,7 @@ export default function MonthlyTarget() {
 
         <div>
           <p className="mb-1 text-center text-gray-500 text-theme-xs dark:text-gray-400 sm:text-sm">
-            Revenue
+            Weekly
           </p>
           <p className="flex items-center justify-center gap-1 text-base font-semibold text-gray-800 dark:text-white/90 sm:text-lg">
             $20K
@@ -194,5 +193,5 @@ export default function MonthlyTarget() {
         </div>
       </div>
     </div>
-  );
+  )
 }

@@ -2,7 +2,7 @@ import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
 
 export default function BarChartOne() {
-  const options: ApexOptions = {
+  const options = {
     colors: ["#465fff"],
     chart: {
       fontFamily: "Outfit, sans-serif",
@@ -77,7 +77,7 @@ export default function BarChartOne() {
         show: false,
       },
       y: {
-        formatter: (val: number) => `${val}`,
+        formatter: (val) => `${val}`,
       },
     },
   };

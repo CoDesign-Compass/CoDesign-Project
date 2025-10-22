@@ -1,0 +1,142 @@
+/* --- 基础样式 (来自 baseStyles) --- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 0.625rem; /* px-2.5 */
+  padding-right: 0.625rem; /* px-2.5 */
+  padding-top: 0.125rem; /* py-0.5 */
+  padding-bottom: 0.125rem; /* py-0.5 */
+  gap: 0.25rem; /* gap-1 */
+  border-radius: 9999px; /* rounded-full */
+  font-weight: 500; /* font-medium */
+}
+
+/* --- 图标样式 --- */
+.iconStart {
+  margin-right: 0.25rem; /* mr-1 */
+}
+.iconEnd {
+  margin-left: 0.25rem; /* ml-1 */
+}
+
+/* --- 尺寸样式 (来自 sizeStyles) --- */
+.size-sm {
+  font-size: var(--text-theme-xs, 12px);
+  line-height: var(--text-theme-xs--line-height, 18px);
+}
+.size-md {
+  font-size: var(--text-sm, 14px);
+  line-height: var(--text-sm--line-height, 20px);
+}
+
+/* --- 变体样式 (来自 variants) --- */
+
+/* light-primary */
+.light-primary {
+  background-color: var(--color-brand-50);
+  color: var(--color-brand-500);
+}
+.dark .light-primary {
+  /* 暗黑模式 */
+  background-color: rgba(70, 95, 255, 0.15); /* brand-500/15 */
+  color: var(--color-brand-400);
+}
+
+/* light-success */
+.light-success {
+  background-color: var(--color-success-50);
+  color: var(--color-success-600);
+}
+.dark .light-success {
+  background-color: rgba(18, 183, 106, 0.15); /* success-500/15 */
+  color: var(--color-success-500);
+}
+
+/* light-error */
+.light-error {
+  background-color: var(--color-error-50);
+  color: var(--color-error-600);
+}
+.dark .light-error {
+  background-color: rgba(240, 68, 56, 0.15); /* error-500/15 */
+  color: var(--color-error-500);
+}
+
+/* light-warning */
+.light-warning {
+  background-color: var(--color-warning-50);
+  color: var(--color-warning-600);
+}
+.dark .light-warning {
+  background-color: rgba(247, 144, 9, 0.15); /* warning-500/15 */
+  color: var(--color-orange-400);
+}
+
+/* light-info */
+.light-info {
+  background-color: var(--color-blue-light-50);
+  color: var(--color-blue-light-500);
+}
+.dark .light-info {
+  background-color: rgba(11, 165, 236, 0.15); /* blue-light-500/15 */
+  color: var(--color-blue-light-500);
+}
+
+/* light-light */
+.light-light {
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-700);
+}
+.dark .light-light {
+  background-color: rgba(255, 255, 255, 0.05); /* white/5 */
+  color: rgba(255, 255, 255, 0.8); /* white/80 */
+}
+
+/* light-dark */
+.light-dark {
+  background-color: var(--color-gray-500);
+  color: var(--color-white);
+}
+.dark .light-dark {
+  background-color: rgba(255, 255, 255, 0.05); /* white/5 */
+  color: var(--color-white);
+}
+
+/* --- Solid 变体 --- */
+
+.solid-primary {
+  background-color: var(--color-brand-500);
+  color: var(--color-white);
+}
+.solid-success {
+  background-color: var(--color-success-500);
+  color: var(--color-white);
+}
+.solid-error {
+  background-color: var(--color-error-500);
+  color: var(--color-white);
+}
+.solid-warning {
+  background-color: var(--color-warning-500);
+  color: var(--color-white);
+}
+.solid-info {
+  background-color: var(--color-blue-light-500);
+  color: var(--color-white);
+}
+
+.solid-light {
+  background-color: var(--color-gray-400); /* 假设 */
+  color: var(--color-white);
+}
+.dark .solid-light {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.solid-dark {
+  background-color: var(--color-gray-700);
+  color: var(--color-white);
+}
+/* .dark .solid-dark 样式相同，无需重复 */

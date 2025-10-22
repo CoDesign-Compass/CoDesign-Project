@@ -1,17 +1,6 @@
-import type React from "react";
-import { Link } from "react-router";
+import { Link } from "react-router-dom"; // 'Link' 通常来自 react-router-dom
 
-interface DropdownItemProps {
-  tag?: "a" | "button";
-  to?: string;
-  onClick?: () => void;
-  onItemClick?: () => void;
-  baseClassName?: string;
-  className?: string;
-  children: React.ReactNode;
-}
-
-export const DropdownItem: React.FC<DropdownItemProps> = ({
+export const DropdownItem = ({
   tag = "button",
   to,
   onClick,
@@ -22,7 +11,7 @@ export const DropdownItem: React.FC<DropdownItemProps> = ({
 }) => {
   const combinedClasses = `${baseClassName} ${className}`.trim();
 
-  const handleClick = (event: React.MouseEvent) => {
+  const handleClick = (event) => {
     if (tag === "button") {
       event.preventDefault();
     }
