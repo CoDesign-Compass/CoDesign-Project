@@ -53,7 +53,11 @@ export default function Layout({ children }) {
             cursor: "pointer",
           }}
         >
-          Switch to {theme === "light" ? "Dark" : "Light"} Mode
+          <img
+            src={theme === "light" ? "/light_mode.png" : "/dark_mode.png"}
+            alt="Purpose Media Logo"
+            style={{ height: "30px" }}
+          />
         </button>
       </header>
 
