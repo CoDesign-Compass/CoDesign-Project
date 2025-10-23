@@ -1,4 +1,4 @@
-# S3 Week 12 Tutoring Meeting
+# S2 Week 12 Tutoring Meeting
 
 ## Date
 23 Oct, 2025
