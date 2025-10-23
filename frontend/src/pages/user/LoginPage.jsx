@@ -10,21 +10,23 @@ export default function LoginPage({ onSubmit: onSubmitProp }) {
   const [showPw, setShowPw] = useState(false);
 
   // ---- Help bubble outside-click ----
-  const [open, setOpen] = useState(false);
-  const popRef = useRef(null);
+  const [open, setOpen] = useState(false)
+  const popRef = useRef(null)
+  const navigate = useNavigate()
+
   useEffect(() => {
     const onDown = (e) => {
-      if (popRef.current && !popRef.current.contains(e.target)) setOpen(false);
-    };
-    document.addEventListener("mousedown", onDown);
-    return () => document.removeEventListener("mousedown", onDown);
-  }, []);
+      if (popRef.current && !popRef.current.contains(e.target)) setOpen(false)
+    }
+    document.addEventListener('mousedown', onDown)
+    return () => document.removeEventListener('mousedown', onDown)
+  }, [])
 
   const change = (k) => (e) =>
     setForm((f) => ({
       ...f,
-      [k]: e.target.type === "checkbox" ? e.target.checked : e.target.value,
-    }));
+      [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value,
+    }))
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -47,7 +49,7 @@ export default function LoginPage({ onSubmit: onSubmitProp }) {
     setHelpSent(true);
   };
 
-  const container = { width: "min(960px, 92vw)", margin: "0 auto" };
+  const container = { width: 'min(960px, 92vw)', margin: '0 auto' }
 
   return (
     <div
@@ -63,20 +65,20 @@ export default function LoginPage({ onSubmit: onSubmitProp }) {
       <div style={{ background: "var(--bg-color)", color: "var(--text-color)" }}>
         <section
           style={{
-            width: "100vw",
-            marginLeft: "calc(50% - 50vw)",
-            marginRight: "calc(50% - 50vw)",
+            width: '100vw',
+            marginLeft: 'calc(50% - 50vw)',
+            marginRight: 'calc(50% - 50vw)',
             height: 120,
-            backgroundImage: "url(/Banner.png)",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            position: "relative",
-            display: "grid",
-            placeItems: "center",
-            textAlign: "center",
+            backgroundImage: 'url(/Banner.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            position: 'relative',
+            display: 'grid',
+            placeItems: 'center',
+            textAlign: 'center',
           }}
         >
-          <div style={{ position: "absolute", inset: 0 }} />
+          <div style={{ position: 'absolute', inset: 0 }} />
           <h1
             className="hero-title"
             style={{
@@ -84,7 +86,7 @@ export default function LoginPage({ onSubmit: onSubmitProp }) {
               fontSize: 44,
               color: "var(--heading)",
               letterSpacing: 1,
-              textShadow: "0 1px 2px rgba(0.3,0.5,0.7,.5)",
+              textShadow: '0 1px 2px rgba(0.3,0.5,0.7,.5)',
             }}
           >
             Login
@@ -133,10 +135,10 @@ export default function LoginPage({ onSubmit: onSubmitProp }) {
               <div style={{ position: "relative" }}>
                 <input
                   id="password"
-                  type={showPw ? "text" : "password"}
+                  type={showPw ? 'text' : 'password'}
                   className="input"
                   value={form.password}
-                  onChange={change("password")}
+                  onChange={change('password')}
                   placeholder="Password"
                   autoComplete="current-password"
                 />
@@ -155,7 +157,7 @@ export default function LoginPage({ onSubmit: onSubmitProp }) {
                     fontSize: 15,
                   }}
                 >
-                  {showPw ? "Hide" : "Show"}
+                  {showPw ? 'Hide' : 'Show'}
                 </button>
                 {!!form.password && (
                   <button
@@ -197,7 +199,9 @@ export default function LoginPage({ onSubmit: onSubmitProp }) {
               <span>Remember me</span>
             </label>
 
-            <div style={{ display: "grid", justifyItems: "center", marginTop: 10 }}>
+            <div
+              style={{ display: 'grid', justifyItems: 'center', marginTop: 10 }}
+            >
               <button
                 className="cta-btn"
                 type="submit"
@@ -224,6 +228,40 @@ export default function LoginPage({ onSubmit: onSubmitProp }) {
                   }}
                 >
                   Login
+                </span>
+              </button>
+            </div>
+
+            <div
+              style={{ display: 'grid', justifyItems: 'center', marginTop: 10 }}
+            >
+              <button
+                className="cta-btn"
+                type="submit"
+                onClick={() => navigate('/admin/dashboard')}
+                style={{
+                  minWidth: 240,
+                  padding: '12px 24px',
+                  borderRadius: 14,
+                  background: '#2f2f2f',
+                  border: '3px solid #ffe070',
+                  color: '#fff',
+                  cursor: 'pointer',
+                  boxShadow:
+                    '0 2px 0 rgba(0,0,0,.25), inset 0 0 0 1px rgba(0,0,0,.08)',
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 22,
+                    lineHeight: 1.1,
+                    fontWeight: 500,
+                    textDecorationColor: '#fff',
+                    textDecorationThickness: '1.5px',
+                    textUnderlineOffset: '4px',
+                  }}
+                >
+                  Login to Admin
                 </span>
               </button>
             </div>
@@ -303,11 +341,11 @@ export default function LoginPage({ onSubmit: onSubmitProp }) {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 /* small field helper */
-function Field({ id, type = "text", placeholder, value, onChange, onClear }) {
+function Field({ id, type = 'text', placeholder, value, onChange, onClear }) {
   return (
     <div style={{ display: "grid", gap: 6 }}>
       <label className="sr-only" htmlFor={id}>
@@ -335,23 +373,23 @@ function Field({ id, type = "text", placeholder, value, onChange, onClear }) {
         )}
       </div>
     </div>
-  );
+  )
 }
 
 /*clear all button(×) */
 function suffixBtn(rightPx) {
   return {
-    position: "absolute",
+    position: 'absolute',
     right: rightPx,
-    top: "50%",
-    transform: "translateY(-50%)",
+    top: '50%',
+    transform: 'translateY(-50%)',
     width: 28,
     height: 28,
-    border: "none",
-    background: "transparent",
-    cursor: "pointer",
+    border: 'none',
+    background: 'transparent',
+    cursor: 'pointer',
     fontSize: 18,
-    color: "grey",
+    color: 'grey',
     lineHeight: 1,
-  };
+  }
 }
