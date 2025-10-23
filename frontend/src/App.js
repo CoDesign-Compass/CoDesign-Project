@@ -9,6 +9,7 @@ import HowPage from "./pages/user/HowPage";
 import ThankYouPage from "./pages/user/ThankYouPage";
 import Layout from "./components/Layout";
 import LoginPage from "./pages/user/LoginPage";
+import CreateAccountPage from "./pages/user/CreateAccountPage";
 
 // admin
 import AdminLayout from "./components/AdminLayout";
@@ -33,6 +34,7 @@ function App() {
                     <Route path="/why" element={<Layout><WhyPage /></Layout>} />
                     <Route path="/how" element={<Layout><HowPage /></Layout>} />
                     <Route path="/thankyou" element={<Layout><ThankYouPage /></Layout>} />
+                    <Route path="/createaccount" element={<Layout><CreateAccountPage /></Layout>} />
 
                     {/* ---------- ADMIN ROUTES ---------- */}
                     <Route path="/admin" element={<AdminLayout />}>
