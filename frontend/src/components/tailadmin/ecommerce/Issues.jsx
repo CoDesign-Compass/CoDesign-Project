@@ -1,11 +1,16 @@
 import { ChatIcon, ArrowDownIcon, ArrowUpIcon, GroupIcon } from '../icons'
 import Badge from '../ui/badge/Badge'
+import { useNavigate } from 'react-router-dom'
 
 export default function Issues() {
+  const navigate = useNavigate()
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 md:gap-6">
       {/* <!-- Metric Item Start --> */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+      <div
+        className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6"
+        onClick={() => navigate('/admin/issue-report')}
+      >
         <h4>ISSUE 1</h4>
         <div className="flex items-center flex-start mt-5 gap-4">
           <div className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-xl dark:bg-gray-800">
@@ -31,7 +36,10 @@ export default function Issues() {
       </div>
       {/* <!-- Metric Item End --> */}
       {/* <!-- Metric Item Start --> */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+      <div
+        className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6"
+        onClick={() => navigate('/admin/issue-report')}
+      >
         <h4>ISSUE 2</h4>
         <div className="flex items-center flex-start mt-5 gap-4">
           <div className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-xl dark:bg-gray-800">
@@ -57,7 +65,10 @@ export default function Issues() {
       </div>
       {/* <!-- Metric Item End --> */}
       {/* <!-- Metric Item Start --> */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+      <div
+        className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6"
+        onClick={() => navigate('/admin/issue-report')}
+      >
         <h4>ISSUE 3</h4>
         <div className="flex items-center flex-start mt-5 gap-4">
           <div className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-xl dark:bg-gray-800">
