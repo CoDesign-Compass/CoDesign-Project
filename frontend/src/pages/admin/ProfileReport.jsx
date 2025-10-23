@@ -19,18 +19,19 @@ export default function ProfileReport() {
             <Divider />
             <Title tag="h4">Featured</Title>
 
-            <List
-                split={true}
-                items={reports.map((r, i) => ({
-                    content: (
+            <List split>
+                {reports.map((r, i) => (
+                    <List.ListItem
+                        key={i}
+                        action={<span style={{ fontSize: "20px", cursor: "pointer" }}>⋮</span>}
+                    >
                         <Space direction="vertical" size={0}>
                             <strong>{r.title}</strong>
                             <Paragraph>{r.desc}</Paragraph>
                         </Space>
-                    ),
-                    action: <span style={{ fontSize: "20px", cursor: "pointer" }}>⋮</span>,
-                }))}
-            />
+                    </List.ListItem>
+                ))}
+            </List>
         </div>
     );
 }
