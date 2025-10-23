@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginPage({ onSubmit: onSubmitProp }) {
   // ---- FORM ----
@@ -12,7 +13,7 @@ export default function LoginPage({ onSubmit: onSubmitProp }) {
   // ---- Help bubble outside-click ----
   const [open, setOpen] = useState(false)
   const popRef = useRef(null)
-
+  const navigate = useNavigate()
 
   useEffect(() => {
     const onDown = (e) => {
@@ -238,6 +239,7 @@ export default function LoginPage({ onSubmit: onSubmitProp }) {
               <button
                 className="cta-btn"
                 type="submit"
+                onClick={() => navigate('/admin/dashboard')}
                 style={{
                   minWidth: 240,
                   padding: '12px 24px',
