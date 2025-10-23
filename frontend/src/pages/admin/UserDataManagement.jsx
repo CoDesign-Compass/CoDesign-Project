@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 
+/* Gift icon */
 const GiftIcon = (props) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...props}>
     <path strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
@@ -7,26 +8,59 @@ const GiftIcon = (props) => (
   </svg>
 );
 
+/* export csv */
+function usersToCSV(rows) {
+  const header = ["id", "name", "email", "status"];
+  const esc = (v) => {
+    const s = v == null ? "" : String(v);
+    return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  };
+  const lines = [header.join(",")];
+  for (const u of rows) {
+    lines.push([
+      esc(u.id),
+      esc(u.name),
+      esc(u.email),
+      esc(u.Sent ? "Sent" : "Not Sent"),
+    ].join(","));
+  }
+  return "\uFEFF" + lines.join("\n");
+}
+function downloadTextAsFile(text, filename) {
+  const blob = new Blob([text], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 export default function UserDataManagement() {
+  // ---- data ----
   const seed = [
-    { id: "u-1001", name: "User One",   email: "one@email.com",   redeemed: true  },
-    { id: "u-1002", name: "User Two",   email: "two@email.com",   redeemed: false },
-    { id: "u-1003", name: "User Three", email: "three@email.com", redeemed: true  },
-    { id: "u-1004", name: "User Four",  email: "four@email.com",  redeemed: false },
-    { id: "u-1005", name: "User Five",  email: "five@email.com",  redeemed: false },
-    { id: "u-1006", name: "User Six",   email: "six@email.com",   redeemed: true  },
-    { id: "u-1007", name: "User Seven", email: "seven@email.com", redeemed: false },
-    { id: "u-1008", name: "User Eight", email: "eight@email.com", redeemed: true  },
-    { id: "u-1009", name: "User Nine",  email: "nine@email.com",  redeemed: false },
-    { id: "u-1010", name: "User Ten",   email: "ten@email.com",   redeemed: false },
+    { id: "u-1001", name: "User One",   email: "one@email.com",   Sent: true  },
+    { id: "u-1002", name: "User Two",   email: "two@email.com",   Sent: false },
+    { id: "u-1003", name: "User Three", email: "three@email.com", Sent: true  },
+    { id: "u-1004", name: "User Four",  email: "four@email.com",  Sent: false },
+    { id: "u-1005", name: "User Five",  email: "five@email.com",  Sent: false },
+    { id: "u-1006", name: "User Six",   email: "six@email.com",   Sent: true  },
+    { id: "u-1007", name: "User Seven", email: "seven@email.com", Sent: false },
+    { id: "u-1008", name: "User Eight", email: "eight@email.com", Sent: true  },
+    { id: "u-1009", name: "User Nine",  email: "nine@email.com",  Sent: false },
+    { id: "u-1010", name: "User Ten",   email: "ten@email.com",   Sent: false },
   ];
 
   const [rows, setRows] = useState(seed);
   const [q, setQ] = useState("");
-  const [selected, setSelected] = useState(new Set());
+  const [nextBulkToSent, setNextBulkToSent] = useState(true); 
+  const [selected, setSelected] = useState(new Set()); 
   const [pageSize, setPageSize] = useState(10);
   const [page, setPage] = useState(1);
 
+  // ---- search & seperate pages ----
   const filtered = useMemo(() => {
     const k = q.trim().toLowerCase();
     if (!k) return rows;
@@ -44,16 +78,46 @@ export default function UserDataManagement() {
     return filtered.slice(start, start + pageSize);
   }, [filtered, page, pageSize]);
 
+  // ---- choose row/update status ----
   const toggleRow = (id) => {
-    setSelected(s => {
+    setSelected((s) => {
       const next = new Set(s);
       next.has(id) ? next.delete(id) : next.add(id);
       return next;
     });
   };
-  const toggleRedeemed = (id) => {
-    setRows(list => list.map(r => r.id === id ? { ...r, redeemed: !r.redeemed } : r));
+  const toggleSent = (id) => {
+    setRows((list) => list.map((r) => (r.id === id ? { ...r, Sent: !r.Sent } : r)));
   };
+
+  // update status (selected)
+  function handleBulkToggleStatus() {
+   if (selected.size === 0) return;
+   setRows(prev =>
+     prev.map(u =>
+       selected.has(u.id) ? { ...u, Sent: nextBulkToSent } : u
+     )
+   );
+
+   setNextBulkToSent(v => !v);
+   // if update to unsned，uncomment this：
+    setSelected(new Set());
+ }
+
+  // export CSV
+  function handleExport(scope = "selected") {
+    const data =
+      scope === "selected" ? rows.filter((r) => selected.has(r.id)) : rows;
+    if (!data.length) {
+      alert(scope === "selected" ? "No selected users." : "No data to export.");
+      return;
+    }
+    const csv = usersToCSV(data);
+    const ts = new Date().toISOString().slice(0,19).replace(/[:T]/g,"-");
+    downloadTextAsFile(csv, `users-${scope}-${ts}.csv`);
+  }
+
+  // send gift(selected)
   const sendGift = (ids) => {
     if (!ids.length) return;
     alert(`Send gift to: ${ids.join(", ")}`);
@@ -61,18 +125,40 @@ export default function UserDataManagement() {
 
   return (
     <div className="space-y-4">
-      {/* tool bar */}
+      {/* toolbar */}
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <h2 className="text-lg font-semibold">User Data Management</h2>
+
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          {/* selected status + application */}
           <button
-            onClick={() => sendGift(Array.from(selected))}
+            onClick={handleBulkToggleStatus}
             disabled={!selected.size}
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-3.5 py-2 text-sm font-medium text-indigo-700 hover:bg-indigo-100 disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-40"
+            title={selected.size ? `Set selected to ${nextBulkToSent ? 'Sent' : 'Not Sent'}` : "No rows selected"}
           >
-            <GiftIcon className="h-4 w-4" />
-            Send Gift (Selected)
+            {`Set ${nextBulkToSent ? 'Sent' : 'Not Sent'} (Selected)`}
           </button>
+
+
+          {/* export button */}
+          <button
+            onClick={() => handleExport("selected")}
+            disabled={!selected.size}
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+            title="Export selected rows to CSV"
+          >
+            Export Selected
+          </button>
+          <button
+            onClick={() => handleExport("all")}
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            title="Export all rows to CSV"
+          >
+            Export All
+          </button>
+
+          {/* search bar */}
           <div className="relative">
             <input
               value={q}
@@ -88,7 +174,7 @@ export default function UserDataManagement() {
         </div>
       </div>
 
-      {/* card(mobile) */}
+      {/* mobile card view */}
       <div className="grid gap-3 md:hidden">
         {paged.map((r) => (
           <div key={r.id} className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-black/5">
@@ -111,10 +197,10 @@ export default function UserDataManagement() {
               </div>
               <span className={[
                 "rounded-full px-2.5 py-1 text-xs font-medium ring-1",
-                r.redeemed ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
-                           : "bg-amber-50 text-amber-700 ring-amber-200"
+                r.Sent ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
+                       : "bg-amber-50 text-amber-700 ring-amber-200"
               ].join(" ")}>
-                {r.redeemed ? "Redeemed" : "Not redeemed"}
+                {r.Sent ? "Sent" : "Not Sent"}
               </span>
             </div>
 
@@ -122,17 +208,11 @@ export default function UserDataManagement() {
 
             <div className="mt-3 flex justify-end gap-2">
               <button
-                onClick={() => sendGift([r.id])}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-200 bg-white px-3 py-1.5 text-xs font-medium text-indigo-700 hover:bg-indigo-50"
+                onClick={() => toggleSent(r.id)}
+                className="inline-flex items-center rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-indigo-700 hover:bg-indigo-50"
               >
                 <GiftIcon className="h-4 w-4" />
                 Send Gift
-              </button>
-              <button
-                onClick={() => toggleRedeemed(r.id)}
-                className="inline-flex items-center rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
-              >
-                Toggle
               </button>
             </div>
           </div>
@@ -144,7 +224,7 @@ export default function UserDataManagement() {
         )}
       </div>
 
-      {/* table */}
+      {/* PC table view */}
       <div className="hidden overflow-x-auto rounded-2xl bg-white p-4 shadow-sm ring-1 ring-black/5 md:block">
         <table className="min-w-full text-left">
           <thead>
@@ -182,26 +262,20 @@ export default function UserDataManagement() {
                 <td className="px-3 py-4">
                   <span className={[
                     "rounded-full px-2.5 py-1 text-xs font-medium ring-1",
-                    r.redeemed ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
-                               : "bg-amber-50 text-amber-700 ring-amber-200"
+                    r.Sent ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
+                           : "bg-amber-50 text-amber-700 ring-amber-200"
                   ].join(" ")}>
-                    {r.redeemed ? "Redeemed" : "Not redeemed"}
+                    {r.Sent ? "Sent" : "Not Sent"}
                   </span>
                 </td>
                 <td className="px-3 py-4">
                   <div className="flex justify-end gap-2">
                     <button
-                      onClick={() => sendGift([r.id])}
+                      onClick={() => toggleSent(r.id)}
                       className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-200 bg-white px-3 py-1.5 text-xs font-medium text-indigo-700 hover:bg-indigo-50"
                     >
                       <GiftIcon className="h-4 w-4" />
                       Send Gift
-                    </button>
-                    <button
-                      onClick={() => toggleRedeemed(r.id)}
-                      className="inline-flex items-center rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
-                    >
-                      Toggle
                     </button>
                   </div>
                 </td>
@@ -223,13 +297,13 @@ export default function UserDataManagement() {
             onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }}
             className="h-9 rounded-lg border border-gray-200 bg-white px-2 pr-8 text-sm"
           >
-            {[5, 8, 10, 20, 50].map(n => (
+            {[5, 8, 10, 20, 50].map((n) => (
               <option key={n} value={n}>{`${n} / page`}</option>
             ))}
           </select>
           <div className="flex items-center gap-1">
             <button
-              onClick={() => setPage(p => Math.max(1, p - 1))}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
               className="h-9 rounded-lg border border-gray-200 bg-white px-3 text-sm hover:bg-gray-50"
             >
               Previous
@@ -238,7 +312,7 @@ export default function UserDataManagement() {
               {page} / {Math.max(1, pageCount)}
             </span>
             <button
-              onClick={() => setPage(p => Math.min(pageCount, p + 1))}
+              onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
               className="h-9 rounded-lg border border-gray-200 bg-white px-3 text-sm hover:bg-gray-50"
             >
               Next
