@@ -31,9 +31,9 @@ Ricky Chen, Jingwen Zhang, Yu Pan, Jiaxin Li, Aria Fung, Zhimeng Zhu, Heidi Prow
 ## Action Items
 | Action Items | Assignee | Due Date |
 | ------------- | -------- | -------- |
-| Implement new prompt-based “Why” question logic with dynamic follow-ups. | Yu Pan, Jiaxin Li | Week 13 |
-| Update admin engagement report to include dropout tracking and completion metrics. | Ricky Chen, Aria Fung | Week 13 |
-| Debug and extend admin issue visibility function. | Jingwen Zhang, Zhimeng Zhu | Week 13 |
+| Implement new prompt-based “Why” question logic with dynamic follow-ups. | Yu Pan, Jiaxin Li | sprint 4 |
+| Update admin engagement report to include dropout tracking and completion metrics. | Ricky Chen, Aria Fung | sprint 4 |
+| Debug and extend admin issue visibility function. | Jingwen Zhang, Zhimeng Zhu | sprint 4 |
 
 ## Client Sign-off (only for client meeting)
 | Deliverable Presented | Accepted by Client? | Comments |
@@ -42,7 +42,7 @@ Ricky Chen, Jingwen Zhang, Yu Pan, Jiaxin Li, Aria Fung, Zhimeng Zhu, Heidi Prow
 
 ## Task Allocations
 | Task | Assignee | Due Date | Issue |
-| ---- | -------- | -------- |-------|
-| Implement prompt-based “Why” question sequence | Yu Pan, Jiaxin Li | Week 13 | -     |
-| Update engagement report with dropout tracking and completion rates | Ricky Chen, Aria Fung | Week 13 | -     |
-| Fix admin issue visibility to show all user-submitted issues | Jingwen Zhang, Zhimeng Zhu | Week 13 | -     |
+| ---- | -------- |----------|-------|
+| Implement prompt-based “Why” question sequence | Yu Pan, Jiaxin Li | sprint 4 | -     |
+| Update engagement report with dropout tracking and completion rates | Ricky Chen, Aria Fung | sprint 4 | -     |
+| Fix admin issue visibility to show all user-submitted issues | Jingwen Zhang, Zhimeng Zhu | sprint 4 | -     |
