@@ -19,7 +19,7 @@ export default function ThankPage() {
   const navigate = useNavigate();
   const onLogin = (e) => {
     e.preventDefault();
-    navigate("/login");
+    navigate("/createaccount");
   };
 
   useEffect(() => {

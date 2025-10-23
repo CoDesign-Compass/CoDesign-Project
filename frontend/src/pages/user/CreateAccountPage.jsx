@@ -4,8 +4,10 @@ export default function CreateAccountPage({ mode = "create", onSubmit: onSubmitP
 
   // ---- FORM ----
   const [form, setForm] = useState({
+    username: "",
     email: "",
     password: "",
+    confirm: "",
     subscribe: false,
   });
   const [showPw, setShowPw] = useState(false);
@@ -61,7 +63,7 @@ const handleHelpSubmit = (e) => {
 
   return (
     <div
-      className="Login page"
+      className="CreateAccount page"
       style={{
         background: "var(--bg-color)",     
         color: "var(--text-color)",
@@ -98,11 +100,11 @@ const handleHelpSubmit = (e) => {
               textShadow: "0 1px 2px rgba(0.3,0.5,0.7,.5)",
             }}
           >
-            Login
+            Create Account
           </h1>
         </section>
 
-        <main style={{ width: "100%", display: "grid", placeItems: "center", padding: "64px 12px 56px" }}>
+        <main style={{ width: "100%", display: "grid", placeItems: "center", padding: "32px 12px 40px" }}>
           <style>{`
             .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,1px,1px);white-space:nowrap;border:0;}
             .input{width:100%;height:44px;border-radius:8px;border:1px solid #d8d8d8;background:#fff;color:#111;padding:0 44px 0 12px;font-size:16px;outline:none;}
@@ -110,7 +112,10 @@ const handleHelpSubmit = (e) => {
           `}</style>
 
           <form className="form-wrap" onSubmit={handleSubmit} noValidate style={{ width: "min(560px, 92vw)", display: "grid", gap: 16, margin: "0 auto" }}>
-            
+            {mode === "create" && (
+              <Field id="username" placeholder="Username" value={form.username}
+                onChange={change("username")} onClear={() => setForm((f) => ({ ...f, username: "" }))} />
+            )}
             <Field id="email" type="email" placeholder="Email" value={form.email}
               onChange={change("email")} onClear={() => setForm((f) => ({ ...f, email: "" }))} />
 
@@ -144,6 +149,10 @@ const handleHelpSubmit = (e) => {
               </div>
             </div>
 
+            {mode === "create" && (
+              <Field id="confirm" type="password" placeholder="Confirm Password" value={form.confirm}
+                onChange={change("confirm")} onClear={() => setForm((f) => ({ ...f, confirm: "" }))} />
+            )}
 
             <label style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 4, fontSize: 14, color: "var(--text-color)", opacity: 0.9 }}>
               <input
@@ -152,7 +161,7 @@ const handleHelpSubmit = (e) => {
                 onChange={change("subscribe")}
                 style={{ width: 16, height: 16, accentColor: "#ffe070", cursor: "pointer" }}
               />
-              <span>Remember me</span>
+              <span>Keep me updated with the latest information</span>
             </label>
 
             <div style={{ display: "grid", justifyItems: "center", marginTop: 10 }}>
@@ -169,7 +178,7 @@ const handleHelpSubmit = (e) => {
                   fontSize: 22, lineHeight: 1.1, fontWeight: 500,
                   textDecorationColor: "#fff", textDecorationThickness: "1.5px", textUnderlineOffset: "4px",
                 }}>
-                  Login
+                  Sign Up
                 </span>
               </button>
             </div>
