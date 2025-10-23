@@ -67,11 +67,10 @@ export default function Layout({ children }) {
       {/* Footer with navigation */}
       <footer
         style={{
-          backgroundColor: "#fff",
+          backgroundColor: theme === "light" ? "white" : "#303030",
           padding: "1rem",
           display: "flex",
           justifyContent: "space-between",
-          borderTop: "1px solid #eee",
         }}
       >
         {/* Back 按钮（第一页隐藏） */}
@@ -79,8 +78,8 @@ export default function Layout({ children }) {
           <button
             onClick={goBack}
             style={{
-              background: "black",
-              color: "white",
+              background: theme === "light" ? "black" : "white",
+              color: theme === "light" ? "white" : "black",
               padding: "0.5rem 1rem",
               borderRadius: "6px",
               border: "none",
@@ -97,8 +96,8 @@ export default function Layout({ children }) {
           <button
             onClick={goNext}
             style={{
-              background: "black",
-              color: "white",
+              background: theme === "light" ? "black" : "white",
+              color: theme === "light" ? "white" : "black",
               padding: "0.5rem 1rem",
               borderRadius: "6px",
               border: "none",
