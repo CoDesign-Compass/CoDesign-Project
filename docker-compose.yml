@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: cdc_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: codesign
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - cdc_pgdata:/var/lib/postgresql/data
+
+volumes:
+  cdc_pgdata:
