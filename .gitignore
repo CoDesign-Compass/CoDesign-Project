@@ -1,3 +1,4 @@
 # misc
 # VS Code specific settings
 /.vscode
+.env
