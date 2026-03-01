@@ -29,6 +29,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(body);
     }
 
+    @ExceptionHandler(AdminUnauthorizedException.class)
+    public ResponseEntity<?> handleUnauthorized(AdminUnauthorizedException ex, HttpServletRequest req) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", Instant.now().toString());
+        body.put("status", 401);
+        body.put("error", "Unauthorized");
+        body.put("message", ex.getMessage());
+        body.put("path", req.getRequestURI());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleAny(Exception ex, HttpServletRequest req) {
         Map<String, Object> body = new HashMap<>();
