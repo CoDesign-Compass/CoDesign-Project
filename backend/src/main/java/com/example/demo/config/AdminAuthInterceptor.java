@@ -18,10 +18,7 @@ public class AdminAuthInterceptor implements HandlerInterceptor {
         String token = request.getHeader("X-ADMIN-TOKEN");
 
         if (token == null || !token.equals(adminToken)) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write("{\"status\":401,\"error\":\"Unauthorized\",\"message\":\"Missing or invalid X-ADMIN-TOKEN\"}");
-            return false;
+            throw new AdminUnauthorizedException("Missing or invalid X-ADMIN-TOKEN");
         }
         return true;
     }
