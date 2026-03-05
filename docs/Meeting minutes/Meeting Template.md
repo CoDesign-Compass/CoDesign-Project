@@ -1,12 +1,21 @@
-# S2 Week x xxx Meeting
+# S1 Week x xxx Meeting
+
 ## Date
+
 ## Loaction
+
 The Hive, Building 108, ANU
+
 ## Participants
+
 Ricky Chen, Jingwen Zhang, Yu Pan, Jiaxin Li, Shuo Li, Aria Fung, Zhimeng Zhu, Buddhi Kothalawala(tutor) / Heidi Prowse (client), Deep Gandhecha(client)
+
 ## Goals
-* 
+
+-
+
 ## Discussion Topics
+
 | Time | Item | Presenter | Notes |
 | ---- | ---- | --------- | ----- |
 |      |      |           |       |
@@ -14,21 +23,25 @@ Ricky Chen, Jingwen Zhang, Yu Pan, Jiaxin Li, Shuo Li, Aria Fung, Zhimeng Zhu, B
 |      |      |           |       |
 
 ## Decisions
-|Decision|Outcome|
-|---|---|
-|||
+
+| Decision | Outcome |
+| -------- | ------- |
+|          |         |
+
 ## Action Items
-|Action Items|Assignee|Due Date|
-|---|---|---|
-||||
+
+| Action Items | Assignee | Due Date |
+| ------------ | -------- | -------- |
+|              |          |          |
+
 ## Client Sign-off (only for client meeting)
+
 | Decision(Last week) -> Outome(Last week) -> Client Sign-off |
-|---|
-||
+| ----------------------------------------------------------- |
+|                                                             |
 
 ## Task Allocations
-|Task|Assignee|Due Date|Issue|
-|---|---|---|---|
-|||||
 
-
+| Task | Assignee | Due Date |
+| ---- | -------- | -------- |
+|      |          |          |
