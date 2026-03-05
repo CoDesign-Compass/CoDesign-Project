@@ -290,7 +290,7 @@ export default function UserDataManagement() {
 
       {/* seperate pages */}
       <div className="flex flex-col items-start justify-between gap-3 md:flex-row md:items-center">
-        <div className="text-sm text-gray-500">{total} items</div>
+        <div className="text-sm text-gray-500">{paged.length} items</div>
         <div className="flex items-center gap-3">
           <select
             value={pageSize}
