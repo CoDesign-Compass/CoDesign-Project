@@ -10,6 +10,7 @@ import { useTheme } from "../../context/ThemeContext";
  * 4) Help "?" button (bottom-right)
  */
 export default function ThankPage() {
+  console.log("THANKPAGE VERSION: 2026-03-05 v2");
   const { theme } = useTheme();
   const [open, setOpen] = useState(false);
   const popRef = useRef(null);
@@ -22,21 +23,69 @@ export default function ThankPage() {
     navigate("/createaccount");
   };
 
-  useEffect(() => {
-    const onDown = (e) => {
-      if (popRef.current && !popRef.current.contains(e.target)) setOpen(false);
-    };
-    document.addEventListener("mousedown", onDown);
-    return () => document.removeEventListener("mousedown", onDown);
-  }, []);
 
-  const onSubmit = (e) => {
-    e.preventDefault();
-    if (!email) return;
-    localStorage.setItem("email", email);
-    alert("Email saved: " + email);
-    setEmail("");
+  const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080";
+
+  async function createSubmission(issueId) {
+    const res = await fetch(`${API_BASE}/api/submissions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ issueId }),
+    });
+
+    const text = await res.text();
+    if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
+    return text ? JSON.parse(text) : {};
+  }
+
+  async function submitSubmission(id, payload) {
+    const res = await fetch(`${API_BASE}/api/submissions/${id}/submit`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const text = await res.text();
+    if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
+    return text ? JSON.parse(text) : {};
+  }
+
+const onSubmit = async (e) => {
+  e.preventDefault();
+
+  const trimmed = email.trim();
+  if(!trimmed.length) return;
+
+  let submissionId = localStorage.getItem("submissionId");
+  if (!submissionId) {
+    const created = await createSubmission(1);
+    const newId = created?.id ?? created?.submissionId;
+    if (!newId) {
+      alert("Created submission but no id returned. Check backend response.");
+      console.log("createSubmission response:", created);
+      return;
+    }
+    submissionId = String(newId);
+    localStorage.setItem("submissionId", submissionId);
+  }
+
+  
+  const payload = {
+    email: trimmed.length ? trimmed : null,
+    wantsVoucher: wantVoucher,
+    wantsUpdates: wantUpdates,
   };
+
+  try {
+    const resp = await submitSubmission(submissionId, payload);
+    console.log("submit ok:", resp);
+    alert("Submitted successfully!");
+    // setEmail("");
+  } catch (err) {
+    console.error(err);
+    alert("Submit failed: " + err.message);
+  }
+}; 
 
   useEffect(() => {
     const onDown = (e) => {
@@ -58,10 +107,6 @@ export default function ThankPage() {
     if (helpForm.message.trim().length < 5) {
       return setHelpErr("Tell us a bit more (≥ 5 characters).");
     }
-
-    // TODO: connect backend
-    // e.g.: fetch("/api/help", { method:"POST", headers:{'Content-Type':'application/json'}, body: JSON.stringify(helpForm) })
-    // .then(() => setHelpSent(true))
 
     setHelpSent(true);
   };

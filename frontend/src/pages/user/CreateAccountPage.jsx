@@ -29,13 +29,84 @@ export default function CreateAccountPage({ mode = "create", onSubmit: onSubmitP
       [k]: e.target.type === "checkbox" ? e.target.checked : e.target.value,
     }));
 
-  const handleSubmit = (e) => {
+  const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080";
+
+  async function signUp(payload) {
+    const res = await fetch(`${API_BASE}/api/users/signup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const text = await res.text();
+    if (!res.ok) {
+        let msg = text;
+        try{
+          const j = JSON.parse(text);
+          msg = j.message || j.error || text;
+        } catch {}
+        if (String(msg).toLowerCase().includes("email already exists")) {
+          throw new Error("This email is already registered. Try logging in, or use another email.");
+        }
+        throw new Error(msg || `HTTP ${res.status}`);
+    }
+    return text ? JSON.parse(text) : {};
+  }
+
+  async function linkAccount(submissionId, userId) {
+    const res = await fetch(`${API_BASE}/api/submissions/${submissionId}/link-account`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId }),
+    });
+    const text = await res.text();
+    if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
+    return text ? JSON.parse(text) : {};
+  }
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (mode === "create" && form.password !== form.confirm) {
       alert("Passwords do not match.");
       return;
     }
-    onSubmitProp?.(form);
+
+    const payload = {
+      username: form.username.trim(),
+      email: form.email.trim(),
+      password: form.password,
+      wantsUpdates: form.subscribe, // ticked item
+    };
+
+    const submissionId = localStorage.getItem("submissionId");
+    if (!submissionId) {
+      alert("No submissionId found. Please start from feedback flow.");
+      const submissionId = localStorage.getItem("submissionId");
+    }
+
+    try {
+      const user = await signUp(payload);
+      console.log("signup ok:", user);
+
+      //  signup response must have id（userId）
+      const userId = user.id || user.userId;
+      if (!userId) {
+        throw new Error("Signup succeeded but no userId returned from backend.");
+      }
+
+    //  link if and only if submissionId exists
+      if (submissionId) {
+        const linked = await linkAccount(submissionId, userId);
+        console.log("link ok:", linked);
+        alert("Account created and submission linked!");
+      } else {
+        alert("Account created! (No submission to link)");
+      }
+
+    } catch (err) {
+      console.error(err);
+      alert("Sign up failed: " + err.message);
+    }
   };
 
   // help form
@@ -51,10 +122,6 @@ const handleHelpSubmit = (e) => {
   if (helpForm.message.trim().length < 5) {
     return setHelpErr("Tell us a bit more (≥ 5 characters).");
   }
-
-  // TODO: connect backend
-  // e.g.: fetch("/api/help", { method:"POST", headers:{'Content-Type':'application/json'}, body: JSON.stringify(helpForm) })
-  // .then(() => setHelpSent(true))
 
   setHelpSent(true); 
 };
