@@ -70,6 +70,18 @@ Frontend: CSS, HTML, React
 |week 10|[S2 Week10 Client Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S2%20Week%2010%20Client%20Meeting)<br>[S2 Week10 Tutoring Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S2%20Week%2010%20Tutoring%20Meeting.md)<br>[S2 Week10 Team Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S2%20Week%2010%20Team%20Meeting.md)|
 |week 11|[S2 Week11 Team Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S2%20Week%2011%20Team%20Meeting.md)|
 |week 12|[S2 Week12 Client Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S2%20Week%2012%20Client%20Meeting.md)<br>[S2 Week12 Tutoring Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S2%20Week%2012%20Tutoring%20Meeting.md)<br>[S2 Week12 Team Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S2%20Week%2012%20Team%20Meeting.md)|
+
+|2026 S1|meeting minutes|
+|---|---|
+|week 1|[S1 Week1 Tutoring Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week1%20Tutor%20Meeting.md)<br>[S1 Week1 Team Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%201%20Team%20Meeting.md)|
+|week 2||
+|week 3||
+|week 4||
+|week 5||
+|week 6||
+|week 7||
+|week 8||
+|week 9||
 ## Team velocity
 ### Sprint 1
 | Task  | Estimate (Story Points) |
