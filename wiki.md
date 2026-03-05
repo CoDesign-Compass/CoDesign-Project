@@ -74,7 +74,7 @@ Frontend: CSS, HTML, React
 |2026 S1|meeting minutes|
 |---|---|
 |week 1|[S1 Week1 Tutoring Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week1%20Tutor%20Meeting.md)<br>[S1 Week1 Team Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%201%20Team%20Meeting.md)|
-|week 2||
+|week 2|[S1 Week2 Tutor Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%202%20Tutor%20Meeting.md)<br>[S1 Week2 Team Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%202%20Team%20Meeting.md)|
 |week 3||
 |week 4||
 |week 5||
