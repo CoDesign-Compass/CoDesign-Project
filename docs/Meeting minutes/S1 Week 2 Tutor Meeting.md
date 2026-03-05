@@ -10,7 +10,7 @@ The Hive, Building 108, ANU
 
 ## Participants
 
-Ricky Chen, Jingwen Zhang, Yu Pan, Jiaxin Li, Shuo Li, Aria Fung, Zhimeng Zhu, Saswat Panda(tutor)
+Ricky Chen, Jingwen Zhang, Yu Pan, Jiaxin Li, Shuo Li, Aria Fung, Zhimeng Zhu, Buddhi Kothalawala(tutor)
 
 ## Goals
 
@@ -42,4 +42,4 @@ Ricky Chen, Jingwen Zhang, Yu Pan, Jiaxin Li, Shuo Li, Aria Fung, Zhimeng Zhu, S
 
 ## Task Allocations
 
-To be discussed during team meeting
+To be discussed in the team meeting
