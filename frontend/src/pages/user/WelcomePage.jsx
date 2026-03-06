@@ -28,7 +28,13 @@ export default function WelcomePage() {
     }
   }
   const onLogin = () => {
-    navigate('/login')
+    const currentShareId = routeShareId || shareId
+
+    if (currentShareId) {
+      navigate(`/share/${currentShareId}/login`)
+    } else {
+      navigate('/login')
+    }
   }
 
   useEffect(() => {

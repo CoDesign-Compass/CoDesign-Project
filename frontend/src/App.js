@@ -35,23 +35,6 @@ function App() {
         <Router>
           <Routes>
             {/* ---------- USER ROUTES ---------- */}
-            <Route
-              path="/login"
-              element={
-                <Layout>
-                  <LoginPage />
-                </Layout>
-              }
-            />
-            <Route
-              path="/createaccount"
-              element={
-                <Layout>
-                  <CreateAccountPage />
-                </Layout>
-              }
-            />
-
             {/* keep for test */}
             <Route
               path="/"
@@ -90,6 +73,22 @@ function App() {
               element={
                 <Layout>
                   <ThankYouPage />
+                </Layout>
+              }
+            />
+            <Route
+              path="/login"
+              element={
+                <Layout>
+                  <LoginPage />
+                </Layout>
+              }
+            />
+            <Route
+              path="/createaccount"
+              element={
+                <Layout>
+                  <CreateAccountPage />
                 </Layout>
               }
             />
@@ -132,6 +131,22 @@ function App() {
               element={
                 <Layout>
                   <ThankYouPage />
+                </Layout>
+              }
+            />
+            <Route
+              path="/share/:shareId/login"
+              element={
+                <Layout>
+                  <LoginPage />
+                </Layout>
+              }
+            />
+            <Route
+              path="/share/:shareId/createaccount"
+              element={
+                <Layout>
+                  <CreateAccountPage />
                 </Layout>
               }
             />

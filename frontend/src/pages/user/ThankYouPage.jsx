@@ -20,9 +20,17 @@ export default function ThankPage() {
   const [wantVoucher, setWantVoucher] = useState(false)
   const [wantUpdates, setWantUpdates] = useState(false)
   const navigate = useNavigate()
+
+  const currentShareId = routeShareId || shareId
+
   const onLogin = (e) => {
     e.preventDefault()
-    navigate('/createaccount')
+
+    if (currentShareId) {
+      navigate(`/share/${currentShareId}/createaccount`)
+    } else {
+      navigate('/createaccount')
+    }
   }
 
   useEffect(() => {
