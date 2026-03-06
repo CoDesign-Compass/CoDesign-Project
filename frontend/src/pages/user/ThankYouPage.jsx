@@ -31,7 +31,7 @@ export default function ThankPage() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ issueId }),
-    });
+  });
 
     const text = await res.text();
     if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
@@ -58,6 +58,11 @@ const onSubmit = async (e) => {
 
   let submissionId = localStorage.getItem("submissionId");
   if (!submissionId) {
+  //read and check issue id（uncomment the following 3 + bottom 1 line）
+//   const raw = localStorage.getItem("issueId");
+//    const issueId = Number(raw);
+//    const safeIssueId = Number.isFinite(issueId) && issueId > 0 ? issueId : 1;
+    const issueId = Number(localStorage.getItem("issueId") || 1);
     const created = await createSubmission(1);
     const newId = created?.id ?? created?.submissionId;
     if (!newId) {
@@ -67,6 +72,8 @@ const onSubmit = async (e) => {
     }
     submissionId = String(newId);
     localStorage.setItem("submissionId", submissionId);
+    localStorage.setItem("issueId", String(issueId));
+//  localStorage.setItem("issueId", String(safeIssueId));
   }
 
   

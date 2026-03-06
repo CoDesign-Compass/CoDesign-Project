@@ -81,7 +81,7 @@ export default function CreateAccountPage({ mode = "create", onSubmit: onSubmitP
     const submissionId = localStorage.getItem("submissionId");
     if (!submissionId) {
       alert("No submissionId found. Please start from feedback flow.");
-      const submissionId = localStorage.getItem("submissionId");
+      return;
     }
 
     try {
