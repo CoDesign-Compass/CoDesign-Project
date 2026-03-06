@@ -1,6 +1,7 @@
-import { useNavigate } from "react-router-dom";
-import { useState, useRef, useEffect } from "react";
-import { useTheme } from "../../context/ThemeContext";
+import { useNavigate, useParams } from 'react-router-dom'
+import { useState, useRef, useEffect } from 'react'
+import { useTheme } from '../../context/ThemeContext'
+import { useIssue } from '../../context/IssueContext'
 
 /**
  * ThankyouPage (5 sections)
@@ -10,79 +11,79 @@ import { useTheme } from "../../context/ThemeContext";
  * 4) Help "?" button (bottom-right)
  */
 export default function ThankPage() {
-  const { theme } = useTheme();
-  const [open, setOpen] = useState(false);
-  const popRef = useRef(null);
-  const [email, setEmail] = useState("");
-  const [wantVoucher, setWantVoucher] = useState(false);
-  const [wantUpdates, setWantUpdates] = useState(false);
-  const navigate = useNavigate();
+  const { shareId: routeShareId } = useParams()
+  const { shareId, setShareId } = useIssue()
+  const { theme } = useTheme()
+  const [open, setOpen] = useState(false)
+  const popRef = useRef(null)
+  const [email, setEmail] = useState('')
+  const [wantVoucher, setWantVoucher] = useState(false)
+  const [wantUpdates, setWantUpdates] = useState(false)
+  const navigate = useNavigate()
   const onLogin = (e) => {
-    e.preventDefault();
-    navigate("/createaccount");
-  };
+    e.preventDefault()
+    navigate('/createaccount')
+  }
 
   useEffect(() => {
     const onDown = (e) => {
-      if (popRef.current && !popRef.current.contains(e.target)) setOpen(false);
-    };
-    document.addEventListener("mousedown", onDown);
-    return () => document.removeEventListener("mousedown", onDown);
-  }, []);
+      if (popRef.current && !popRef.current.contains(e.target)) setOpen(false)
+    }
+    document.addEventListener('mousedown', onDown)
+    return () => document.removeEventListener('mousedown', onDown)
+  }, [])
+
+  useEffect(() => {
+    if (routeShareId) {
+      setShareId(routeShareId)
+    }
+  }, [routeShareId, setShareId])
 
   const onSubmit = (e) => {
-    e.preventDefault();
-    if (!email) return;
-    localStorage.setItem("email", email);
-    alert("Email saved: " + email);
-    setEmail("");
-  };
+    e.preventDefault()
+    if (!email) return
+    localStorage.setItem('email', email)
+    alert('Email saved: ' + email)
+    setEmail('')
+  }
 
-  useEffect(() => {
-    const onDown = (e) => {
-      if (popRef.current && !popRef.current.contains(e.target)) setOpen(false);
-    };
-    document.addEventListener("mousedown", onDown);
-    return () => document.removeEventListener("mousedown", onDown);
-  }, []);
-
-  const [helpForm, setHelpForm] = useState({ email: "", message: "" });
-  const [helpSent, setHelpSent] = useState(false);
-  const [helpErr, setHelpErr] = useState("");
+  const [helpForm, setHelpForm] = useState({ email: '', message: '' })
+  const [helpSent, setHelpSent] = useState(false)
+  const [helpErr, setHelpErr] = useState('')
 
   const handleHelpSubmit = (e) => {
-    e.preventDefault();
-    setHelpErr("");
-    const validEmail = /^\S+@\S+\.\S+$/.test(helpForm.email);
-    if (!validEmail) return setHelpErr("Please enter a valid email.");
+    e.preventDefault()
+    setHelpErr('')
+    const validEmail = /^\S+@\S+\.\S+$/.test(helpForm.email)
+    if (!validEmail) return setHelpErr('Please enter a valid email.')
     if (helpForm.message.trim().length < 5) {
-      return setHelpErr("Tell us a bit more (≥ 5 characters).");
+      return setHelpErr('Tell us a bit more (≥ 5 characters).')
     }
 
     // TODO: connect backend
     // e.g.: fetch("/api/help", { method:"POST", headers:{'Content-Type':'application/json'}, body: JSON.stringify(helpForm) })
     // .then(() => setHelpSent(true))
 
-    setHelpSent(true);
-  };
+    setHelpSent(true)
+  }
 
   return (
     <div
       className="thankyou-page"
       style={{
-        display: "flex",
-        flexDirection: "column",
-        width: "100%",
-        margin: "0 auto",
-        paddingInline: "clamp(12px, 4vw, 24px)",
-        boxSizing: "border-box",
+        display: 'flex',
+        flexDirection: 'column',
+        width: '100%',
+        margin: '0 auto',
+        paddingInline: 'clamp(12px, 4vw, 24px)',
+        boxSizing: 'border-box',
       }}
     >
       <section
         style={{
-          margin: "clamp(18px, 4vw, 40px)",
-          display: "grid",
-          placeItems: "center",
+          margin: 'clamp(18px, 4vw, 40px)',
+          display: 'grid',
+          placeItems: 'center',
         }}
       ></section>
 
@@ -91,25 +92,25 @@ export default function ThankPage() {
         className="banner"
         style={{
           margin: 0,
-          width: "100%",
-          height: "clamp(140px, 30vh, 260px)",
-          backgroundImage: "url(/Banner.png)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          display: "grid",
-          placeItems: "center",
-          textAlign: "center",
+          width: '100%',
+          height: 'clamp(140px, 30vh, 260px)',
+          backgroundImage: 'url(/Banner.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          display: 'grid',
+          placeItems: 'center',
+          textAlign: 'center',
         }}
       >
         <div>
           <h1
             style={{
               margin: 0,
-              fontSize: "clamp(30px, 8vw, 96px)",
-              color: theme === "light" ? "#303030" : "#ffe070",
-              fontFamily: "Poppins, sans-serif",
+              fontSize: 'clamp(30px, 8vw, 96px)',
+              color: theme === 'light' ? '#303030' : '#ffe070',
+              fontFamily: 'Poppins, sans-serif',
               lineHeight: 1.1,
-              paddingInline: "4vw",
+              paddingInline: '4vw',
             }}
           >
             Thanks
@@ -117,9 +118,9 @@ export default function ThankPage() {
           <h2
             style={{
               marginTop: 0,
-              fontSize: "clamp(24px, 3.2vw, 40px)",
-              color: theme === "light" ? "#303030" : "#ffe070",
-              fontFamily: "Poppins, sans-serif",
+              fontSize: 'clamp(24px, 3.2vw, 40px)',
+              color: theme === 'light' ? '#303030' : '#ffe070',
+              fontFamily: 'Poppins, sans-serif',
             }}
           >
             for sharing your experience
@@ -130,20 +131,20 @@ export default function ThankPage() {
       {/* 2) subscribe block */}
       <section
         style={{
-          margin: "32px auto",
-          textAlign: "center",
+          margin: '32px auto',
+          textAlign: 'center',
         }}
       >
         <div className="GiftInformation">
           <p
             style={{
               margin: 0,
-              color: "#ffe070",
-              textAlign: "center",
-              fontSize: "clamp(14px, 2.4vw, 20px)",
+              color: '#ffe070',
+              textAlign: 'center',
+              fontSize: 'clamp(14px, 2.4vw, 20px)',
               lineHeight: 1.4,
               fontWeight: 700,
-              fontFamily: "Poppins, sans-serif",
+              fontFamily: 'Poppins, sans-serif',
             }}
           >
             Give us your email for $10 Coles voucher or more
@@ -152,25 +153,25 @@ export default function ThankPage() {
 
         <div
           style={{
-            display: "flex",
-            justifyContent: "center",
-            margin: "clamp(14px, 4vw, 24px) 0",
+            display: 'flex',
+            justifyContent: 'center',
+            margin: 'clamp(14px, 4vw, 24px) 0',
           }}
         >
           <form
             onSubmit={onSubmit}
             style={{
-              display: "flex",
-              alignItems: "center",
+              display: 'flex',
+              alignItems: 'center',
               gap: 12,
-              flexWrap: "nowrap",
-              width: "100%",
+              flexWrap: 'nowrap',
+              width: '100%',
             }}
           >
             <div
               style={{
-                position: "relative",
-                flex: "1 1 clamp(220px, 70vw, 420px)",
+                position: 'relative',
+                flex: '1 1 clamp(220px, 70vw, 420px)',
                 minWidth: 0,
               }}
             >
@@ -180,38 +181,38 @@ export default function ThankPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 style={{
-                  width: "100%",
-                  height: "clamp(30px, 3vw, 46px)",
+                  width: '100%',
+                  height: 'clamp(30px, 3vw, 46px)',
                   borderRadius: 8,
-                  border: "1px solid #cfcfcf",
-                  background: "#fff",
-                  position: "relative",
-                  fontSize: "clamp(12px, 2vw, 18px)",
-                  outline: "none",
-                  fontFamily: "Poppins, sans-serif",
+                  border: '1px solid #cfcfcf',
+                  background: '#fff',
+                  position: 'relative',
+                  fontSize: 'clamp(12px, 2vw, 18px)',
+                  outline: 'none',
+                  fontFamily: 'Poppins, sans-serif',
                 }}
                 required
               />
               {email && (
                 <button
                   type="button"
-                  onClick={() => setEmail("")}
+                  onClick={() => setEmail('')}
                   aria-label="Clear"
                   style={{
-                    position: "absolute",
+                    position: 'absolute',
                     right: 8,
-                    top: "50%",
-                    transform: "translateY(-50%)",
+                    top: '50%',
+                    transform: 'translateY(-50%)',
                     width: 24,
                     height: 24,
-                    border: "none",
-                    background: "transparent",
-                    cursor: "pointer",
-                    fontSize: "clamp(12px, 4vw, 18px)",
-                    color: "grey",
+                    border: 'none',
+                    background: 'transparent',
+                    cursor: 'pointer',
+                    fontSize: 'clamp(12px, 4vw, 18px)',
+                    color: 'grey',
                     lineHeight: 1,
                     zIndex: 1,
-                    fontFamily: "Poppins, sans-serif",
+                    fontFamily: 'Poppins, sans-serif',
                   }}
                 >
                   ×
@@ -222,17 +223,17 @@ export default function ThankPage() {
             <button
               type="submit"
               style={{
-                margin: "5px",
-                flex: "0 0 auto",
-                fontSize: "clamp(12px, 1.5vw, 16px)",
+                margin: '5px',
+                flex: '0 0 auto',
+                fontSize: 'clamp(12px, 1.5vw, 16px)',
                 borderRadius: 8,
-                padding: "clamp(5px, 1vw, 10px) clamp(7px, 1.5vw, 14px)",
-                cursor: "pointer",
-                border: "1.5px solid #ffe070",
-                color: theme === "light" ? "#303030" : "white",
-                background: "#7F7FBC",
-                whiteSpace: "nowrap",
-                fontFamily: "Poppins, sans-serif",
+                padding: 'clamp(5px, 1vw, 10px) clamp(7px, 1.5vw, 14px)',
+                cursor: 'pointer',
+                border: '1.5px solid #ffe070',
+                color: theme === 'light' ? '#303030' : 'white',
+                background: '#7F7FBC',
+                whiteSpace: 'nowrap',
+                fontFamily: 'Poppins, sans-serif',
                 opacity: 0.85,
               }}
               onMouseEnter={(e) => (e.currentTarget.style.opacity = 1)}
@@ -246,17 +247,17 @@ export default function ThankPage() {
         <div
           className="checkBox"
           style={{
-            marginTop: "clamp(18px, 3vw, 30px)",
-            display: "grid",
+            marginTop: 'clamp(18px, 3vw, 30px)',
+            display: 'grid',
             gap: 14,
-            textAlign: "left",
+            textAlign: 'left',
           }}
         >
           <label
             style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "flex-start",
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
               gap: 12,
             }}
           >
@@ -267,17 +268,17 @@ export default function ThankPage() {
               style={{
                 width: 18,
                 height: 18,
-                accentColor: "#ffe070",
-                cursor: "pointer",
+                accentColor: '#ffe070',
+                cursor: 'pointer',
                 flexShrink: 0,
               }}
             />
             <span
               style={{
-                fontSize: "clamp(12px, 2vw, 16px)",
+                fontSize: 'clamp(12px, 2vw, 16px)',
                 fontWeight: 600,
-                color: theme === "light" ? "black" : "white",
-                fontFamily: "Poppins, sans-serif",
+                color: theme === 'light' ? 'black' : 'white',
+                fontFamily: 'Poppins, sans-serif',
                 lineHeight: 1.4,
               }}
             >
@@ -287,9 +288,9 @@ export default function ThankPage() {
 
           <label
             style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "flex-start",
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
               gap: 12,
               flex: 1,
             }}
@@ -301,17 +302,17 @@ export default function ThankPage() {
               style={{
                 width: 18,
                 height: 18,
-                accentColor: "#ffe070",
-                cursor: "pointer",
+                accentColor: '#ffe070',
+                cursor: 'pointer',
                 flexShrink: 0,
               }}
             />
             <span
               style={{
-                fontSize: "clamp(12px, 2vw, 16px)",
+                fontSize: 'clamp(12px, 2vw, 16px)',
                 fontWeight: 600,
-                color: theme === "light" ? "black" : "white",
-                fontFamily: "Poppins, sans-serif",
+                color: theme === 'light' ? 'black' : 'white',
+                fontFamily: 'Poppins, sans-serif',
                 lineHeight: 1,
                 flex: 1,
               }}
@@ -326,25 +327,25 @@ export default function ThankPage() {
       <section
         className="join-button"
         style={{
-          margin: "clamp(18px, 3vw, 30px)",
-          display: "grid",
-          placeItems: "center",
+          margin: 'clamp(18px, 3vw, 30px)',
+          display: 'grid',
+          placeItems: 'center',
         }}
       >
         <button
           onClick={onLogin}
           style={{
-            fontSize: "clamp(18px, 3.2vw, 30px)",
+            fontSize: 'clamp(18px, 3.2vw, 30px)',
             borderRadius: 8,
-            padding: "5px 20px",
-            cursor: "pointer",
-            border: "2px solid #ffe070",
-            color: theme === "light" ? "#303030" : "white",
-            background: "#7F7FBC",
-            textDecoration: "underline",
-            textUnderlineOffset: "4px",
-            textDecorationThickness: "1.5px",
-            fontFamily: "Poppins, sans-serif",
+            padding: '5px 20px',
+            cursor: 'pointer',
+            border: '2px solid #ffe070',
+            color: theme === 'light' ? '#303030' : 'white',
+            background: '#7F7FBC',
+            textDecoration: 'underline',
+            textUnderlineOffset: '4px',
+            textDecorationThickness: '1.5px',
+            fontFamily: 'Poppins, sans-serif',
             opacity: 0.85,
           }}
           onMouseEnter={(e) => (e.currentTarget.style.opacity = 1)}
@@ -357,27 +358,27 @@ export default function ThankPage() {
       {/* 4) Help / "?" button */}
       <div
         style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          margin: "clamp(10px, 3vw, 20px) clamp(16px, 4vw, 30px)",
+          display: 'flex',
+          justifyContent: 'flex-end',
+          margin: 'clamp(10px, 3vw, 20px) clamp(16px, 4vw, 30px)',
         }}
       >
-        <div ref={popRef} style={{ position: "relative" }}>
+        <div ref={popRef} style={{ position: 'relative' }}>
           <button
             aria-label="Help"
             title="Help"
             onClick={() => setOpen((v) => !v)}
             style={{
-              border: "none",
-              background: "transparent",
+              border: 'none',
+              background: 'transparent',
               padding: 0,
-              cursor: "pointer",
+              cursor: 'pointer',
             }}
           >
             <img
               src="/Information.png"
               alt="Information"
-              style={{ height: "clamp(20px, 5vw, 32px)", display: "block" }}
+              style={{ height: 'clamp(20px, 5vw, 32px)', display: 'block' }}
             />
           </button>
 
@@ -385,36 +386,36 @@ export default function ThankPage() {
             <div
               role="tooltip"
               style={{
-                position: "absolute",
-                bottom: "calc(100% + 8px)",
-                left: "calc(100% - 130px)",
-                background: "#ffe070",
-                padding: "12px 12px",
-                transform: "translateX(-50%)",
-                width: "clamp(200px, 60vw, 360px)",
+                position: 'absolute',
+                bottom: 'calc(100% + 8px)',
+                left: 'calc(100% - 130px)',
+                background: '#ffe070',
+                padding: '12px 12px',
+                transform: 'translateX(-50%)',
+                width: 'clamp(200px, 60vw, 360px)',
                 borderRadius: 8,
-                boxShadow: "0 8px 24px rgba(0,0,0,.18)",
+                boxShadow: '0 8px 24px rgba(0,0,0,.18)',
                 zIndex: 1000,
               }}
             >
               <div
                 style={{
                   lineHeight: 1.55,
-                  fontFamily: "Poppins, sans-serif",
-                  color: "#303030",
+                  fontFamily: 'Poppins, sans-serif',
+                  color: '#303030',
                 }}
               />
               {helpSent ? (
                 <div style={{ lineHeight: 1.55 }}>
                   <p style={{ margin: 0, fontWeight: 600 }}>Thanks! 🎉</p>
-                  <p style={{ margin: "6px 0 0" }}>
+                  <p style={{ margin: '6px 0 0' }}>
                     We’ve received your message and will get back to you soon.
                   </p>
                 </div>
               ) : (
                 <form
                   onSubmit={handleHelpSubmit}
-                  style={{ display: "grid", gap: 8 }}
+                  style={{ display: 'grid', gap: 8 }}
                 >
                   <label style={{ fontSize: 13 }}>
                     Email address
@@ -426,14 +427,14 @@ export default function ThankPage() {
                       }
                       placeholder="you@example.com"
                       style={{
-                        width: "100%",
+                        width: '100%',
                         height: 38,
                         marginTop: 4,
                         borderRadius: 6,
-                        border: "1px solid #d8c25b",
-                        background: "#fff9c6",
-                        padding: "0 10px",
-                        outline: "none",
+                        border: '1px solid #d8c25b',
+                        background: '#fff9c6',
+                        padding: '0 10px',
+                        outline: 'none',
                       }}
                     />
                   </label>
@@ -448,29 +449,29 @@ export default function ThankPage() {
                       }
                       placeholder="Tell us what's going on…"
                       style={{
-                        width: "100%",
+                        width: '100%',
                         marginTop: 4,
                         borderRadius: 6,
-                        border: "1px solid #d8c25b",
-                        background: "#fffef0",
-                        padding: "8px 10px",
-                        resize: "vertical",
-                        outline: "none",
+                        border: '1px solid #d8c25b',
+                        background: '#fffef0',
+                        padding: '8px 10px',
+                        resize: 'vertical',
+                        outline: 'none',
                       }}
                     />
                   </label>
 
                   {helpErr && (
-                    <div style={{ color: "#9b1c1c", fontSize: 12 }}>
+                    <div style={{ color: '#9b1c1c', fontSize: 12 }}>
                       {helpErr}
                     </div>
                   )}
 
                   <div
                     style={{
-                      display: "flex",
+                      display: 'flex',
                       gap: 8,
-                      justifyContent: "flex-end",
+                      justifyContent: 'flex-end',
                       marginTop: 2,
                     }}
                   >
@@ -479,12 +480,12 @@ export default function ThankPage() {
                       onClick={() => setOpen(false)}
                       style={{
                         height: 32,
-                        padding: "0 10px",
+                        padding: '0 10px',
                         borderRadius: 6,
-                        border: "1px solid rgba(0,0,0,.15)",
-                        background: "#fff",
-                        color: "#303030",
-                        cursor: "pointer",
+                        border: '1px solid rgba(0,0,0,.15)',
+                        background: '#fff',
+                        color: '#303030',
+                        cursor: 'pointer',
                       }}
                     >
                       Cancel
@@ -493,13 +494,13 @@ export default function ThankPage() {
                       type="submit"
                       style={{
                         height: 32,
-                        padding: "0 12px",
+                        padding: '0 12px',
                         borderRadius: 6,
-                        border: "none",
-                        background: "#303030",
-                        color: "#ffe070",
-                        cursor: "pointer",
-                        boxShadow: "0 1px 0 rgba(0,0,0,.2)",
+                        border: 'none',
+                        background: '#303030',
+                        color: '#ffe070',
+                        cursor: 'pointer',
+                        boxShadow: '0 1px 0 rgba(0,0,0,.2)',
                       }}
                     >
                       Send
@@ -512,5 +513,5 @@ export default function ThankPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }
