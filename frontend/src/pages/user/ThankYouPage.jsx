@@ -13,6 +13,10 @@ import { useIssue } from '../../context/IssueContext'
 export default function ThankPage() {
   const { shareId: routeShareId } = useParams()
   const { shareId, setShareId } = useIssue()
+
+  const currentShareId = routeShareId || shareId
+
+  console.log('THANKPAGE VERSION: 2026-03-05 v2')
   const { theme } = useTheme()
   const [open, setOpen] = useState(false)
   const popRef = useRef(null)
@@ -20,17 +24,6 @@ export default function ThankPage() {
   const [wantVoucher, setWantVoucher] = useState(false)
   const [wantUpdates, setWantUpdates] = useState(false)
   const navigate = useNavigate()
-
-  const currentShareId = routeShareId || shareId
-
-  console.log("THANKPAGE VERSION: 2026-03-05 v2");
-  const { theme } = useTheme();
-  const [open, setOpen] = useState(false);
-  const popRef = useRef(null);
-  const [email, setEmail] = useState("");
-  const [wantVoucher, setWantVoucher] = useState(false);
-  const [wantUpdates, setWantUpdates] = useState(false);
-  const navigate = useNavigate();
   const onLogin = (e) => {
     e.preventDefault()
 
@@ -49,89 +42,80 @@ export default function ThankPage() {
     return () => document.removeEventListener('mousedown', onDown)
   }, [])
 
-  const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080";
+  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'
 
   async function createSubmission(issueId) {
     const res = await fetch(`${API_BASE}/api/submissions`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ issueId }),
-  });
+    })
 
-    const text = await res.text();
-    if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
-    return text ? JSON.parse(text) : {};
+    const text = await res.text()
+    if (!res.ok) throw new Error(text || `HTTP ${res.status}`)
+    return text ? JSON.parse(text) : {}
   }
 
   async function submitSubmission(id, payload) {
     const res = await fetch(`${API_BASE}/api/submissions/${id}/submit`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
-    });
+    })
 
-    const text = await res.text();
-    if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
-    return text ? JSON.parse(text) : {};
+    const text = await res.text()
+    if (!res.ok) throw new Error(text || `HTTP ${res.status}`)
+    return text ? JSON.parse(text) : {}
   }
 
-const onSubmit = async (e) => {
-  e.preventDefault();
+  const onSubmit = async (e) => {
+    e.preventDefault()
 
-  const trimmed = email.trim();
-  if(!trimmed.length) return;
+    const trimmed = email.trim()
+    if (!trimmed.length) return
 
-  let submissionId = localStorage.getItem("submissionId");
-  if (!submissionId) {
-  //read and check issue id（uncomment the following 3 + bottom 1 line）
-//   const raw = localStorage.getItem("issueId");
-//    const issueId = Number(raw);
-//    const safeIssueId = Number.isFinite(issueId) && issueId > 0 ? issueId : 1;
-    const issueId = Number(localStorage.getItem("issueId") || 1);
-    const created = await createSubmission(1);
-    const newId = created?.id ?? created?.submissionId;
-    if (!newId) {
-      alert("Created submission but no id returned. Check backend response.");
-      console.log("createSubmission response:", created);
-      return;
+    let submissionId = localStorage.getItem('submissionId')
+    if (!submissionId) {
+      //read and check issue id（uncomment the following 3 + bottom 1 line）
+      //   const raw = localStorage.getItem("issueId");
+      //    const issueId = Number(raw);
+      //    const safeIssueId = Number.isFinite(issueId) && issueId > 0 ? issueId : 1;
+      const issueId = Number(localStorage.getItem('issueId') || 1)
+      const created = await createSubmission(1)
+      const newId = created?.id ?? created?.submissionId
+      if (!newId) {
+        alert('Created submission but no id returned. Check backend response.')
+        console.log('createSubmission response:', created)
+        return
+      }
+      submissionId = String(newId)
+      localStorage.setItem('submissionId', submissionId)
+      localStorage.setItem('issueId', String(issueId))
+      //  localStorage.setItem("issueId", String(safeIssueId));
     }
-    submissionId = String(newId);
-    localStorage.setItem("submissionId", submissionId);
-    localStorage.setItem("issueId", String(issueId));
-//  localStorage.setItem("issueId", String(safeIssueId));
-  }
 
-  
-  const payload = {
-    email: trimmed.length ? trimmed : null,
-    wantsVoucher: wantVoucher,
-    wantsUpdates: wantUpdates,
-  };
+    const payload = {
+      email: trimmed.length ? trimmed : null,
+      wantsVoucher: wantVoucher,
+      wantsUpdates: wantUpdates,
+    }
 
-  try {
-    const resp = await submitSubmission(submissionId, payload);
-    console.log("submit ok:", resp);
-    alert("Submitted successfully!");
-    // setEmail("");
-  } catch (err) {
-    console.error(err);
-    alert("Submit failed: " + err.message);
+    try {
+      const resp = await submitSubmission(submissionId, payload)
+      console.log('submit ok:', resp)
+      alert('Submitted successfully!')
+      // setEmail("");
+    } catch (err) {
+      console.error(err)
+      alert('Submit failed: ' + err.message)
+    }
   }
-}; 
 
   useEffect(() => {
     if (routeShareId) {
       setShareId(routeShareId)
     }
   }, [routeShareId, setShareId])
-
-  const onSubmit = (e) => {
-    e.preventDefault()
-    if (!email) return
-    localStorage.setItem('email', email)
-    alert('Email saved: ' + email)
-    setEmail('')
-  }
 
   const [helpForm, setHelpForm] = useState({ email: '', message: '' })
   const [helpSent, setHelpSent] = useState(false)
@@ -146,8 +130,8 @@ const onSubmit = async (e) => {
       return setHelpErr('Tell us a bit more (≥ 5 characters).')
     }
 
-    setHelpSent(true);
-  };
+    setHelpSent(true)
+  }
 
   return (
     <div
