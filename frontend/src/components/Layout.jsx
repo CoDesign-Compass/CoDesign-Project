@@ -1,76 +1,86 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import { useTheme } from "../context/ThemeContext";
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useTheme } from '../context/ThemeContext'
 
 export default function Layout({ children }) {
-  const location = useLocation();
-  const navigate = useNavigate();
+  const location = useLocation()
+  const navigate = useNavigate()
+  const { shareId } = useParams()
 
   // 定义页面顺序
-  const pages = ["/", "/profile", "/why", "/how", "/thankyou"];
-  const currentIndex = pages.indexOf(location.pathname);
+  const pages = shareId
+    ? [
+        `/share/${shareId}`,
+        `/share/${shareId}/profile`,
+        `/share/${shareId}/why`,
+        `/share/${shareId}/how`,
+        `/share/${shareId}/thankyou`,
+      ]
+    : ['/', '/profile', '/why', '/how', '/thankyou']
 
-  const { theme, toggleTheme } = useTheme();
+  const currentIndex = pages.indexOf(location.pathname)
+
+  const { theme, toggleTheme } = useTheme()
 
   const goBack = () => {
     if (currentIndex > 0) {
-      navigate(pages[currentIndex - 1]);
+      navigate(pages[currentIndex - 1])
     }
-  };
+  }
 
   const goNext = () => {
     if (currentIndex < pages.length - 1) {
-      navigate(pages[currentIndex + 1]);
+      navigate(pages[currentIndex + 1])
     }
-  };
+  }
 
   return (
-    <div className="app-layout" style={{ fontFamily: "sans-serif" }}>
+    <div className="app-layout" style={{ fontFamily: 'sans-serif' }}>
       {/* Header */}
       <header
         style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          position: "relative",
-          padding: "1rem",
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          position: 'relative',
+          padding: '1rem',
         }}
       >
         <img
-          src={theme === "light" ? "/logo_light.png" : "/logo_dark.png"}
+          src={theme === 'light' ? '/logo_light.png' : '/logo_dark.png'}
           alt="Purpose Media Logo"
-          style={{ height: "60px" }}
+          style={{ height: '60px' }}
         />
         <button
           onClick={toggleTheme}
           style={{
-            position: "absolute",
-            right: "1rem",
-            padding: "0.5rem 1rem",
-            borderRadius: "8px",
-            border: "1px solid #d8d8d8",
-            background: "transparent",
-            color: "var(--text-color)",
-            cursor: "pointer",
+            position: 'absolute',
+            right: '1rem',
+            padding: '0.5rem 1rem',
+            borderRadius: '8px',
+            border: '1px solid #d8d8d8',
+            background: 'transparent',
+            color: 'var(--text-color)',
+            cursor: 'pointer',
           }}
         >
           <img
-            src={theme === "light" ? "/light_mode.png" : "/dark_mode.png"}
+            src={theme === 'light' ? '/light_mode.png' : '/dark_mode.png'}
             alt="Purpose Media Logo"
-            style={{ height: "30px" }}
+            style={{ height: '30px' }}
           />
         </button>
       </header>
 
       {/* Main content */}
-      <main style={{ minHeight: "70vh" }}>{children}</main>
+      <main style={{ minHeight: '70vh' }}>{children}</main>
 
       {/* Footer with navigation */}
       <footer
         style={{
-          backgroundColor: theme === "light" ? "white" : "#303030",
-          padding: "1rem",
-          display: "flex",
-          justifyContent: "space-between",
+          backgroundColor: theme === 'light' ? 'white' : '#303030',
+          padding: '1rem',
+          display: 'flex',
+          justifyContent: 'space-between',
         }}
       >
         {/* Back 按钮（第一页隐藏） */}
@@ -78,11 +88,11 @@ export default function Layout({ children }) {
           <button
             onClick={goBack}
             style={{
-              background: theme === "light" ? "black" : "white",
-              color: theme === "light" ? "white" : "black",
-              padding: "0.5rem 1rem",
-              borderRadius: "6px",
-              border: "none",
+              background: theme === 'light' ? 'black' : 'white',
+              color: theme === 'light' ? 'white' : 'black',
+              padding: '0.5rem 1rem',
+              borderRadius: '6px',
+              border: 'none',
             }}
           >
             ← Back
@@ -92,15 +102,15 @@ export default function Layout({ children }) {
         )}
 
         {/* Next 按钮（最后一页隐藏） */}
-        {currentIndex < pages.length - 1 ? (
+        {currentIndex >= 0 && currentIndex < pages.length - 1 ? (
           <button
             onClick={goNext}
             style={{
-              background: theme === "light" ? "black" : "white",
-              color: theme === "light" ? "white" : "black",
-              padding: "0.5rem 1rem",
-              borderRadius: "6px",
-              border: "none",
+              background: theme === 'light' ? 'black' : 'white',
+              color: theme === 'light' ? 'white' : 'black',
+              padding: '0.5rem 1rem',
+              borderRadius: '6px',
+              border: 'none',
             }}
           >
             Next →
@@ -110,5 +120,5 @@ export default function Layout({ children }) {
         )}
       </footer>
     </div>
-  );
+  )
 }

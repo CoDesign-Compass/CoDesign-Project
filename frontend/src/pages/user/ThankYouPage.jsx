@@ -1,6 +1,7 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { useTheme } from "../../context/ThemeContext";
+import { useIssue } from "../../context/IssueContext";
 
 /**
  * ThankyouPage (5 sections)
@@ -10,6 +11,9 @@ import { useTheme } from "../../context/ThemeContext";
  * 4) Help "?" button (bottom-right)
  */
 export default function ThankPage() {
+  const { shareId: routeShareId } = useParams();
+  const { shareId, setShareId } = useIssue();
+  const currentShareId = routeShareId || shareId;
   const { theme } = useTheme();
   const [open, setOpen] = useState(false);
   const popRef = useRef(null);
@@ -17,9 +21,93 @@ export default function ThankPage() {
   const [wantVoucher, setWantVoucher] = useState(false);
   const [wantUpdates, setWantUpdates] = useState(false);
   const navigate = useNavigate();
+  //const onLogin = (e) => {
+   // e.preventDefault();
+   // navigate("/createaccount");
+ // };
+
+
+  const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080";
+
+  async function createSubmission(issueId) {
+    const res = await fetch(`${API_BASE}/api/submissions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ issueId }),
+  });
+
+    const text = await res.text();
+    if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
+    return text ? JSON.parse(text) : {};
+  }
+
+  async function submitSubmission(id, payload) {
+    const res = await fetch(`${API_BASE}/api/submissions/${id}/submit`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const text = await res.text();
+    if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
+    return text ? JSON.parse(text) : {};
+  }
+
+const onSubmit = async (e) => {
+  e.preventDefault();
+
+  const trimmed = email.trim();
+  if(!trimmed.length) return;
+
+  let submissionId = localStorage.getItem("submissionId");
+  if (!submissionId) {
+    const raw = localStorage.getItem("issueId");
+    const issueId = Number(raw);
+
+  if (!Number.isFinite(issueId) || issueId <= 0) {
+      alert("No issueId found. Please enter from a share link / welcome page.");
+      return;
+    }
+
+    const created = await createSubmission(issueId);
+    const newId = created?.id ?? created?.submissionId;
+  if (!newId) {
+    alert("Created submission but no id returned. Check backend response.");
+    console.log("createSubmission response:", created);
+    return;
+  }
+
+    submissionId = String(newId);
+    localStorage.setItem("submissionId", submissionId);
+    
+    if (created?.issueId) localStorage.setItem("issueId", String(created.issueId));
+  }
+
+  
+  const payload = {
+    email: trimmed.length ? trimmed : null,
+    wantsVoucher: wantVoucher,
+    wantsUpdates: wantUpdates,
+  };
+
+  try {
+    const resp = await submitSubmission(submissionId, payload);
+    console.log("submit ok:", resp);
+    alert("Submitted successfully!");
+    // setEmail("");
+  } catch (err) {
+    console.error(err);
+    alert("Submit failed: " + err.message);
+  }
+}; 
+
   const onLogin = (e) => {
     e.preventDefault();
-    navigate("/createaccount");
+    if (currentShareId) {
+      navigate(`/share/${currentShareId}/createaccount`);
+    } else {
+      navigate("/createaccount");
+    }
   };
 
   useEffect(() => {
@@ -30,27 +118,16 @@ export default function ThankPage() {
     return () => document.removeEventListener("mousedown", onDown);
   }, []);
 
-  const onSubmit = (e) => {
-    e.preventDefault();
-    if (!email) return;
-    localStorage.setItem("email", email);
-    alert("Email saved: " + email);
-    setEmail("");
-  };
-
   useEffect(() => {
-    const onDown = (e) => {
-      if (popRef.current && !popRef.current.contains(e.target)) setOpen(false);
-    };
-    document.addEventListener("mousedown", onDown);
-    return () => document.removeEventListener("mousedown", onDown);
-  }, []);
+    if (routeShareId) setShareId(routeShareId);
+  }, [routeShareId, setShareId]);
+
 
   const [helpForm, setHelpForm] = useState({ email: "", message: "" });
   const [helpSent, setHelpSent] = useState(false);
   const [helpErr, setHelpErr] = useState("");
 
-  const handleHelpSubmit = (e) => {
+  const handleHelpSubmit = async (e) => {
     e.preventDefault();
     setHelpErr("");
     const validEmail = /^\S+@\S+\.\S+$/.test(helpForm.email);
@@ -59,11 +136,30 @@ export default function ThankPage() {
       return setHelpErr("Tell us a bit more (≥ 5 characters).");
     }
 
-    // TODO: connect backend
-    // e.g.: fetch("/api/help", { method:"POST", headers:{'Content-Type':'application/json'}, body: JSON.stringify(helpForm) })
-    // .then(() => setHelpSent(true))
+    try {
+      const payload = {
+        email: helpForm.email.trim(),
+        message: helpForm.message.trim(),
+        shareId: localStorage.getItem("shareId") || null,
+        issueId: Number(localStorage.getItem("issueId")) || null,
+        submissionId: Number(localStorage.getItem("submissionId")) || null,
+        pagePath: window.location.pathname,
+      };
 
-    setHelpSent(true);
+      const res = await fetch(`${API_BASE}/api/help`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const text = await res.text();
+      if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
+
+      setHelpSent(true);
+      } catch (err) {
+      console.error(err);
+      setHelpErr("Send failed: " + err.message);
+    }
   };
 
   return (

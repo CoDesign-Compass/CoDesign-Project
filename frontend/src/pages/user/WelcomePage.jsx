@@ -1,6 +1,7 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { useTheme } from "../../context/ThemeContext";
+import { useIssue } from "../../context/IssueContext";
 
 /**
  * WelcomePage (4 sections)
@@ -11,35 +12,131 @@ import { useTheme } from "../../context/ThemeContext";
  */
 export default function WelcomePage() {
   const { theme } = useTheme();
+  const { shareId: routeShareId } = useParams();
+  const { shareId, setIssueId, setShareId, setIssueContent } = useIssue();
+
   const [open, setOpen] = useState(false);
   const popRef = useRef(null);
   const navigate = useNavigate();
-  const onStart = () => navigate("/profile");
-  const onLogin = () => {
-    navigate("/login");
+  //const onStart = () => navigate("/profile");
+
+  const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080";
+
+  const [starting, setStarting] = useState(false);
+
+  useEffect(() => {
+    const onDown = (e) => {
+      if (popRef.current && !popRef.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, []);
+
+  useEffect(() => {
+    if (!routeShareId) return;
+
+    const fetchIssueContext = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/share/${routeShareId}`);
+        const text = await res.text();
+        if (!res.ok) throw new Error(text || "Failed to fetch issue context");
+
+        const data = text ? JSON.parse(text) : {};
+        const fetchedIssueId = Number(data?.issueId);
+
+        if (!Number.isFinite(fetchedIssueId) || fetchedIssueId <= 0) {
+          throw new Error("Invalid issueId from /api/share/{shareId}");
+        }
+
+        // update context
+        setIssueId(fetchedIssueId);
+        setShareId(data?.shareId ?? routeShareId);
+        setIssueContent(data?.issueContent || "");
+
+        // write issueId in localStorage, keep onStart logic
+        localStorage.setItem("issueId", String(fetchedIssueId));
+        localStorage.setItem("shareId", String(data?.shareId ?? routeShareId));
+      } catch (error) {
+        console.error("Failed to initialise issue context:", error);
+        alert("Invalid share link: " + error.message);
+      }
+    };
+
+    fetchIssueContext();
+  }, [routeShareId, API_BASE, setIssueId, setShareId, setIssueContent]);
+
+
+
+  const onStart = async () => {
+    if (starting) return;
+    setStarting(true);
+
+    try {
+      const issueId = Number(localStorage.getItem("issueId"));
+
+      if (!Number.isFinite(issueId) || issueId <= 0) {
+        alert("No issueId found. Please enter from a share link / welcome page.");
+        return;
+      }
+
+      const res = await fetch(`${API_BASE}/api/submissions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ issueId }),
+      });
+
+      const text = await res.text();
+      if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
+
+      const data = text ? JSON.parse(text) : null;
+      const submissionId = data?.id;
+
+      if (!submissionId) throw new Error("No submissionId returned from backend.");
+
+      localStorage.setItem("submissionId", String(submissionId));
+      localStorage.setItem("issueId", String(data?.issueId ?? issueId));
+
+      const currentShareId = routeShareId || shareId;
+      if (currentShareId) {
+        navigate(`/share/${currentShareId}/profile`);
+      } else {
+        // keep for test
+        navigate("/profile");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Start failed: " + err.message);
+    } finally {
+      setStarting(false);
+    }
   };
 
-  useEffect(() => {
-    const onDown = (e) => {
-      if (popRef.current && !popRef.current.contains(e.target)) setOpen(false);
-    };
-    document.addEventListener("mousedown", onDown);
-    return () => document.removeEventListener("mousedown", onDown);
-  }, []);
+  const onLogin = () => {
+    const currentShareId = routeShareId || shareId;
+    if (currentShareId) {
+      navigate(`/share/${currentShareId}/login`);
+    } else {
+      navigate("/login");
+    }
+  };
 
-  useEffect(() => {
-    const onDown = (e) => {
-      if (popRef.current && !popRef.current.contains(e.target)) setOpen(false);
-    };
-    document.addEventListener("mousedown", onDown);
-    return () => document.removeEventListener("mousedown", onDown);
-  }, []);
+  async function createSubmission(issueId) {
+    const res = await fetch(`${API_BASE}/api/submissions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ issueId }),
+    });
+    const text = await res.text();
+    if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
+    return text ? JSON.parse(text) : {};
+  }
+
 
   const [helpForm, setHelpForm] = useState({ email: "", message: "" });
   const [helpSent, setHelpSent] = useState(false);
   const [helpErr, setHelpErr] = useState("");
 
-  const handleHelpSubmit = (e) => {
+  const handleHelpSubmit = async (e) => {
     e.preventDefault();
     setHelpErr("");
     const validEmail = /^\S+@\S+\.\S+$/.test(helpForm.email);
@@ -47,13 +144,31 @@ export default function WelcomePage() {
     if (helpForm.message.trim().length < 5) {
       return setHelpErr("Tell us a bit more (≥ 5 characters).");
     }
+    try {
+    const payload = {
+      email: helpForm.email.trim(),
+      message: helpForm.message.trim(),
+      shareId: localStorage.getItem("shareId") || null,
+      issueId: Number(localStorage.getItem("issueId")) || null,
+      submissionId: Number(localStorage.getItem("submissionId")) || null,
+      pagePath: window.location.pathname,
+    };
 
-    // TODO: connect backend
-    // e.g.: fetch("/api/help", { method:"POST", headers:{'Content-Type':'application/json'}, body: JSON.stringify(helpForm) })
-    // .then(() => setHelpSent(true))
+    const res = await fetch(`${API_BASE}/api/help`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const text = await res.text();
+    if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
 
     setHelpSent(true);
-  };
+  } catch (err) {
+    console.error(err);
+    setHelpErr("Send failed: " + err.message);
+  }
+};
 
   return (
     <div
@@ -117,21 +232,22 @@ export default function WelcomePage() {
       >
         <button
           onClick={onStart}
+          disabled={starting}
           style={{
             fontSize: "clamp(20px, 3.2vw, 36px)",
             borderRadius: 8,
             padding: "clamp(6px, 1vw, 10px) clamp(16px, 3vw, 24px)",
-            cursor: "pointer",
             border: "none",
             background: "#7F7FBC",
             fontFamily: "Poppins, sans-serif",
             transition: "opacity 0.2s ease",
             opacity: 0.85,
+            cursor: starting ? "not-allowed" : "pointer",
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.opacity = 1)}
-          onMouseLeave={(e) => (e.currentTarget.style.opacity = 0.85)}
+          //onMouseEnter={(e) => (e.currentTarget.style.opacity = 1)}
+          //onMouseLeave={(e) => (e.currentTarget.style.opacity = 0.85)}
         >
-          Start
+          {starting ? "Starting..." : "Start"}
         </button>
       </section>
 

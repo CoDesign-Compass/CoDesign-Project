@@ -1,184 +1,125 @@
-// export default function DashBoard() {
-//     return <h1>Dashboard Page</h1>;
-// }
-
-import React, { useState } from "react";
-import Button from "../../components/tailadmin/ui/button/Button";
-import TextArea from "../../components/tailadmin/form/input/TextArea";
-import { ArrowLeft, Trash2, Upload } from "lucide-react";
+import React, { useState } from 'react'
+import Button from '../../components/tailadmin/ui/button/Button'
+import { ArrowLeft, Copy, Link as LinkIcon } from 'lucide-react'
 
 export default function CreateNewIssue() {
-    const [issueName, setIssueName] = useState("");
-    const [description, setDescription] = useState("");
-    const [image, setImage] = useState(null);
-    const [whys, setWhys] = useState([]);
-    const [hows, setHows] = useState([]);
+  const [issueContent, setIssueContent] = useState('')
+  const [shareLink, setShareLink] = useState('')
+  const [isPublishing, setIsPublishing] = useState(false)
 
-    const addWhy = () => setWhys([...whys, ""]);
-    const addHow = () => setHows([...hows, ""]);
+  const handleSubmit = async () => {
+    const content = issueContent.trim()
+    // Basic validation: issue content must not be empty
+    if (!content) {
+      alert('Issue Content cannot be empty.')
+      return
+    }
 
-    const updateWhy = (index, value) => {
-        const newWhys = [...whys];
-        newWhys[index] = value;
-        setWhys(newWhys);
-    };
+    setIsPublishing(true)
+    try {
+      const response = await fetch('http://localhost:8080/api/issues', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          issueContent: content,
+        }),
+      })
 
-    const updateHow = (index, value) => {
-        const newHows = [...hows];
-        newHows[index] = value;
-        setHows(newHows);
-    };
+      if (!response.ok) {
+        throw new Error('Failed to create issue')
+      }
 
-    const deleteWhy = (index) => setWhys(whys.filter((_, i) => i !== index));
-    const deleteHow = (index) => setHows(hows.filter((_, i) => i !== index));
+      const data = await response.json()
 
-    // pic upload logic
-    const handleImageUpload = (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            const imageUrl = URL.createObjectURL(file);
-            setImage(imageUrl);
-        }
-    };
+      // Generate the public share link
+      const url = `${window.location.origin}/share/${data.shareId}`
+      setShareLink(url)
+      console.log('Created issue:', data)
+    } catch (err) {
+      console.error(err)
+      alert('Failed to publish issue')
+    } finally {
+      setIsPublishing(false)
+    }
+  }
 
-    const handleSubmit = () => {
-        const newIssue = {
-            name: issueName,
-            description,
-            whys,
-            hows,
-            image,
-        };
-        console.log("Created Issue:", newIssue);
-        alert("Issue submitted! Check console for details.");
-    };
+  const handleCopy = async () => {
+    if (!shareLink) return
+    try {
+      await navigator.clipboard.writeText(shareLink)
+      alert('Link copied!')
+    } catch (e) {
+      console.error(e)
+      alert('Copy failed. Please copy the link manually.')
+    }
+  }
 
-    return (
-        <div className="p-6 max-w-3xl mx-auto">
-            {/* back */}
-            <div className="flex items-center mb-4">
-                <button
-                    onClick={() => window.history.back()}
-                    className="flex items-center text-gray-600 hover:text-gray-900"
-                >
-                    <ArrowLeft className="w-5 h-5 mr-1" /> Back
-                </button>
-            </div>
+  return (
+    <div className="p-6 max-w-3xl mx-auto">
+      {/* back */}
+      <div className="flex items-center mb-4">
+        <button
+          onClick={() => window.history.back()}
+          className="flex items-center text-gray-600 hover:text-gray-900"
+          type="button"
+        >
+          <ArrowLeft className="w-5 h-5 mr-1" /> Back
+        </button>
+      </div>
 
-            <h1 className="text-2xl font-bold mb-6">Create New Issue</h1>
+      <h1 className="text-2xl font-bold mb-6">Create New Issue</h1>
 
-            {/* Issue name + pic upload */}
-            <div className="flex items-center gap-4 mb-6">
-                {/* pic upload zone */}
-                <div className="relative w-20 h-20 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden bg-gray-50">
-                    {image ? (
-                        <img
-                            src={image}
-                            alt="Issue avatar"
-                            className="object-cover w-full h-full rounded-full"
-                        />
-                    ) : (
-                        <label className="cursor-pointer flex flex-col items-center text-gray-500 text-sm">
-                            <Upload className="w-6 h-6 mb-1" />
-                            <span>Upload</span>
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={handleImageUpload}
-                                className="hidden"
-                            />
-                        </label>
-                    )}
-                </div>
+      {/* Issue content */}
+      <div className="mb-6">
+        <label className="block text-gray-700 mb-2">Issue Content</label>
+        <input
+          type="text"
+          className="w-full border rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-200"
+          value={issueContent}
+          onChange={(e) => setIssueContent(e.target.value)}
+          placeholder="Enter issue content..."
+        />
+      </div>
 
-                {/* Issue input */}
-                <div className="flex-1">
-                    <label className="block text-gray-700 mb-2">Issue Name</label>
-                    <input
-                        type="text"
-                        className="w-full border rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-200"
-                        value={issueName}
-                        onChange={(e) => setIssueName(e.target.value)}
-                        placeholder="Enter issue name..."
-                    />
-                </div>
-            </div>
+      {/* publish button */}
+      <div className="text-center">
+        <Button onClick={handleSubmit} disabled={isPublishing}>
+          {isPublishing ? 'Publishing...' : 'Publish Issue'}
+        </Button>
+      </div>
 
-            {/* Description input */}
-            <div className="mb-8">
-                <label className="block text-gray-700 mb-2">Description</label>
-                <TextArea
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Describe the issue..."
-                    rows={4}
-                />
-            </div>
+      {/* Share link panel：show after pulish successfully */}
+      {shareLink && (
+        <div className="mt-8 border rounded-lg p-4 bg-gray-50">
+          <div className="flex items-center gap-2 mb-2">
+            <LinkIcon className="w-4 h-4 text-gray-700" />
+            <h2 className="font-semibold text-gray-800">Share link</h2>
+          </div>
 
-            {/* WHY zone */}
-            <div className="mb-8">
-                <div className="flex justify-between items-center mb-3">
-                    <h2 className="text-xl font-semibold">Why</h2>
-                    <Button onClick={addWhy}>Add Why</Button>
-                </div>
-                <div className="space-y-3">
-                    {whys.map((why, index) => (
-                        <div
-                            key={index}
-                            className="p-4 border rounded-lg flex justify-between items-center"
-                        >
-                            <input
-                                type="text"
-                                className="flex-1 border-none outline-none"
-                                value={why}
-                                onChange={(e) => updateWhy(index, e.target.value)}
-                                placeholder={`Why ${index + 1}...`}
-                            />
-                            <button
-                                onClick={() => deleteWhy(index)}
-                                className="text-red-500 hover:text-red-700 ml-2"
-                            >
-                                <Trash2 className="w-5 h-5" />
-                            </button>
-                        </div>
-                    ))}
-                </div>
-            </div>
+          <div className="flex items-center gap-2">
+            <input
+              className="flex-1 border rounded-lg p-2 bg-white"
+              value={shareLink}
+              readOnly
+            />
+            <button
+              type="button"
+              onClick={handleCopy}
+              className="p-2 border rounded-lg hover:bg-gray-100"
+              title="Copy link"
+              aria-label="Copy link"
+            >
+              <Copy className="w-4 h-4" />
+            </button>
+          </div>
 
-            {/* HOW zone */}
-            <div className="mb-8">
-                <div className="flex justify-between items-center mb-3">
-                    <h2 className="text-xl font-semibold">How</h2>
-                    <Button onClick={addHow}>Add How</Button>
-                </div>
-                <div className="space-y-3">
-                    {hows.map((how, index) => (
-                        <div
-                            key={index}
-                            className="p-4 border rounded-lg flex justify-between items-center"
-                        >
-                            <input
-                                type="text"
-                                className="flex-1 border-none outline-none"
-                                value={how}
-                                onChange={(e) => updateHow(index, e.target.value)}
-                                placeholder={`How ${index + 1}...`}
-                            />
-                            <button
-                                onClick={() => deleteHow(index)}
-                                className="text-red-500 hover:text-red-700 ml-2"
-                            >
-                                <Trash2 className="w-5 h-5" />
-                            </button>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            {/* submit button */}
-            <div className="text-center">
-                <Button onClick={handleSubmit}>Submit Issue</Button>
-            </div>
+          <p className="text-sm text-gray-600 mt-2">
+            Anyone with this link can access the issue page.
+          </p>
         </div>
-    );
+      )}
+    </div>
+  )
 }
