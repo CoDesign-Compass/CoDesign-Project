@@ -115,7 +115,7 @@ const [helpForm, setHelpForm] = useState({ email: "", message: "" });
 const [helpSent, setHelpSent] = useState(false);
 const [helpErr, setHelpErr] = useState("");
 
-const handleHelpSubmit = (e) => {
+const handleHelpSubmit = async (e) => {
   e.preventDefault();
   setHelpErr("");
   const validEmail = /^\S+@\S+\.\S+$/.test(helpForm.email);
@@ -123,9 +123,33 @@ const handleHelpSubmit = (e) => {
   if (helpForm.message.trim().length < 5) {
     return setHelpErr("Tell us a bit more (≥ 5 characters).");
   }
+  try {
+    const payload = {
+      email: helpForm.email.trim(),
+      message: helpForm.message.trim(),
+      shareId: localStorage.getItem("shareId") || null,
+      issueId: Number(localStorage.getItem("issueId")) || null,
+      submissionId: Number(localStorage.getItem("submissionId")) || null,
+      pagePath: window.location.pathname,
+    };
 
-  setHelpSent(true); 
+    const res = await fetch(`${API_BASE}/api/help`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const text = await res.text();
+    if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
+
+    setHelpSent(true);
+  } catch (err) {
+    console.error(err);
+    setHelpErr("Send failed: " + err.message);
+  }
 };
+
+
 
   const container = { width: "min(960px, 92vw)", margin: "0 auto" };
 
