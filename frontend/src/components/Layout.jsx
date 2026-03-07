@@ -1,3 +1,4 @@
+import React, { useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useTheme } from '../context/ThemeContext'
 
@@ -5,8 +6,9 @@ export default function Layout({ children }) {
   const location = useLocation()
   const navigate = useNavigate()
   const { shareId } = useParams()
+  const [onNextHandler, setOnNextHandler] = useState(null)
 
-  // 定义页面顺序
+  // Define page sequence
   const pages = shareId
     ? [
         `/share/${shareId}`,
@@ -18,7 +20,6 @@ export default function Layout({ children }) {
     : ['/', '/profile', '/why', '/how', '/thankyou']
 
   const currentIndex = pages.indexOf(location.pathname)
-
   const { theme, toggleTheme } = useTheme()
 
   const goBack = () => {
@@ -27,15 +28,28 @@ export default function Layout({ children }) {
     }
   }
 
-  const goNext = () => {
+  const goNext = async () => {
+    // If the current page has registered an onNext handler (e.g., ProfilePage validation/save)
+    if (onNextHandler) {
+      const canNavigate = await onNextHandler();
+      if (canNavigate === false) return; // Intercept navigation
+    }
+
     if (currentIndex < pages.length - 1) {
       navigate(pages[currentIndex + 1])
     }
   }
 
+  // Pass setOnNextHandler to child components
+  const childrenWithProps = React.Children.map(children, child => {
+    if (React.isValidElement(child)) {
+      return React.cloneElement(child, { setOnNext: setOnNextHandler });
+    }
+    return child;
+  });
+
   return (
     <div className="app-layout" style={{ fontFamily: 'sans-serif' }}>
-      {/* Header */}
       <header
         style={{
           display: 'flex',
@@ -65,16 +79,14 @@ export default function Layout({ children }) {
         >
           <img
             src={theme === 'light' ? '/light_mode.png' : '/dark_mode.png'}
-            alt="Purpose Media Logo"
+            alt="Mode Icon"
             style={{ height: '30px' }}
           />
         </button>
       </header>
 
-      {/* Main content */}
-      <main style={{ minHeight: '70vh' }}>{children}</main>
+      <main style={{ minHeight: '70vh' }}>{childrenWithProps}</main>
 
-      {/* Footer with navigation */}
       <footer
         style={{
           backgroundColor: theme === 'light' ? 'white' : '#303030',
@@ -83,7 +95,7 @@ export default function Layout({ children }) {
           justifyContent: 'space-between',
         }}
       >
-        {/* Back 按钮（第一页隐藏） */}
+        {/* Back Button (hidden on first page) */}
         {currentIndex > 0 ? (
           <button
             onClick={goBack}
@@ -93,6 +105,7 @@ export default function Layout({ children }) {
               padding: '0.5rem 1rem',
               borderRadius: '6px',
               border: 'none',
+              cursor: 'pointer'
             }}
           >
             ← Back
@@ -101,7 +114,7 @@ export default function Layout({ children }) {
           <div></div>
         )}
 
-        {/* Next 按钮（最后一页隐藏） */}
+        {/* Next Button (hidden on last page) */}
         {currentIndex >= 0 && currentIndex < pages.length - 1 ? (
           <button
             onClick={goNext}
@@ -111,6 +124,7 @@ export default function Layout({ children }) {
               padding: '0.5rem 1rem',
               borderRadius: '6px',
               border: 'none',
+              cursor: 'pointer'
             }}
           >
             Next →

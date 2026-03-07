@@ -1,5 +1,5 @@
 // SearchAndCreate.jsx
-import React from "react";
+import React from 'react'
 
 const SearchAndCreate = ({ inputValue, onInputChange, onCreate }) => {
   return (
@@ -7,19 +7,19 @@ const SearchAndCreate = ({ inputValue, onInputChange, onCreate }) => {
       <div className="search-input-wrapper">
         <input
           type="text"
-          placeholder="Search or Create"
+          placeholder="Press Enter to create new tag"
           className="search-input"
           value={inputValue}
           onChange={(e) => onInputChange(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === "Enter" && inputValue.trim() !== "") {
-              onCreate();
+            if (e.key === 'Enter' && inputValue.trim() !== '') {
+              onCreate()
             }
           }}
         />
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default SearchAndCreate;
+export default SearchAndCreate
