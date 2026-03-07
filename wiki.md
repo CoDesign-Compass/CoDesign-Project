@@ -47,7 +47,7 @@ Frontend: CSS, HTML, React
 |Setup and user story, persona, scenario, product vision|Sprint 1|21 Aug 2025|
 |Sprint 1: Prototype & UI Design|Sprint 1|21 Aug 2025|
 |Sprint 2: MD3 & Implement front-end UI interface for client-end(excluding interactive functionality)|Sprint 2|2 Oct 2025|
-|Sprint3: Admin System UI Implementation|Sprint 3|23 Oct 2025|
+|Sprint 3: Admin System UI Implementation|Sprint 3|23 Oct 2025|
 |2026 S1|---|---|
 |Interaction Implementation|Sprint 4|12 March 2026|
 |Back-end implementation & Test|Sprint 5,6|7 May 2026|
@@ -57,7 +57,7 @@ Frontend: CSS, HTML, React
 |Sprint 1|1.Set up<br>2.deliver user story, persona, scenario, product vision<br>3.Deliever a low-fidelity UI prototype|21 Aug 2025|--|--|
 |Sprint 2|1.Adopt Material Design 3 (MD3) across the prototype<br>2.Implement frontend UI work without interaction(user side)|2 Oct 2025|[Sprint 2 Retro](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/Sprint%202%20Retro.md)<br>[Sprint 2 review](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/Sprint%202%20Review.md)|[sprint 2 slides](https://www.canva.com/design/DAGz8eY40TQ/qhAQETG0Ld8WvToFRh5nmQ/edit?utm_content=DAGz8eY40TQ&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)|
 |Sprint 3|1.Implement frontend UI work without interaction(Admin side)<br>2.Modify the frontend based on the client's feedback|23 Oct 2025|[Sprint 3 Retro](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/Sprint%203%20Retro.md)<br>[Sprint 3 review](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/Sprint%203%20Review.md)||
-|Sprint 4||12 March 2026|||
+|Sprint 4|1.Establish the backend environment with Docker<br>2.Define the API technology stack and documentation tools<br>3.Implement backend and initial APIs integrated with the frontend.|12 March 2026|||
 |Sprint 5||2 April 2026|||
 |Sprint 6||7 May 2026|||
 
@@ -95,7 +95,7 @@ Frontend: CSS, HTML, React
 | User Story + Persona + Scenario| 7 SP |
 | Product Vision, Product Discription and Analysis| 3 SP |
 | Initial Project Setup (GitHub, ReadMe, etc.) | 3 SP |
-| **Total**| **22 SP**|
+| **Total**| 22 SP|
 ### Sprint 2
 | Task| Estimate (Story Points) | 
 |----|----|
@@ -116,3 +116,12 @@ Frontend: CSS, HTML, React
 |Refine user side frontend based on client's feedback|8 SP|
 |Add PR template & update templates based on feedback|2 SP|
 |**Total** |41 SP|
+### Sprint 4
+| Task| Estimate (Story Points) |
+|----|----|
+|Meeting minutes & Risk log & reflection log & project challenges(documents)|7 SP|
+|Establish the backend environment with Docker|2 SP|
+|Implement backend and initial APIs integrated with the frontend|36 SP|
+|Deploy frontend prototype to Netlify|1 SP|
+|**Total** |46 SP|
+
