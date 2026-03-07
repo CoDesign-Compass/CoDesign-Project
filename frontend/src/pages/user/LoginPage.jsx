@@ -5,6 +5,10 @@ import { useIssue } from '../../context/IssueContext'
 export default function LoginPage({ onSubmit: onSubmitProp }) {
   const { shareId: routeShareId } = useParams()
   const { setShareId } = useIssue()
+  const { shareId } = useIssue()
+const currentShareId = routeShareId || shareId
+
+const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
   // ---- FORM ----
   const [form, setForm] = useState({
     email: '',
@@ -48,16 +52,40 @@ export default function LoginPage({ onSubmit: onSubmitProp }) {
   const [helpSent, setHelpSent] = useState(false)
   const [helpErr, setHelpErr] = useState('')
 
-  const handleHelpSubmit = (e) => {
-    e.preventDefault()
-    setHelpErr('')
-    const validEmail = /^\S+@\S+\.\S+$/.test(helpForm.email)
-    if (!validEmail) return setHelpErr('Please enter a valid email.')
+  const handleHelpSubmit = async (e) => {
+    e.preventDefault();
+    setHelpErr("");
+    const validEmail = /^\S+@\S+\.\S+$/.test(helpForm.email);
+    if (!validEmail) return setHelpErr("Please enter a valid email.");
     if (helpForm.message.trim().length < 5) {
-      return setHelpErr('Tell us a bit more (≥ 5 characters).')
+      return setHelpErr("Tell us a bit more (≥ 5 characters).");
     }
-    setHelpSent(true)
-  }
+
+    try {
+      const payload = {
+        email: helpForm.email.trim(),
+        message: helpForm.message.trim(),
+        shareId: currentShareId || localStorage.getItem("shareId") || null,
+        issueId: Number(localStorage.getItem("issueId")) || null,
+        submissionId: Number(localStorage.getItem("submissionId")) || null,
+        pagePath: window.location.pathname,
+      };
+
+      const res = await fetch(`${API_BASE}/api/help`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const text = await res.text();
+      if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
+
+      setHelpSent(true);
+      } catch (err) {
+      console.error(err);
+      setHelpErr("Send failed: " + err.message);
+    }
+  };
 
   const container = { width: 'min(960px, 92vw)', margin: '0 auto' }
 
@@ -215,6 +243,7 @@ export default function LoginPage({ onSubmit: onSubmitProp }) {
               <button
                 className="cta-btn"
                 type="submit"
+                onClick={() => navigate('/why')}
                 style={{
                   minWidth: 240,
                   padding: '12px 24px',
@@ -341,11 +370,80 @@ export default function LoginPage({ onSubmit: onSubmitProp }) {
                     </p>
                   </div>
                 ) : (
-                  <form
-                    onSubmit={handleHelpSubmit}
-                    style={{ display: 'grid', gap: 8 }}
-                  >
-                    {/* ...保留你现有的帮助表单... */}
+                  <form onSubmit={handleHelpSubmit} style={{ display: "grid", gap: 8 }}>
+                    <label style={{ fontSize: 13 }}>
+                      Email address
+                      <input
+                        type="email"
+                        value={helpForm.email}
+                        onChange={(e) => setHelpForm((f) => ({ ...f, email: e.target.value }))}
+                        placeholder="you@example.com"
+                        style={{
+                          width: "100%",
+                          height: 38,
+                          marginTop: 4,
+                          borderRadius: 6,
+                          border: "1px solid #d8c25b",
+                          background: "#fff9c6",
+                          padding: "0 10px",
+                          outline: "none",
+                        }}
+                      />
+                    </label>
+
+                    <label style={{ fontSize: 13 }}>
+                      Your question
+                      <textarea
+                        rows={3}
+                        value={helpForm.message}
+                        onChange={(e) => setHelpForm((f) => ({ ...f, message: e.target.value }))}
+                        placeholder="Tell us what's going on…"
+                        style={{
+                          width: "100%",
+                          marginTop: 4,
+                          borderRadius: 6,
+                          border: "1px solid #d8c25b",
+                          background: "#fffef0",
+                          padding: "8px 10px",
+                          resize: "vertical",
+                          outline: "none",
+                        }}
+                      />
+                    </label>
+
+                    {helpErr && <div style={{ color: "#9b1c1c", fontSize: 12 }}>{helpErr}</div>}
+
+                    <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+                      <button
+                        type="button"
+                        onClick={() => setOpen(false)}
+                        style={{
+                          height: 32,
+                          padding: "0 10px",
+                          borderRadius: 6,
+                          border: "1px solid rgba(0,0,0,.15)",
+                          background: "#fff",
+                          color: "#303030",
+                          cursor: "pointer",
+                        }}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        style={{
+                          height: 32,
+                          padding: "0 12px",
+                          borderRadius: 6,
+                          border: "none",
+                          background: "#303030",
+                          color: "#ffe070",
+                          cursor: "pointer",
+                        }}
+                      >
+                        Send
+                      </button>
+                    </div>
                   </form>
                 )}
               </div>
