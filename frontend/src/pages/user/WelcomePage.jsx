@@ -14,10 +14,60 @@ export default function WelcomePage() {
   const [open, setOpen] = useState(false);
   const popRef = useRef(null);
   const navigate = useNavigate();
-  const onStart = () => navigate("/profile");
+  //const onStart = () => navigate("/profile");
+
+  const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080";
+
+  const onStart = async () => {
+    if (starting) return;
+    setStarting(true);
+
+    try {
+      const issueId = Number(localStorage.getItem("issueId") || 1); 
+
+      const res = await fetch(`${API_BASE}/api/submissions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ issueId }),
+      });
+
+      const text = await res.text();
+      if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
+
+      const data = text ? JSON.parse(text) : null;
+      const submissionId = data?.id;
+
+      if (!submissionId) throw new Error("No submissionId returned from backend.");
+
+
+      localStorage.setItem("submissionId", String(submissionId));
+      localStorage.setItem("issueId", String(data?.issueId ?? issueId));
+
+      navigate("/profile");
+    } catch (err) {
+      console.error(err);
+      alert("Start failed: " + err.message);
+    } finally {
+      setStarting(false);
+    }
+  };
+
   const onLogin = () => {
     navigate("/login");
   };
+
+  const [starting, setStarting] = useState(false);
+
+  async function createSubmission(issueId) {
+    const res = await fetch(`${API_BASE}/api/submissions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ issueId }),
+    });
+    const text = await res.text();
+    if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
+    return text ? JSON.parse(text) : {};
+  }
 
   useEffect(() => {
     const onDown = (e) => {
@@ -117,6 +167,7 @@ export default function WelcomePage() {
       >
         <button
           onClick={onStart}
+          disabled={starting}
           style={{
             fontSize: "clamp(20px, 3.2vw, 36px)",
             borderRadius: 8,
@@ -127,11 +178,12 @@ export default function WelcomePage() {
             fontFamily: "Poppins, sans-serif",
             transition: "opacity 0.2s ease",
             opacity: 0.85,
+            cursor: starting ? "not-allowed" : "pointer",
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.opacity = 1)}
-          onMouseLeave={(e) => (e.currentTarget.style.opacity = 0.85)}
+          //onMouseEnter={(e) => (e.currentTarget.style.opacity = 1)}
+          //onMouseLeave={(e) => (e.currentTarget.style.opacity = 0.85)}
         >
-          Start
+          {starting ? "Starting..." : "Start"}
         </button>
       </section>
 
