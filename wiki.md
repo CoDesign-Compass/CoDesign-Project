@@ -20,7 +20,7 @@ Frontend: CSS, HTML, React
 ## Team Members
 |Name|Role|
 |----|----|
-|Jingwen Zhang|responsible for maintaining the project's organizational artefacts (Wiki, README, PBI board; issues, milestones when needed); UI designer; developer; update meeting minutes; create and update templates; create scenarios; create reflection log; reviewer|
+|Jingwen Zhang|UI designer; developer; update meeting minutes; create and update templates; create scenarios; create reflection log; reviewer;maintain logs|
 |Aria Fung|UI designer; developer; update meeting minutes; create scenarios; create risk log; reviewer; maintain logs|
 |Jiaxin Li|UI designer; developer; update meeting minutes; create Function Feasibility Investigation; reviewer; maintain logs|
 |Shuo Li|UI designer; developer; create Persona, Product Vison and Project Introduction; reviewer; maintain logs|
@@ -57,6 +57,10 @@ Frontend: CSS, HTML, React
 |Sprint 1|1.Set up<br>2.deliver user story, persona, scenario, product vision<br>3.Deliever a low-fidelity UI prototype|21 Aug 2025|--|--|
 |Sprint 2|1.Adopt Material Design 3 (MD3) across the prototype<br>2.Implement frontend UI work without interaction(user side)|2 Oct 2025|[Sprint 2 Retro](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/Sprint%202%20Retro.md)<br>[Sprint 2 review](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/Sprint%202%20Review.md)|[sprint 2 slides](https://www.canva.com/design/DAGz8eY40TQ/qhAQETG0Ld8WvToFRh5nmQ/edit?utm_content=DAGz8eY40TQ&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)|
 |Sprint 3|1.Implement frontend UI work without interaction(Admin side)<br>2.Modify the frontend based on the client's feedback|23 Oct 2025|[Sprint 3 Retro](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/Sprint%203%20Retro.md)<br>[Sprint 3 review](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/Sprint%203%20Review.md)||
+|Sprint 4||12 March 2026|||
+|Sprint 5||2 April 2026|||
+|Sprint 6||7 May 2026|||
+
 ## Meeting Records
 [Scribe Record](https://docs.google.com/spreadsheets/d/1S0wbxD3qdw5VT001IVuKAfbjTX7lGPsIckci2tuJUc4/edit?gid=0#gid=0)
 |2025 S2|meeting minutes|
