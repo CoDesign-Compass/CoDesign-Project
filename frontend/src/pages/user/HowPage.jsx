@@ -59,7 +59,7 @@ export default function HowPage() {
         <strong>How could this be improved?</strong>
       </p>
 
-      {/* 已回答的问题显示 */}
+      {/* Answered questions displayed */}
       {questions.slice(0, step).map((q, i) => (
         <div
           key={i}
@@ -76,7 +76,7 @@ export default function HowPage() {
         </div>
       ))}
 
-      {/* 当前问题输入框 */}
+      {/* Current Problem Input Field */}
       <AnimatePresence mode="popLayout">
         <motion.div
           key={step}
