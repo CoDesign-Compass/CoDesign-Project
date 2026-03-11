@@ -4,40 +4,65 @@ import MonthlySalesChart from '../../components/tailadmin/ecommerce/MonthlySales
 import EcommerceMetrics from '../../components/tailadmin/ecommerce/EcommerceMetrics'
 import MonthlyTarget from '../../components/tailadmin/ecommerce/AnalysisReport'
 import Issues from '../../components/tailadmin/ecommerce/Issues'
+import QuestionnaireMetrics from '../../components/questionnaire/QuestionnaireMetrics'
+import QuestionOptionDistributionChart from '../../components/questionnaire/QuestionOptionDistributionChart'
+import QuestionnaireFlowChart from '../../components/questionnaire/QuestionnaireFlowChart'
+// import WordCloudComponent from '../../components/questionnaire/WordCloudComponent'
+import CurrentQuestionDistribution from '../../components/questionnaire/CurrentQuestionDistribution'
+
 
 // --- dashboard components ---
 
 const DashBoard = () => {
   return (
     <>
-      <div className="grid grid-cols-12 gap-4 md:gap-6">
-        <div className="col-span-12 space-y-6 xl:col-span-12">
-          <Issues />
-        </div>
-        <div className="col-span-12 space-y-6 xl:col-span-7">
-          <EcommerceMetrics />
-          <MonthlySalesChart />
-        </div>
-        <div className="col-span-12 xl:col-span-5">
-          <MonthlyTarget />
+      <div className="min-h-screen bg-gray-50 p-4 dark:bg-gray-900 md:p-6">
+      <div className="mx-auto max-w-[1600px]">
+        {/* Page Title */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white md:text-3xl">
+            Data Dashboard
+          </h1>
         </div>
 
-        <div className="col-span-12 xl:col-span-5">
-          {/* <MonthlyTarget /> */}
-        </div>
+        {/* Dashboard Grid Layout */}
+        <div className="grid grid-cols-12 gap-4 md:gap-6">
 
-        <div className="col-span-12">
-          <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-            <h1 style={{ height: '30vh' }}>Word Cloud</h1>
+          {/* Top KPI Overview */}
+          <div className="col-span-12">
+            <QuestionnaireMetrics />
           </div>
 
-          {/* <StatisticsChart /> */}
-        </div>
+          {/* Top Area - Question Reach Status */}
+          <div className="col-span-12">
+            <CurrentQuestionDistribution />
+          </div>
 
-        <div className="col-span-12 xl:col-span-7">
-          {/* <RecentOrders /> */}
+          {/* Left Middle Area - Quantitative Statistics (7 columns) */}
+          <div className="col-span-12 space-y-6 xl:col-span-7">
+            <QuestionOptionDistributionChart />
+          </div>
+
+          {/* Right Middle Area - Path Analysis (5 columns) */}
+          <div className="col-span-12 xl:col-span-5">
+            <QuestionnaireFlowChart />
+          </div>
+
+          {/* Bottom Area - Qualitative Analysis (Word Cloud) */}
+          {/* <div className="col-span-12">
+            <WordCloudComponent />
+          </div> */}
+
+          
+
+
+      
+
         </div>
       </div>
+    </div>
+
+
     </>
   )
 }
