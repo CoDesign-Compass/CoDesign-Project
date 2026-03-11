@@ -49,8 +49,9 @@ Frontend: CSS, HTML, React
 |Sprint 2: MD3 & Implement front-end UI interface for client-end(excluding interactive functionality)|Sprint 2|2 Oct 2025|
 |Sprint 3: Admin System UI Implementation|Sprint 3|23 Oct 2025|
 |2026 S1|---|---|
-|Interaction Implementation|Sprint 4|12 March 2026|
-|Back-end implementation & Test|Sprint 5,6|7 May 2026|
+|Sprint 4: Implement Minimal Local Deployment|Sprint 4|12 March 2026|
+|Sprint 5: Deploy the server and AI components to deliver the initial project prototype|Sprint 5|2 April 2026|
+|Sprint 6: Final System Refinement and Presentation Preparation|Sprint 6|7 May 2026|
 ## Sprints
 |Sprint|Goals|Due Date|Sprint Review&Retro Meeting|Pre slides|
 |----|----|----|---|---|
