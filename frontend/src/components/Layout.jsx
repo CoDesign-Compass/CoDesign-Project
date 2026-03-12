@@ -60,7 +60,7 @@ export default function Layout({ children }) {
         }}
       >
         <img
-          src={theme === 'light' ? '/logo_light.png' : '/logo_dark.png'}
+          src={theme === 'light' ? '/Logo_light.png' : '/Logo_dark.png'}
           alt="Purpose Media Logo"
           style={{ height: '60px' }}
         />

@@ -34,5 +34,19 @@ services:
     ports:
       - "${API_PORT:-8080}:8080"
 
+  web:
+    # Frontend build context and dockerfile location
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: cdc_frontend
+    restart: unless-stopped
+    # Expose the frontend on port 3000 on the host
+    ports:
+      - "3000:80"
+    # Ensure backend starts before frontend
+    depends_on:
+      - api
+
 volumes:
   cdc_pgdata:
