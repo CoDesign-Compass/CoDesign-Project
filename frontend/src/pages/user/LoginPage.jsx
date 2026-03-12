@@ -276,8 +276,14 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
             >
               <button
                 className="cta-btn"
-                type="submit"
-                onClick={() => navigate('/admin/dashboard')}
+                type="button"
+                onClick={() => {
+                  if (currentShareId) {
+                    navigate(`/share/${currentShareId}/createaccount`)
+                  } else {
+                    navigate('/createaccount')
+                  }
+                }}
                 style={{
                   minWidth: 240,
                   padding: '12px 24px',
@@ -286,8 +292,7 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
                   border: '3px solid #ffe070',
                   color: '#fff',
                   cursor: 'pointer',
-                  boxShadow:
-                    '0 2px 0 rgba(0,0,0,.25), inset 0 0 0 1px rgba(0,0,0,.08)',
+                  boxShadow: '0 2px 0 rgba(0,0,0,.25), inset 0 0 0 1px rgba(0,0,0,.08)',
                 }}
               >
                 <span
@@ -300,7 +305,7 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
                     textUnderlineOffset: '4px',
                   }}
                 >
-                  Login to Admin
+                  Sign Up
                 </span>
               </button>
             </div>
@@ -368,6 +373,28 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
                     <p style={{ margin: '6px 0 0' }}>
                       We’ve received your message and will get back to you soon.
                     </p>
+                    {/* Admin Login (optional also show after sent) */}
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 10 }}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpen(false)
+                          navigate('/admin/dashboard')
+                        }}
+                        style={{
+                          height: 32,
+                          padding: '0 12px',
+                          borderRadius: 6,
+                          border: 'none',
+                          background: '#303030',
+                          color: '#ffe070',
+                          cursor: 'pointer',
+                          boxShadow: '0 1px 0 rgba(0,0,0,.2)',
+                        }}
+                      >
+                        Admin Login
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   <form onSubmit={handleHelpSubmit} style={{ display: "grid", gap: 8 }}>
@@ -413,6 +440,29 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
 
                     {helpErr && <div style={{ color: "#9b1c1c", fontSize: 12 }}>{helpErr}</div>}
 
+                    {/* Admin Login button row */}
+                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpen(false)
+                          navigate('/admin/dashboard')
+                        }}
+                        style={{
+                          height: 32,
+                          padding: '0 12px',
+                          borderRadius: 6,
+                          border: '1px solid rgba(0,0,0,.15)',
+                          background: '#fff',
+                          color: '#303030',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Admin Login
+                      </button>
+                    </div>
+
+                    {/* Cancel / Send row */}        
                     <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
                       <button
                         type="button"
