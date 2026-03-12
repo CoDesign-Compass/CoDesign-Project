@@ -95,6 +95,11 @@ export default function CreateAccountPage({ mode = "create", onSubmit: onSubmitP
         throw new Error("Signup succeeded but no userId returned from backend.");
       }
 
+      if (form.password.length < 4) {
+        alert("Password must be at least 4 characters.");
+        return;
+      }
+
     //  link if and only if submissionId exists
       if (submissionId) {
         const linked = await linkAccount(submissionId, userId);
