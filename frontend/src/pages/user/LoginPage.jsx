@@ -4,11 +4,31 @@ import { useIssue } from '../../context/IssueContext'
 
 export default function LoginPage({ onSubmit: onSubmitProp }) {
   const { shareId: routeShareId } = useParams()
-  const { setShareId } = useIssue()
-  const { shareId } = useIssue()
-const currentShareId = routeShareId || shareId
+  const { shareId, setShareId } = useIssue()
+  const currentShareId = routeShareId || shareId
 
-const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
+  const API_BASE =
+    process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'
+
+  async function loginApi({ email, password }) {
+    const res = await fetch(`${API_BASE}/api/users/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: email.trim(), password }),
+    });
+    const text = await res.text();
+    if (!res.ok) {
+      let msg = text;
+      try { msg = JSON.parse(text).message || msg; } catch {}
+      throw new Error(msg || `HTTP ${res.status}`);
+    }
+    return text ? JSON.parse(text) : {};
+  }
+
+  // DEV admin shortcut (from .env)
+  const ADMIN_EMAIL = process.env.REACT_APP_ADMIN_EMAIL || ''
+  const ADMIN_PASSWORD = process.env.REACT_APP_ADMIN_PASSWORD || ''
+
   // ---- FORM ----
   const [form, setForm] = useState({
     email: '',
@@ -31,9 +51,7 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
   }, [])
 
   useEffect(() => {
-    if (routeShareId) {
-      setShareId(routeShareId)
-    }
+    if (routeShareId) setShareId(routeShareId)
   }, [routeShareId, setShareId])
 
   const change = (k) => (e) =>
@@ -42,50 +60,82 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
       [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value,
     }))
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    onSubmitProp?.(form)
-  }
 
-  // help form
+    try {
+    const res = await fetch(`${API_BASE}/api/users/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: form.email.trim(),
+        password: form.password,
+      }),
+    });
+
+    const text = await res.text();
+    const data = text ? JSON.parse(text) : {};
+
+    if (!res.ok) {
+      throw new Error(data?.message || text || `HTTP ${res.status}`);
+    }
+
+    localStorage.setItem("userId", String(data.userId || data.id || ""));
+    localStorage.setItem("userRole", data.role || "USER");
+
+    const role = (data.role || "").toUpperCase();
+    if (role === "ADMIN") {
+      navigate("/admin/dashboard");
+      return;
+    }
+
+    if (currentShareId) navigate(`/share/${currentShareId}/profile`);
+    else navigate("/profile");
+  } catch (err) {
+    console.error(err);
+    alert("Login failed: " + err.message);
+  }
+};
+
+  // ---- help form ----
   const [helpForm, setHelpForm] = useState({ email: '', message: '' })
   const [helpSent, setHelpSent] = useState(false)
   const [helpErr, setHelpErr] = useState('')
 
   const handleHelpSubmit = async (e) => {
-    e.preventDefault();
-    setHelpErr("");
-    const validEmail = /^\S+@\S+\.\S+$/.test(helpForm.email);
-    if (!validEmail) return setHelpErr("Please enter a valid email.");
+    e.preventDefault()
+    setHelpErr('')
+    const validEmail = /^\S+@\S+\.\S+$/.test(helpForm.email)
+    if (!validEmail) return setHelpErr('Please enter a valid email.')
     if (helpForm.message.trim().length < 5) {
-      return setHelpErr("Tell us a bit more (≥ 5 characters).");
+      return setHelpErr('Tell us a bit more (≥ 5 characters).')
     }
 
     try {
       const payload = {
         email: helpForm.email.trim(),
         message: helpForm.message.trim(),
-        shareId: currentShareId || localStorage.getItem("shareId") || null,
-        issueId: Number(localStorage.getItem("issueId")) || null,
-        submissionId: Number(localStorage.getItem("submissionId")) || null,
+        shareId: currentShareId || localStorage.getItem('shareId') || null,
+        issueId: Number(localStorage.getItem('issueId')) || null,
+        submissionId: Number(localStorage.getItem('submissionId')) || null,
         pagePath: window.location.pathname,
-      };
+      }
 
       const res = await fetch(`${API_BASE}/api/help`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
-      });
+      })
 
-      const text = await res.text();
-      if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
+      const text = await res.text()
+      if (!res.ok) throw new Error(text || `HTTP ${res.status}`)
 
-      setHelpSent(true);
-      } catch (err) {
-      console.error(err);
-      setHelpErr("Send failed: " + err.message);
+      setHelpSent(true)
+    } catch (err) {
+      console.error(err)
+      setHelpErr('Send failed: ' + err.message)
     }
-  };
+  }
 
   const container = { width: 'min(960px, 92vw)', margin: '0 auto' }
 
@@ -100,9 +150,7 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
         minHeight: '100vh',
       }}
     >
-      <div
-        style={{ background: 'var(--bg-color)', color: 'var(--text-color)' }}
-      >
+      <div style={{ background: 'var(--bg-color)', color: 'var(--text-color)' }}>
         <section
           style={{
             width: '100vw',
@@ -167,7 +215,6 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
               onClear={() => setForm((f) => ({ ...f, email: '' }))}
             />
 
-            {/* Password */}
             <div style={{ display: 'grid', gap: 6 }}>
               <label className="sr-only" htmlFor="password">
                 Password
@@ -237,13 +284,10 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
               <span>Remember me</span>
             </label>
 
-            <div
-              style={{ display: 'grid', justifyItems: 'center', marginTop: 10 }}
-            >
+            <div style={{ display: 'grid', justifyItems: 'center', marginTop: 10 }}>
               <button
                 className="cta-btn"
                 type="submit"
-                onClick={() => navigate('/why')}
                 style={{
                   minWidth: 240,
                   padding: '12px 24px',
@@ -271,18 +315,13 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
               </button>
             </div>
 
-            <div
-              style={{ display: 'grid', justifyItems: 'center', marginTop: 10 }}
-            >
+            <div style={{ display: 'grid', justifyItems: 'center', marginTop: 10 }}>
               <button
                 className="cta-btn"
                 type="button"
                 onClick={() => {
-                  if (currentShareId) {
-                    navigate(`/share/${currentShareId}/createaccount`)
-                  } else {
-                    navigate('/createaccount')
-                  }
+                  if (currentShareId) navigate(`/share/${currentShareId}/createaccount`)
+                  else navigate('/createaccount')
                 }}
                 style={{
                   minWidth: 240,
@@ -292,7 +331,8 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
                   border: '3px solid #ffe070',
                   color: '#fff',
                   cursor: 'pointer',
-                  boxShadow: '0 2px 0 rgba(0,0,0,.25), inset 0 0 0 1px rgba(0,0,0,.08)',
+                  boxShadow:
+                    '0 2px 0 rgba(0,0,0,.25), inset 0 0 0 1px rgba(0,0,0,.08)',
                 }}
               >
                 <span
@@ -333,12 +373,9 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
                 cursor: 'pointer',
               }}
             >
-              <img
-                src="/Information.png"
-                alt="Information"
-                style={{ height: 30, display: 'block' }}
-              />
+              <img src="/Information.png" alt="Information" style={{ height: 30, display: 'block' }} />
             </button>
+
             {open && (
               <div
                 role="tooltip"
@@ -367,37 +404,16 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
                     boxShadow: '-1px 1px 2px rgba(0,0,0,.05)',
                   }}
                 />
+
                 {helpSent ? (
                   <div style={{ lineHeight: 1.55 }}>
                     <p style={{ margin: 0, fontWeight: 600 }}>Thanks! 🎉</p>
                     <p style={{ margin: '6px 0 0' }}>
                       We’ve received your message and will get back to you soon.
                     </p>
-                    {/* Admin Login (optional also show after sent) */}
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 10 }}>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setOpen(false)
-                          navigate('/admin/dashboard')
-                        }}
-                        style={{
-                          height: 32,
-                          padding: '0 12px',
-                          borderRadius: 6,
-                          border: 'none',
-                          background: '#303030',
-                          color: '#ffe070',
-                          cursor: 'pointer',
-                          boxShadow: '0 1px 0 rgba(0,0,0,.2)',
-                        }}
-                      >
-                        Admin Login
-                      </button>
-                    </div>
                   </div>
                 ) : (
-                  <form onSubmit={handleHelpSubmit} style={{ display: "grid", gap: 8 }}>
+                  <form onSubmit={handleHelpSubmit} style={{ display: 'grid', gap: 8 }}>
                     <label style={{ fontSize: 13 }}>
                       Email address
                       <input
@@ -406,14 +422,14 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
                         onChange={(e) => setHelpForm((f) => ({ ...f, email: e.target.value }))}
                         placeholder="you@example.com"
                         style={{
-                          width: "100%",
+                          width: '100%',
                           height: 38,
                           marginTop: 4,
                           borderRadius: 6,
-                          border: "1px solid #d8c25b",
-                          background: "#fff9c6",
-                          padding: "0 10px",
-                          outline: "none",
+                          border: '1px solid #d8c25b',
+                          background: '#fff9c6',
+                          padding: '0 10px',
+                          outline: 'none',
                         }}
                       />
                     </label>
@@ -426,55 +442,32 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
                         onChange={(e) => setHelpForm((f) => ({ ...f, message: e.target.value }))}
                         placeholder="Tell us what's going on…"
                         style={{
-                          width: "100%",
+                          width: '100%',
                           marginTop: 4,
                           borderRadius: 6,
-                          border: "1px solid #d8c25b",
-                          background: "#fffef0",
-                          padding: "8px 10px",
-                          resize: "vertical",
-                          outline: "none",
+                          border: '1px solid #d8c25b',
+                          background: '#fffef0',
+                          padding: '8px 10px',
+                          resize: 'vertical',
+                          outline: 'none',
                         }}
                       />
                     </label>
 
-                    {helpErr && <div style={{ color: "#9b1c1c", fontSize: 12 }}>{helpErr}</div>}
+                    {helpErr && <div style={{ color: '#9b1c1c', fontSize: 12 }}>{helpErr}</div>}
 
-                    {/* Admin Login button row */}
-                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setOpen(false)
-                          navigate('/admin/dashboard')
-                        }}
-                        style={{
-                          height: 32,
-                          padding: '0 12px',
-                          borderRadius: 6,
-                          border: '1px solid rgba(0,0,0,.15)',
-                          background: '#fff',
-                          color: '#303030',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        Admin Login
-                      </button>
-                    </div>
-
-                    {/* Cancel / Send row */}        
-                    <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+                    <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
                       <button
                         type="button"
                         onClick={() => setOpen(false)}
                         style={{
                           height: 32,
-                          padding: "0 10px",
+                          padding: '0 10px',
                           borderRadius: 6,
-                          border: "1px solid rgba(0,0,0,.15)",
-                          background: "#fff",
-                          color: "#303030",
-                          cursor: "pointer",
+                          border: '1px solid rgba(0,0,0,.15)',
+                          background: '#fff',
+                          color: '#303030',
+                          cursor: 'pointer',
                         }}
                       >
                         Cancel
@@ -483,12 +476,12 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
                         type="submit"
                         style={{
                           height: 32,
-                          padding: "0 12px",
+                          padding: '0 12px',
                           borderRadius: 6,
-                          border: "none",
-                          background: "#303030",
-                          color: "#ffe070",
-                          cursor: "pointer",
+                          border: 'none',
+                          background: '#303030',
+                          color: '#ffe070',
+                          cursor: 'pointer',
                         }}
                       >
                         Send
@@ -523,12 +516,7 @@ function Field({ id, type = 'text', placeholder, value, onChange, onClear }) {
           autoComplete={id}
         />
         {!!value && (
-          <button
-            type="button"
-            aria-label="Clear"
-            onClick={onClear}
-            style={suffixBtn(12)}
-          >
+          <button type="button" aria-label="Clear" onClick={onClear} style={suffixBtn(12)}>
             ×
           </button>
         )}
@@ -537,7 +525,6 @@ function Field({ id, type = 'text', placeholder, value, onChange, onClear }) {
   )
 }
 
-/*clear all button(×) */
 function suffixBtn(rightPx) {
   return {
     position: 'absolute',
