@@ -78,12 +78,18 @@ export default function HowPage() {
 
       {/* Current Problem Input Field */}
       <AnimatePresence mode="popLayout">
+        {/* Question Section */}
+        {step > 0 && (
+          <div style={{ fontWeight: 600, marginBottom: 6 }}>
+            How could that be improved?
+          </div>
+        )}
         <motion.div
           key={step}
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -6 }}
-          transition={{ duration: 0.25 }}
+          transition={{ duration: 0.25, ease: 'easeOut' }}
           style={{ display: 'flex', gap: 10, marginTop: 8, flexWrap: 'wrap' }}
         >
           <input
@@ -120,6 +126,7 @@ export default function HowPage() {
               style={{
                 background: '#ffe071',
                 border: 'none',
+                color: 'black',
                 borderRadius: 10,
                 padding: '12px 18px',
                 fontWeight: 600,
@@ -135,6 +142,7 @@ export default function HowPage() {
             disabled={!answers[step].trim()}
             style={{
               background: '#ffe071',
+              color: 'black',
               border: 'none',
               borderRadius: 10,
               padding: '12px 18px',
