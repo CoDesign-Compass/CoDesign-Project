@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useParams } from 'react-router-dom'
 import { useIssue } from '../../context/IssueContext'
+import { useNavigate } from "react-router-dom"
 
 export default function WhyPage() {
   const { shareId: routeShareId } = useParams()
@@ -13,6 +14,34 @@ export default function WhyPage() {
   const endRef = useRef(null)
   const [hoveredButton, setHoveredButton] = useState(null)
   const [selectedButton, setSelectedButton] = useState(null)
+
+  const navigate = useNavigate()
+
+  const submitWhy = async () => {
+    const body = {
+      shareId: routeShareId,
+      stance: selectedButton,
+      answer1: answers[0],
+      answer2: answers[1],
+      answer3: answers[2],
+      answer4: answers[3],
+      answer5: answers[4],
+    }
+
+    const response = await fetch('http://localhost:8080/api/why', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to submit why response')
+    }
+
+    navigate(`/share/${routeShareId}/how`)
+  }
 
   useEffect(() => {
     inputRef.current?.focus()
@@ -49,8 +78,21 @@ export default function WhyPage() {
     )
   }
 
-  const next = () => setStep((s) => Math.min(s + 1, questions.length))
-  const finish = () => setStep(questions.length)
+  //const next = () => setStep((s) => Math.min(s + 1, questions.length))
+  const next = async () => {
+    const isLastQuestion = step === questions.length - 1
+
+    if (isLastQuestion) {
+      await submitWhy()
+      return
+    }
+
+    setStep((s) => s + 1)
+  }
+  //const finish = () => setStep(questions.length)
+  const finish = async () => {
+    await submitWhy()
+  }
 
   return (
     <div style={{ maxWidth: '600px', margin: '0 auto' }}>
