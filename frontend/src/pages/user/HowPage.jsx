@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useParams } from 'react-router-dom'
 import { useIssue } from '../../context/IssueContext'
+import { useNavigate } from 'react-router-dom'
 
 export default function HowPage() {
   const { shareId: routeShareId } = useParams()
@@ -16,6 +17,33 @@ export default function HowPage() {
   const [answers, setAnswers] = useState(Array(questions.length).fill(''))
   const inputRef = useRef(null)
   const endRef = useRef(null)
+
+  const navigate = useNavigate()
+
+  const submitHow = async () => {
+    const body = {
+      shareId: routeShareId,
+      answer1: answers[0],
+      answer2: answers[1],
+      answer3: answers[2],
+      answer4: answers[3],
+      answer5: answers[4],
+    }
+
+    const response = await fetch('http://localhost:8080/api/how', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to submit how response')
+    }
+
+    navigate(`/share/${routeShareId}/thankyou`)
+  }
 
   useEffect(() => {
     inputRef.current?.focus()
@@ -50,9 +78,21 @@ export default function HowPage() {
     )
   }
 
-  const next = () => setStep((s) => Math.min(s + 1, questions.length))
-  const finish = () => setStep(questions.length)
+  //const next = () => setStep((s) => Math.min(s + 1, questions.length))
+  const next = async () => {
+    const isLastQuestion = step === questions.length - 1
 
+    if (isLastQuestion) {
+      await submitHow()
+      return
+    }
+
+    setStep((s) => s + 1)
+  }
+  //const finish = () => setStep(questions.length)
+  const finish = async () => {
+    await submitHow()
+  }
   return (
     <div style={{ maxWidth: '600px', margin: '0 auto' }}>
       <p>
@@ -78,12 +118,18 @@ export default function HowPage() {
 
       {/* Current Problem Input Field */}
       <AnimatePresence mode="popLayout">
+        {/* Question Section */}
+        {step > 0 && (
+          <div style={{ fontWeight: 600, marginBottom: 6 }}>
+            How could that be improved?
+          </div>
+        )}
         <motion.div
           key={step}
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -6 }}
-          transition={{ duration: 0.25 }}
+          transition={{ duration: 0.25, ease: 'easeOut' }}
           style={{ display: 'flex', gap: 10, marginTop: 8, flexWrap: 'wrap' }}
         >
           <input
@@ -120,6 +166,7 @@ export default function HowPage() {
               style={{
                 background: '#ffe071',
                 border: 'none',
+                color: 'black',
                 borderRadius: 10,
                 padding: '12px 18px',
                 fontWeight: 600,
@@ -135,6 +182,7 @@ export default function HowPage() {
             disabled={!answers[step].trim()}
             style={{
               background: '#ffe071',
+              color: 'black',
               border: 'none',
               borderRadius: 10,
               padding: '12px 18px',
