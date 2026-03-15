@@ -1,6 +1,7 @@
 package com.example.demo.ai;
 
 import com.example.demo.ai.dto.AiReportResponse;
+import com.example.demo.ai.dto.GenerateAiReportByShareRequest;
 import com.example.demo.ai.dto.GenerateAiReportRequest;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +19,12 @@ public class AiReportController {
     public AiReportResponse generate(@RequestBody GenerateAiReportRequest request) {
         return aiReportService.generateReport(request.getSubmissionId());
     }
+
+    @PostMapping("/generate-by-share")
+    public AiReportResponse generateByShare(@RequestBody GenerateAiReportByShareRequest request) {
+        return aiReportService.generateReportByShareId(request.getShareId());
+    }
+
 
     @GetMapping("/submission/{submissionId}")
     public AiReport getLatestBySubmission(@PathVariable Long submissionId) {

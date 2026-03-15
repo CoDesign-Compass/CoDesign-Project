@@ -3,8 +3,12 @@ package com.example.demo.ai;
 import com.example.demo.ai.dto.AiReportResponse;
 import com.example.demo.ai.ollama.OllamaChatRequest;
 import com.example.demo.ai.ollama.OllamaChatResponse;
+import com.example.demo.entity.HowResponse;
 import com.example.demo.entity.Issue;
+import com.example.demo.entity.WhyResponse;
+import com.example.demo.repository.HowResponseRepository;
 import com.example.demo.repository.IssueRepository;
+import com.example.demo.repository.WhyResponseRepository;
 import com.example.demo.submission.Submission;
 import com.example.demo.submission.SubmissionRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,6 +29,8 @@ public class AiReportService {
     private final AiReportRepository aiReportRepository;
     private final SubmissionRepository submissionRepository;
     private final IssueRepository issueRepository;
+    private final WhyResponseRepository whyResponseRepository;
+    private final HowResponseRepository howResponseRepository;
 
     @Value("${ollama.model}")
     private String ollamaModel;
@@ -34,15 +40,20 @@ public class AiReportService {
             ObjectMapper objectMapper,
             AiReportRepository aiReportRepository,
             SubmissionRepository submissionRepository,
-            IssueRepository issueRepository
+            IssueRepository issueRepository,
+            WhyResponseRepository whyResponseRepository,
+            HowResponseRepository howResponseRepository
     ) {
         this.ollamaClient = ollamaClient;
         this.objectMapper = objectMapper;
         this.aiReportRepository = aiReportRepository;
         this.submissionRepository = submissionRepository;
         this.issueRepository = issueRepository;
+        this.whyResponseRepository = whyResponseRepository;
+        this.howResponseRepository = howResponseRepository;
     }
 
+    // ===== submission version =====
     public AiReportResponse generateReport(Long submissionId) {
         if (submissionId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "submissionId is required");
@@ -63,8 +74,54 @@ public class AiReportService {
             }
         }
 
-        String inputText = buildInputText(submission, issue);
+        String inputText = buildInputTextForSubmission(submission, issue);
 
+        AiReportResponse report = callOllamaAndParse(inputText);
+
+        saveAiReport(
+                submissionId,
+                issueId,
+                shareId,
+                report
+        );
+
+        return report;
+    }
+
+    // ===== shareId version =====
+    public AiReportResponse generateReportByShareId(String shareId) {
+        if (shareId == null || shareId.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "shareId is required");
+        }
+
+        Issue issue = issueRepository.findByShareId(shareId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Issue not found for shareId: " + shareId));
+
+        List<WhyResponse> whyResponses = whyResponseRepository.findByShareId(shareId);
+        List<HowResponse> howResponses = howResponseRepository.findByShareId(shareId);
+
+        String inputText = buildInputTextForShare(issue, whyResponses, howResponses);
+
+        AiReportResponse report = callOllamaAndParse(inputText);
+
+        saveAiReport(
+                null, 
+                issue.getIssueId(),
+                shareId,
+                report
+        );
+
+        return report;
+    }
+
+    public AiReport getLatestBySubmissionId(Long submissionId) {
+        return aiReportRepository.findTopBySubmissionIdOrderByCreatedAtDesc(submissionId)
+                .orElseThrow(() -> new RuntimeException("AI report not found"));
+    }
+
+    // ===== 公共：调 Ollama 并解析 =====
+    private AiReportResponse callOllamaAndParse(String inputText) {
         String schemaInstruction = """
 Return only valid JSON matching this schema:
 {
@@ -106,9 +163,9 @@ Do not invent facts.
 """;
 
         String userPrompt = """
-Generate a structured AI report from the following submission content.
+Generate a structured AI report from the following input.
 
-Submission content:
+Input:
 %s
 """.formatted(inputText);
 
@@ -141,7 +198,21 @@ Submission content:
                 report.getMetadata().setGeneratedAt(Instant.now().toString());
             }
 
+            return report;
+
+        } catch (Exception e) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_GATEWAY,
+                    "Failed to parse Ollama structured output: " + e.getMessage()
+            );
+        }
+    }
+
+    // ===== 公共：保存 ai_reports =====
+    private void saveAiReport(Long submissionId, Long issueId, String shareId, AiReportResponse report) {
+        try {
             String parsedReportJson = objectMapper.writeValueAsString(report);
+            String rawOutput = parsedReportJson; // 当前直接保存解析后的 JSON；若要保留原始字符串可再分开
 
             AiReport entity = new AiReport();
             entity.setSubmissionId(submissionId);
@@ -149,34 +220,23 @@ Submission content:
             entity.setShareId(shareId);
             entity.setModel(ollamaModel);
             entity.setPromptVersion("v1");
-            entity.setRawOutput(rawJson);
+            entity.setRawOutput(rawOutput);
             entity.setParsedReportJson(parsedReportJson);
             entity.setCreatedAt(Instant.now());
 
             aiReportRepository.save(entity);
 
-            return report;
-
         } catch (Exception e) {
             throw new ResponseStatusException(
-                    HttpStatus.BAD_GATEWAY,
-                    "Failed to parse/save Ollama structured output: " + e.getMessage()
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Failed to save AI report: " + e.getMessage()
             );
         }
     }
 
-    public AiReport getLatestBySubmissionId(Long submissionId) {
-        return aiReportRepository.findTopBySubmissionIdOrderByCreatedAtDesc(submissionId)
-                .orElseThrow(() -> new RuntimeException("AI report not found"));
-    }
-
-    private String buildInputText(Submission submission, Issue issue) {
-            String issueContent = issue == null ? "" : safe(issue.getIssueContent());
-            String shareId = issue == null ? "" : safe(issue.getShareId());
-            String issueState = issue == null || issue.getState() == null ? "" : issue.getState().name();
-            String publishedAt = issue == null || issue.getPublishedAt() == null ? "" : issue.getPublishedAt().toString();
-            
-            return """
+    // ===== submission version input =====
+    private String buildInputTextForSubmission(Submission submission, Issue issue) {
+        return """
 Submission metadata:
 - Submission ID: %d
 - Issue ID: %s
@@ -202,23 +262,82 @@ Do not invent user feedback that is not present in the input.
 If evidence is limited, clearly reflect that in the summary, insights, and risks/limitations.
 """.formatted(
                 submission.getId(),
-            submission.getIssueId(),
-            submission.getUserId(),
-            submission.getStatus(),
-            safe(submission.getEmail()),
-            submission.isWantsVoucher(),
-            submission.isWantsUpdates(),
-            submission.getSubmittedAt() == null ? "" : submission.getSubmittedAt().toString(),
-            submission.getCreatedAt() == null ? "" : submission.getCreatedAt().toString(),
-            submission.getUpdatedAt() == null ? "" : submission.getUpdatedAt().toString(),
-            shareId,
-            issueState,
-            publishedAt,
-            issueContent
+                submission.getIssueId(),
+                submission.getUserId(),
+                submission.getStatus(),
+                safe(submission.getEmail()),
+                submission.isWantsVoucher(),
+                submission.isWantsUpdates(),
+                stringify(submission.getSubmittedAt()),
+                stringify(submission.getCreatedAt()),
+                stringify(submission.getUpdatedAt()),
+                issue == null ? "" : safe(issue.getShareId()),
+                issue == null || issue.getState() == null ? "" : issue.getState().name(),
+                issue == null ? "" : stringify(issue.getPublishedAt()),
+                issue == null ? "" : safe(issue.getIssueContent())
         );
     }
 
+    // ===== shareId version input =====
+    private String buildInputTextForShare(
+            Issue issue,
+            List<WhyResponse> whyResponses,
+            List<HowResponse> howResponses
+    ) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("Issue context:\n");
+        sb.append("- Issue ID: ").append(issue.getIssueId()).append("\n");
+        sb.append("- Share ID: ").append(safe(issue.getShareId())).append("\n");
+        sb.append("- Issue state: ").append(issue.getState() == null ? "" : issue.getState().name()).append("\n");
+        sb.append("- Published at: ").append(stringify(issue.getPublishedAt())).append("\n");
+        sb.append("- Issue content:\n").append(safe(issue.getIssueContent())).append("\n\n");
+
+        sb.append("Why responses:\n");
+        if (whyResponses == null || whyResponses.isEmpty()) {
+            sb.append("- No why responses found.\n");
+        } else {
+            for (int i = 0; i < whyResponses.size(); i++) {
+                WhyResponse r = whyResponses.get(i);
+                sb.append("Why response #").append(i + 1).append(":\n");
+                sb.append("  - stance: ").append(safe(r.getStance())).append("\n");
+                sb.append("  - answer1: ").append(safe(r.getAnswer1())).append("\n");
+                sb.append("  - answer2: ").append(safe(r.getAnswer2())).append("\n");
+                sb.append("  - answer3: ").append(safe(r.getAnswer3())).append("\n");
+                sb.append("  - answer4: ").append(safe(r.getAnswer4())).append("\n");
+                sb.append("  - answer5: ").append(safe(r.getAnswer5())).append("\n");
+            }
+        }
+
+        sb.append("\nHow responses:\n");
+        if (howResponses == null || howResponses.isEmpty()) {
+            sb.append("- No how responses found.\n");
+        } else {
+            for (int i = 0; i < howResponses.size(); i++) {
+                HowResponse r = howResponses.get(i);
+                sb.append("How response #").append(i + 1).append(":\n");
+                sb.append("  - answer1: ").append(safe(r.getAnswer1())).append("\n");
+                sb.append("  - answer2: ").append(safe(r.getAnswer2())).append("\n");
+                sb.append("  - answer3: ").append(safe(r.getAnswer3())).append("\n");
+                sb.append("  - answer4: ").append(safe(r.getAnswer4())).append("\n");
+                sb.append("  - answer5: ").append(safe(r.getAnswer5())).append("\n");
+            }
+        }
+
+        sb.append("\nInstructions:\n");
+        sb.append("Generate a structured AI report based on the issue context and all why/how user responses above.\n");
+        sb.append("Summarise common themes, disagreements, pain points, and actionable opportunities.\n");
+        sb.append("Prioritise actual user responses over generic assumptions.\n");
+        sb.append("Do not invent facts. If data is limited, state this clearly in risks and limitations.\n");
+
+        return sb.toString();
+    }
+
     private String safe(String value) {
-    return value == null ? "" : value;
-}
+        return value == null ? "" : value;
+    }
+
+    private String stringify(Object value) {
+        return value == null ? "" : value.toString();
+    }
 }
