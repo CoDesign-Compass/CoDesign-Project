@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useParams } from 'react-router-dom'
 import { useIssue } from '../../context/IssueContext'
 import { useTheme } from '../../context/ThemeContext'
+import { useNavigate } from 'react-router-dom'
 
 export default function HowPage() {
   const { theme } = useTheme()
@@ -31,6 +32,32 @@ export default function HowPage() {
   const inputTextColor = isDark ? '#f5f5f5' : '#111111'
   const buttonBackground = '#ffe071'
   const buttonTextColor = '#000000'
+  const navigate = useNavigate()
+
+  const submitHow = async () => {
+    const body = {
+      shareId: routeShareId,
+      answer1: answers[0],
+      answer2: answers[1],
+      answer3: answers[2],
+      answer4: answers[3],
+      answer5: answers[4],
+    }
+
+    const response = await fetch('http://localhost:8080/api/how', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to submit how response')
+    }
+
+    navigate(`/share/${routeShareId}/thankyou`)
+  }
 
   useEffect(() => {
     inputRef.current?.focus()
@@ -42,9 +69,6 @@ export default function HowPage() {
       setShareId(routeShareId)
     }
   }, [routeShareId, setShareId])
-
-  const next = () => setStep((s) => Math.min(s + 1, questions.length))
-  const finish = () => setStep(questions.length)
 
   if (step >= questions.length) {
     return (
@@ -96,6 +120,21 @@ export default function HowPage() {
     )
   }
 
+  //const next = () => setStep((s) => Math.min(s + 1, questions.length))
+  const next = async () => {
+    const isLastQuestion = step === questions.length - 1
+
+    if (isLastQuestion) {
+      await submitHow()
+      return
+    }
+
+    setStep((s) => s + 1)
+  }
+  //const finish = () => setStep(questions.length)
+  const finish = async () => {
+    await submitHow()
+  }
   return (
     <div
       style={{

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useParams } from 'react-router-dom'
 import { useIssue } from '../../context/IssueContext'
 import { useTheme } from '../../context/ThemeContext'
+import { useNavigate } from 'react-router-dom'
 
 export default function WhyPage() {
   const { theme } = useTheme()
@@ -33,6 +34,33 @@ export default function WhyPage() {
   const issueChipTextColor = '#000000'
   const actionButtonBackground = '#ffe071'
   const actionButtonTextColor = '#000000'
+  const navigate = useNavigate()
+
+  const submitWhy = async () => {
+    const body = {
+      shareId: routeShareId,
+      stance: selectedButton,
+      answer1: answers[0],
+      answer2: answers[1],
+      answer3: answers[2],
+      answer4: answers[3],
+      answer5: answers[4],
+    }
+
+    const response = await fetch('http://localhost:8080/api/why', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to submit why response')
+    }
+
+    navigate(`/share/${routeShareId}/how`)
+  }
 
   useEffect(() => {
     inputRef.current?.focus()
@@ -44,9 +72,6 @@ export default function WhyPage() {
       setShareId(routeShareId)
     }
   }, [routeShareId, setShareId])
-
-  const next = () => setStep((s) => Math.min(s + 1, questions.length))
-  const finish = () => setStep(questions.length)
 
   const getTopChoiceStyle = (key, baseColor, hoverColor, selectedColor) => ({
     flex: 1,
@@ -125,6 +150,22 @@ export default function WhyPage() {
         ))}
       </div>
     )
+  }
+
+  //const next = () => setStep((s) => Math.min(s + 1, questions.length))
+  const next = async () => {
+    const isLastQuestion = step === questions.length - 1
+
+    if (isLastQuestion) {
+      await submitWhy()
+      return
+    }
+
+    setStep((s) => s + 1)
+  }
+  //const finish = () => setStep(questions.length)
+  const finish = async () => {
+    await submitWhy()
   }
 
   return (
