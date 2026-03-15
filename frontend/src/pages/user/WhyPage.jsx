@@ -24,7 +24,6 @@ export default function WhyPage() {
 
   const pageTextColor = isDark ? '#f5f5f5' : '#111111'
   const secondaryTextColor = isDark ? '#cfcfcf' : '#555555'
-  const cardBackground = isDark ? '#232323' : '#f5f5f5'
   const answeredCardBackground = isDark ? '#1f1f1f' : '#f1f3f5'
   const borderColor = isDark ? 'rgba(255,255,255,0.12)' : '#e9ecef'
   const inputBackground = isDark ? '#1a1a1a' : '#ffffff'
@@ -34,6 +33,7 @@ export default function WhyPage() {
   const issueChipTextColor = '#000000'
   const actionButtonBackground = '#ffe071'
   const actionButtonTextColor = '#000000'
+  const hintCardBackground = isDark ? '#1f1f1f' : '#f8f9fa'
   const navigate = useNavigate()
 
   const submitWhy = async () => {
@@ -63,9 +63,11 @@ export default function WhyPage() {
   }
 
   useEffect(() => {
-    inputRef.current?.focus()
-    endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
-  }, [step])
+    if (selectedButton) {
+      inputRef.current?.focus()
+      endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    }
+  }, [step, selectedButton])
 
   useEffect(() => {
     if (routeShareId) {
@@ -81,19 +83,15 @@ export default function WhyPage() {
         : hoveredButton === key
           ? hoverColor
           : baseColor,
-    transform:
-      hoveredButton === key && !selectedButton
-        ? 'translateY(-2px)'
-        : 'translateY(0)',
+    transform: hoveredButton === key ? 'translateY(-2px)' : 'translateY(0)',
     boxShadow:
       selectedButton === key
         ? '0 0 0 2px rgba(0,0,0,0.08), 0 6px 14px rgba(0,0,0,0.18)'
         : hoveredButton === key
           ? '0 6px 14px rgba(0,0,0,0.18)'
           : '0 2px 6px rgba(0,0,0,0.08)',
-    opacity: selectedButton && selectedButton !== key ? 0.55 : 1,
-    cursor:
-      selectedButton && selectedButton !== key ? 'not-allowed' : 'pointer',
+    opacity: 1,
+    cursor: 'pointer',
     transition: 'all 0.15s ease',
     border: 'none',
     borderRadius: '6px',
@@ -102,57 +100,6 @@ export default function WhyPage() {
     color: '#000000',
   })
 
-  if (step >= questions.length) {
-    return (
-      <div
-        style={{
-          maxWidth: 680,
-          margin: '40px auto',
-          padding: '0 16px',
-          fontFamily: 'Poppins, sans-serif',
-          color: pageTextColor,
-        }}
-      >
-        <h2 style={{ marginBottom: 16, color: pageTextColor }}>
-          Your responses
-        </h2>
-
-        {questions.map((q, i) => (
-          <div
-            key={i}
-            style={{
-              padding: '12px 16px',
-              borderRadius: 10,
-              background: cardBackground,
-              marginBottom: 10,
-              border: `1px solid ${borderColor}`,
-            }}
-          >
-            <div
-              style={{
-                fontWeight: 600,
-                marginBottom: 6,
-                color: pageTextColor,
-              }}
-            >
-              Follow-up response {i + 1}
-            </div>
-            <div
-              style={{
-                color: pageTextColor,
-                whiteSpace: 'pre-wrap',
-                lineHeight: 1.5,
-              }}
-            >
-              {answers[i]?.trim() || 'No response provided.'}
-            </div>
-          </div>
-        ))}
-      </div>
-    )
-  }
-
-  //const next = () => setStep((s) => Math.min(s + 1, questions.length))
   const next = async () => {
     const isLastQuestion = step === questions.length - 1
 
@@ -163,7 +110,7 @@ export default function WhyPage() {
 
     setStep((s) => s + 1)
   }
-  //const finish = () => setStep(questions.length)
+
   const finish = async () => {
     await submitWhy()
   }
@@ -204,6 +151,28 @@ export default function WhyPage() {
 
         <div
           style={{
+            fontWeight: 600,
+            marginTop: '1.25rem',
+            marginBottom: '0.5rem',
+            color: pageTextColor,
+          }}
+        >
+          What is your view on this issue?
+        </div>
+
+        <div
+          style={{
+            fontSize: 14,
+            lineHeight: 1.5,
+            color: secondaryTextColor,
+            marginBottom: '1rem',
+          }}
+        >
+          Please select one option before continuing to the follow-up questions.
+        </div>
+
+        <div
+          style={{
             display: 'flex',
             gap: '10px',
             marginTop: '1rem',
@@ -214,10 +183,7 @@ export default function WhyPage() {
             type="button"
             onMouseEnter={() => setHoveredButton('agree')}
             onMouseLeave={() => setHoveredButton(null)}
-            onClick={() => {
-              if (!selectedButton) setSelectedButton('agree')
-            }}
-            disabled={selectedButton !== null && selectedButton !== 'agree'}
+            onClick={() => setSelectedButton('agree')}
             style={getTopChoiceStyle('agree', '#d8f5dc', '#c7f7cd', '#b2f2bb')}
           >
             Agree
@@ -227,10 +193,7 @@ export default function WhyPage() {
             type="button"
             onMouseEnter={() => setHoveredButton('disagree')}
             onMouseLeave={() => setHoveredButton(null)}
-            onClick={() => {
-              if (!selectedButton) setSelectedButton('disagree')
-            }}
-            disabled={selectedButton !== null && selectedButton !== 'disagree'}
+            onClick={() => setSelectedButton('disagree')}
             style={getTopChoiceStyle(
               'disagree',
               '#ffd6d6',
@@ -245,10 +208,7 @@ export default function WhyPage() {
             type="button"
             onMouseEnter={() => setHoveredButton('unknown')}
             onMouseLeave={() => setHoveredButton(null)}
-            onClick={() => {
-              if (!selectedButton) setSelectedButton('unknown')
-            }}
-            disabled={selectedButton !== null && selectedButton !== 'unknown'}
+            onClick={() => setSelectedButton('unknown')}
             style={getTopChoiceStyle(
               'unknown',
               '#f8f9fa',
@@ -261,65 +221,16 @@ export default function WhyPage() {
         </div>
       </div>
 
-      <div
-        style={{
-          fontWeight: 600,
-          marginBottom: 6,
-          color: pageTextColor,
-        }}
-      >
-        Why does this issue matter to you?
-      </div>
-
-      <div
-        style={{
-          fontSize: 14,
-          lineHeight: 1.5,
-          color: secondaryTextColor,
-          marginBottom: 16,
-        }}
-      >
-        Follow-up question {step + 1} of {questions.length}
-      </div>
-
-      {/* Previously answered questions */}
-      {questions.slice(0, step).map((q, i) => (
+      {!selectedButton && (
         <div
-          key={i}
           style={{
-            padding: '12px 16px',
+            padding: '14px 16px',
             borderRadius: 10,
-            background: answeredCardBackground,
-            marginBottom: 10,
+            background: hintCardBackground,
+            marginBottom: 16,
             border: `1px solid ${borderColor}`,
           }}
         >
-          {i > 0 && (
-            <div
-              style={{
-                fontWeight: 600,
-                marginBottom: 6,
-                color: pageTextColor,
-              }}
-            >
-              Why does that matter to you?
-            </div>
-          )}
-
-          <div
-            style={{
-              whiteSpace: 'pre-wrap',
-              color: pageTextColor,
-              lineHeight: 1.5,
-            }}
-          >
-            {answers[i]}
-          </div>
-        </div>
-      ))}
-
-      <AnimatePresence mode="popLayout">
-        {step > 0 && (
           <div
             style={{
               fontWeight: 600,
@@ -327,133 +238,219 @@ export default function WhyPage() {
               color: pageTextColor,
             }}
           >
-            Why does that matter to you?
+            Select a response to continue
           </div>
-        )}
 
-        <motion.div
-          key={step}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -6 }}
-          transition={{ duration: 0.25, ease: 'easeOut' }}
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 10,
-            marginTop: 8,
-          }}
-        >
+          <div
+            style={{
+              fontSize: 14,
+              lineHeight: 1.6,
+              color: secondaryTextColor,
+            }}
+          >
+            Choose Agree, Disagree, or I don’t know first. The follow-up
+            question box will appear after you make your selection.
+          </div>
+        </div>
+      )}
+
+      {selectedButton && (
+        <>
+          <div
+            style={{
+              fontWeight: 600,
+              marginBottom: 6,
+              color: pageTextColor,
+            }}
+          >
+            Why does this issue matter to you?
+          </div>
+
           <div
             style={{
               fontSize: 14,
               lineHeight: 1.5,
               color: secondaryTextColor,
+              marginBottom: 16,
             }}
           >
-            {questions[step]}
+            Follow-up question {step + 1} of {questions.length}
           </div>
 
-          <textarea
-            ref={inputRef}
-            placeholder="Type your answer here..."
-            value={answers[step]}
-            onChange={(e) => {
-              const nextAns = [...answers]
-              nextAns[step] = e.target.value
-              setAnswers(nextAns)
-            }}
-            style={{
-              width: '100%',
-              minHeight: 120,
-              padding: '12px 14px',
-              borderRadius: 10,
-              border: `1px solid ${inputBorderColor}`,
-              outline: 'none',
-              fontSize: 16,
-              resize: 'vertical',
-              boxSizing: 'border-box',
-              fontFamily: 'inherit',
-              lineHeight: 1.5,
-              background: inputBackground,
-              color: inputTextColor,
-            }}
-          />
-
-          <div
-            style={{
-              display: 'flex',
-              gap: 10,
-              flexWrap: 'wrap',
-              alignItems: 'flex-start',
-            }}
-          >
-            {step > 0 && (
-              <motion.div
-                key="idk-group"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 6,
-                }}
-              >
+          {/* Previously answered questions */}
+          {questions.slice(0, step).map((q, i) => (
+            <div
+              key={i}
+              style={{
+                padding: '12px 16px',
+                borderRadius: 10,
+                background: answeredCardBackground,
+                marginBottom: 10,
+                border: `1px solid ${borderColor}`,
+              }}
+            >
+              {i > 0 && (
                 <div
                   style={{
-                    fontSize: 13,
-                    lineHeight: 1.5,
-                    color: secondaryTextColor,
-                    maxWidth: 240,
+                    fontWeight: 600,
+                    marginBottom: 6,
+                    color: pageTextColor,
                   }}
                 >
-                  Select “I don’t know” if you are unsure how to continue. This
-                  will end the follow-up questions.
+                  Why does that matter to you?
                 </div>
+              )}
+
+              <div
+                style={{
+                  whiteSpace: 'pre-wrap',
+                  color: pageTextColor,
+                  lineHeight: 1.5,
+                }}
+              >
+                {answers[i]}
+              </div>
+            </div>
+          ))}
+
+          <AnimatePresence mode="popLayout">
+            {step > 0 && (
+              <div
+                style={{
+                  fontWeight: 600,
+                  marginBottom: 6,
+                  color: pageTextColor,
+                }}
+              >
+                Why does that matter to you?
+              </div>
+            )}
+
+            <motion.div
+              key={step}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 10,
+                marginTop: 8,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 14,
+                  lineHeight: 1.5,
+                  color: secondaryTextColor,
+                }}
+              >
+                {questions[step]}
+              </div>
+
+              <textarea
+                ref={inputRef}
+                placeholder="Type your answer here..."
+                value={answers[step]}
+                onChange={(e) => {
+                  const nextAns = [...answers]
+                  nextAns[step] = e.target.value
+                  setAnswers(nextAns)
+                }}
+                style={{
+                  width: '100%',
+                  minHeight: 120,
+                  padding: '12px 14px',
+                  borderRadius: 10,
+                  border: `1px solid ${inputBorderColor}`,
+                  outline: 'none',
+                  fontSize: 16,
+                  resize: 'vertical',
+                  boxSizing: 'border-box',
+                  fontFamily: 'inherit',
+                  lineHeight: 1.5,
+                  background: inputBackground,
+                  color: inputTextColor,
+                }}
+              />
+
+              <div
+                style={{
+                  display: 'flex',
+                  gap: 10,
+                  flexWrap: 'wrap',
+                  alignItems: 'flex-start',
+                }}
+              >
+                {step > 0 && (
+                  <motion.div
+                    key="idk-group"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.25 }}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 6,
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 13,
+                        lineHeight: 1.5,
+                        color: secondaryTextColor,
+                        maxWidth: 240,
+                      }}
+                    >
+                      Select “I don’t know” if you are unsure how to continue.
+                      This will end the follow-up questions.
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={finish}
+                      style={{
+                        background: actionButtonBackground,
+                        border: 'none',
+                        borderRadius: 10,
+                        padding: '12px 18px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap',
+                        color: actionButtonTextColor,
+                      }}
+                    >
+                      I don’t know
+                    </button>
+                  </motion.div>
+                )}
 
                 <button
                   type="button"
-                  onClick={finish}
+                  onClick={next}
+                  disabled={!answers[step].trim()}
                   style={{
                     background: actionButtonBackground,
                     border: 'none',
                     borderRadius: 10,
                     padding: '12px 18px',
                     fontWeight: 600,
-                    cursor: 'pointer',
+                    cursor: answers[step].trim() ? 'pointer' : 'not-allowed',
+                    opacity: answers[step].trim() ? 1 : 0.7,
                     whiteSpace: 'nowrap',
                     color: actionButtonTextColor,
+                    alignSelf: step > 0 ? 'flex-end' : 'flex-start',
                   }}
                 >
-                  I don’t know
+                  Next
                 </button>
-              </motion.div>
-            )}
-
-            <button
-              type="button"
-              onClick={next}
-              disabled={!answers[step].trim()}
-              style={{
-                background: actionButtonBackground,
-                border: 'none',
-                borderRadius: 10,
-                padding: '12px 18px',
-                fontWeight: 600,
-                cursor: answers[step].trim() ? 'pointer' : 'not-allowed',
-                opacity: answers[step].trim() ? 1 : 0.7,
-                whiteSpace: 'nowrap',
-                color: actionButtonTextColor,
-                alignSelf: step > 0 ? 'flex-end' : 'flex-start',
-              }}
-            >
-              Next
-            </button>
-          </div>
-        </motion.div>
-      </AnimatePresence>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </>
+      )}
 
       <div ref={endRef} />
     </div>

@@ -70,56 +70,6 @@ export default function HowPage() {
     }
   }, [routeShareId, setShareId])
 
-  if (step >= questions.length) {
-    return (
-      <div
-        style={{
-          maxWidth: 680,
-          margin: '40px auto',
-          padding: '0 16px',
-          color: pageTextColor,
-        }}
-      >
-        <h2 style={{ marginBottom: 16, color: pageTextColor }}>
-          Your responses
-        </h2>
-
-        {questions.map((q, i) => (
-          <div
-            key={i}
-            style={{
-              padding: '12px 16px',
-              borderRadius: 10,
-              background: cardBackground,
-              marginBottom: 10,
-              border: `1px solid ${borderColor}`,
-            }}
-          >
-            <div
-              style={{
-                fontWeight: 600,
-                marginBottom: 6,
-                color: pageTextColor,
-              }}
-            >
-              Follow-up response {i + 1}
-            </div>
-
-            <div
-              style={{
-                color: pageTextColor,
-                whiteSpace: 'pre-wrap',
-                lineHeight: 1.5,
-              }}
-            >
-              {answers[i]?.trim() || 'No response provided.'}
-            </div>
-          </div>
-        ))}
-      </div>
-    )
-  }
-
   //const next = () => setStep((s) => Math.min(s + 1, questions.length))
   const next = async () => {
     const isLastQuestion = step === questions.length - 1
