@@ -128,4 +128,13 @@ Frontend: CSS, HTML, React
 |**Total** |46 SP|
 ### Sprint 5
 | Task| Estimate (Story Points) |
-|----|----|
+| ---------------------------------------------------------------------------- | ----------------------- |
+| Meeting minutes & Risk log & reflection log & project challenges (documents) | 6 SP                    |
+| Implement login functionality and user authentication flow                   | 6 SP                    |
+| Implement email notification and coupon sending feature                      | 5 SP                    |
+| Connect backend services with database and ensure stable integration         | 4 SP                    |
+| Implement AI data processing and analysis module                             | 10 SP                   |
+| Generate structured AI reports and support report export                     | 8 SP                    |
+| Deploy AI components and backend services to server environment              | 5 SP                    |
+| Deploy full application prototype to server (frontend + backend)             | 4 SP                    |
+| **Total**                                                                    | 48 SP                   |
