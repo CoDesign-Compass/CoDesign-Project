@@ -7,23 +7,7 @@ export default function LoginPage({ onSubmit: onSubmitProp }) {
   const { shareId, setShareId } = useIssue()
   const currentShareId = routeShareId || shareId
 
-  const API_BASE =
-    process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'
-
-  async function loginApi({ email, password }) {
-    const res = await fetch(`${API_BASE}/api/users/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: email.trim(), password }),
-    });
-    const text = await res.text();
-    if (!res.ok) {
-      let msg = text;
-      try { msg = JSON.parse(text).message || msg; } catch {}
-      throw new Error(msg || `HTTP ${res.status}`);
-    }
-    return text ? JSON.parse(text) : {};
-  }
+  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'
 
   // DEV admin shortcut (from .env)
   const ADMIN_EMAIL = process.env.REACT_APP_ADMIN_EMAIL || ''
@@ -37,18 +21,48 @@ export default function LoginPage({ onSubmit: onSubmitProp }) {
   })
   const [showPw, setShowPw] = useState(false)
 
-  // ---- Help bubble outside-click ----
+  // ---- Login feedback ----
+  const [loginErr, setLoginErr] = useState('')
+  const [loginSubmitting, setLoginSubmitting] = useState(false)
+
+  // ---- Help bubble ----
   const [open, setOpen] = useState(false)
+  const [helpForm, setHelpForm] = useState({ email: '', message: '' })
+  const [helpSent, setHelpSent] = useState(false)
+  const [helpErr, setHelpErr] = useState('')
+  const [helpSubmitting, setHelpSubmitting] = useState(false)
+
   const popRef = useRef(null)
+  const helpEmailRef = useRef(null)
   const navigate = useNavigate()
 
   useEffect(() => {
     const onDown = (e) => {
-      if (popRef.current && !popRef.current.contains(e.target)) setOpen(false)
+      if (popRef.current && !popRef.current.contains(e.target)) {
+        setOpen(false)
+      }
     }
+
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setOpen(false)
+      }
+    }
+
     document.addEventListener('mousedown', onDown)
-    return () => document.removeEventListener('mousedown', onDown)
+    document.addEventListener('keydown', onKeyDown)
+
+    return () => {
+      document.removeEventListener('mousedown', onDown)
+      document.removeEventListener('keydown', onKeyDown)
+    }
   }, [])
+
+  useEffect(() => {
+    if (open) {
+      helpEmailRef.current?.focus()
+    }
+  }, [open])
 
   useEffect(() => {
     if (routeShareId) setShareId(routeShareId)
@@ -62,54 +76,73 @@ export default function LoginPage({ onSubmit: onSubmitProp }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setLoginErr('')
 
     try {
-    const res = await fetch(`${API_BASE}/api/users/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: form.email.trim(),
-        password: form.password,
-      }),
-    });
+      setLoginSubmitting(true)
 
-    const text = await res.text();
-    const data = text ? JSON.parse(text) : {};
+      const res = await fetch(`${API_BASE}/api/users/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: form.email.trim(),
+          password: form.password,
+        }),
+      })
 
-    if (!res.ok) {
-      throw new Error(data?.message || text || `HTTP ${res.status}`);
+      const text = await res.text()
+      const data = text ? JSON.parse(text) : {}
+
+      if (!res.ok) {
+        throw new Error(data?.message || text || `HTTP ${res.status}`)
+      }
+
+      localStorage.setItem('userId', String(data.userId || data.id || ''))
+      localStorage.setItem('userRole', data.role || 'USER')
+
+      const role = (data.role || '').toUpperCase()
+      if (role === 'ADMIN') {
+        navigate('/admin/dashboard')
+        return
+      }
+
+      if (currentShareId) navigate(`/share/${currentShareId}/profile`)
+      else navigate('/profile')
+    } catch (err) {
+      console.error(err)
+      setLoginErr('Login failed: ' + err.message)
+    } finally {
+      setLoginSubmitting(false)
     }
-
-    localStorage.setItem("userId", String(data.userId || data.id || ""));
-    localStorage.setItem("userRole", data.role || "USER");
-
-    const role = (data.role || "").toUpperCase();
-    if (role === "ADMIN") {
-      navigate("/admin/dashboard");
-      return;
-    }
-
-    if (currentShareId) navigate(`/share/${currentShareId}/profile`);
-    else navigate("/profile");
-  } catch (err) {
-    console.error(err);
-    alert("Login failed: " + err.message);
   }
-};
 
-  // ---- help form ----
-  const [helpForm, setHelpForm] = useState({ email: '', message: '' })
-  const [helpSent, setHelpSent] = useState(false)
-  const [helpErr, setHelpErr] = useState('')
+  const handleHelpToggle = () => {
+    setOpen((prev) => {
+      const next = !prev
+      if (next) {
+        setHelpErr('')
+        setHelpSent(false)
+      }
+      return next
+    })
+  }
 
   const handleHelpSubmit = async (e) => {
     e.preventDefault()
     setHelpErr('')
+
     const validEmail = /^\S+@\S+\.\S+$/.test(helpForm.email)
-    if (!validEmail) return setHelpErr('Please enter a valid email.')
-    if (helpForm.message.trim().length < 5) {
-      return setHelpErr('Tell us a bit more (≥ 5 characters).')
+    if (!validEmail) {
+      setHelpErr('Please enter a valid email address.')
+      return
     }
+
+    if (helpForm.message.trim().length < 5) {
+      setHelpErr('Please provide a little more detail (at least 5 characters).')
+      return
+    }
+
+    setHelpSubmitting(true)
 
     try {
       const payload = {
@@ -131,9 +164,12 @@ export default function LoginPage({ onSubmit: onSubmitProp }) {
       if (!res.ok) throw new Error(text || `HTTP ${res.status}`)
 
       setHelpSent(true)
+      setHelpForm({ email: '', message: '' })
     } catch (err) {
       console.error(err)
-      setHelpErr('Send failed: ' + err.message)
+      setHelpErr('We could not send your message. Please try again.')
+    } finally {
+      setHelpSubmitting(false)
     }
   }
 
@@ -150,7 +186,9 @@ export default function LoginPage({ onSubmit: onSubmitProp }) {
         minHeight: '100vh',
       }}
     >
-      <div style={{ background: 'var(--bg-color)', color: 'var(--text-color)' }}>
+      <div
+        style={{ background: 'var(--bg-color)', color: 'var(--text-color)' }}
+      >
         <section
           style={{
             width: '100vw',
@@ -191,7 +229,7 @@ export default function LoginPage({ onSubmit: onSubmitProp }) {
         >
           <style>{`
             .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,1px,1px);white-space:nowrap;border:0;}
-            .input{width:100%;height:44px;border-radius:8px;border:1px solid #d8d8d8;background:#fff;color:#111;padding:0 44px 0 12px;font-size:16px;outline:none;}
+            .input{width:100%;height:44px;border-radius:8px;border:1px solid #d8d8d8;background:#fff;color:#111;padding:0 44px 0 12px;font-size:16px;outline:none;box-sizing:border-box;}
             .input:focus{border-color:#7aa2ff;}
           `}</style>
 
@@ -228,6 +266,7 @@ export default function LoginPage({ onSubmit: onSubmitProp }) {
                   onChange={change('password')}
                   placeholder="Password"
                   autoComplete="current-password"
+                  aria-invalid={loginErr ? 'true' : 'false'}
                 />
                 <button
                   type="button"
@@ -284,10 +323,30 @@ export default function LoginPage({ onSubmit: onSubmitProp }) {
               <span>Remember me</span>
             </label>
 
-            <div style={{ display: 'grid', justifyItems: 'center', marginTop: 10 }}>
+            {loginErr && (
+              <div
+                role="alert"
+                aria-live="assertive"
+                style={{
+                  color: '#9b1c1c',
+                  fontSize: 14,
+                  lineHeight: 1.45,
+                  textAlign: 'center',
+                  fontFamily: 'inherit',
+                }}
+              >
+                {loginErr}
+              </div>
+            )}
+
+            <div
+              style={{ display: 'grid', justifyItems: 'center', marginTop: 10 }}
+            >
               <button
                 className="cta-btn"
                 type="submit"
+                disabled={loginSubmitting}
+                aria-busy={loginSubmitting}
                 style={{
                   minWidth: 240,
                   padding: '12px 24px',
@@ -295,7 +354,8 @@ export default function LoginPage({ onSubmit: onSubmitProp }) {
                   background: '#2f2f2f',
                   border: '3px solid #ffe070',
                   color: '#fff',
-                  cursor: 'pointer',
+                  cursor: loginSubmitting ? 'not-allowed' : 'pointer',
+                  opacity: loginSubmitting ? 0.7 : 1,
                   boxShadow:
                     '0 2px 0 rgba(0,0,0,.25), inset 0 0 0 1px rgba(0,0,0,.08)',
                 }}
@@ -310,17 +370,20 @@ export default function LoginPage({ onSubmit: onSubmitProp }) {
                     textUnderlineOffset: '4px',
                   }}
                 >
-                  Login
+                  {loginSubmitting ? 'Logging in...' : 'Login'}
                 </span>
               </button>
             </div>
 
-            <div style={{ display: 'grid', justifyItems: 'center', marginTop: 10 }}>
+            <div
+              style={{ display: 'grid', justifyItems: 'center', marginTop: 10 }}
+            >
               <button
                 className="cta-btn"
                 type="button"
                 onClick={() => {
-                  if (currentShareId) navigate(`/share/${currentShareId}/createaccount`)
+                  if (currentShareId)
+                    navigate(`/share/${currentShareId}/createaccount`)
                   else navigate('/createaccount')
                 }}
                 style={{
@@ -365,7 +428,9 @@ export default function LoginPage({ onSubmit: onSubmitProp }) {
             <button
               aria-label="Help"
               title="Help"
-              onClick={() => setOpen((v) => !v)}
+              aria-expanded={open}
+              aria-controls="help-dialog"
+              onClick={handleHelpToggle}
               style={{
                 border: 'none',
                 background: 'transparent',
@@ -373,12 +438,19 @@ export default function LoginPage({ onSubmit: onSubmitProp }) {
                 cursor: 'pointer',
               }}
             >
-              <img src="/Information.png" alt="Information" style={{ height: 30, display: 'block' }} />
+              <img
+                src="/Information.png"
+                alt="Information"
+                style={{ height: 30, display: 'block' }}
+              />
             </button>
 
             {open && (
               <div
-                role="tooltip"
+                id="help-dialog"
+                role="dialog"
+                aria-modal="false"
+                aria-labelledby="help-dialog-title"
                 style={{
                   position: 'absolute',
                   bottom: 'calc(100% + 8px)',
@@ -386,41 +458,72 @@ export default function LoginPage({ onSubmit: onSubmitProp }) {
                   width: 'min(320px, 86vw)',
                   background: '#ffe070',
                   color: '#303030',
-                  padding: '12px 14px',
+                  padding: '12px',
                   borderRadius: 8,
                   boxShadow: '0 8px 24px rgba(0,0,0,.18)',
                   zIndex: 1000,
                 }}
               >
-                <div
+                <h2
+                  id="help-dialog-title"
                   style={{
-                    position: 'absolute',
-                    bottom: -6,
-                    right: 14,
-                    width: 12,
-                    height: 12,
-                    background: '#fff',
-                    transform: 'rotate(45deg)',
-                    boxShadow: '-1px 1px 2px rgba(0,0,0,.05)',
+                    margin: '0 0 8px',
+                    fontSize: 16,
+                    fontWeight: 600,
+                    fontFamily: 'Poppins, sans-serif',
+                    color: '#303030',
                   }}
-                />
+                >
+                  Need help?
+                </h2>
+
+                <p
+                  style={{
+                    margin: '0 0 10px',
+                    fontSize: 13,
+                    lineHeight: 1.5,
+                    color: '#303030',
+                    fontFamily: 'Poppins, sans-serif',
+                  }}
+                >
+                  Send us your question and we’ll get back to you.
+                </p>
 
                 {helpSent ? (
-                  <div style={{ lineHeight: 1.55 }}>
+                  <div
+                    style={{
+                      lineHeight: 1.55,
+                      fontFamily: 'Poppins, sans-serif',
+                      color: '#303030',
+                    }}
+                  >
                     <p style={{ margin: 0, fontWeight: 600 }}>Thanks! 🎉</p>
                     <p style={{ margin: '6px 0 0' }}>
                       We’ve received your message and will get back to you soon.
                     </p>
                   </div>
                 ) : (
-                  <form onSubmit={handleHelpSubmit} style={{ display: 'grid', gap: 8 }}>
-                    <label style={{ fontSize: 13 }}>
+                  <form
+                    onSubmit={handleHelpSubmit}
+                    style={{ display: 'grid', gap: 8 }}
+                  >
+                    <label
+                      style={{
+                        fontSize: 13,
+                        fontFamily: 'Poppins, sans-serif',
+                        color: '#303030',
+                      }}
+                    >
                       Email address
                       <input
+                        ref={helpEmailRef}
                         type="email"
                         value={helpForm.email}
-                        onChange={(e) => setHelpForm((f) => ({ ...f, email: e.target.value }))}
+                        onChange={(e) =>
+                          setHelpForm((f) => ({ ...f, email: e.target.value }))
+                        }
                         placeholder="you@example.com"
+                        aria-describedby={helpErr ? 'help-error' : undefined}
                         style={{
                           width: '100%',
                           height: 38,
@@ -430,17 +533,32 @@ export default function LoginPage({ onSubmit: onSubmitProp }) {
                           background: '#fff9c6',
                           padding: '0 10px',
                           outline: 'none',
+                          fontFamily: 'Poppins, sans-serif',
+                          color: '#303030',
+                          boxSizing: 'border-box',
                         }}
                       />
                     </label>
 
-                    <label style={{ fontSize: 13 }}>
+                    <label
+                      style={{
+                        fontSize: 13,
+                        fontFamily: 'Poppins, sans-serif',
+                        color: '#303030',
+                      }}
+                    >
                       Your question
                       <textarea
                         rows={3}
                         value={helpForm.message}
-                        onChange={(e) => setHelpForm((f) => ({ ...f, message: e.target.value }))}
+                        onChange={(e) =>
+                          setHelpForm((f) => ({
+                            ...f,
+                            message: e.target.value,
+                          }))
+                        }
                         placeholder="Tell us what's going on…"
+                        aria-describedby={helpErr ? 'help-error' : undefined}
                         style={{
                           width: '100%',
                           marginTop: 4,
@@ -450,16 +568,40 @@ export default function LoginPage({ onSubmit: onSubmitProp }) {
                           padding: '8px 10px',
                           resize: 'vertical',
                           outline: 'none',
+                          fontFamily: 'Poppins, sans-serif',
+                          color: '#303030',
+                          boxSizing: 'border-box',
                         }}
                       />
                     </label>
 
-                    {helpErr && <div style={{ color: '#9b1c1c', fontSize: 12 }}>{helpErr}</div>}
+                    {helpErr && (
+                      <div
+                        id="help-error"
+                        role="alert"
+                        style={{
+                          color: '#9b1c1c',
+                          fontSize: 12,
+                          fontFamily: 'Poppins, sans-serif',
+                          lineHeight: 1.45,
+                        }}
+                      >
+                        {helpErr}
+                      </div>
+                    )}
 
-                    <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        gap: 8,
+                        justifyContent: 'flex-end',
+                        marginTop: 2,
+                      }}
+                    >
                       <button
                         type="button"
                         onClick={() => setOpen(false)}
+                        disabled={helpSubmitting}
                         style={{
                           height: 32,
                           padding: '0 10px',
@@ -467,13 +609,17 @@ export default function LoginPage({ onSubmit: onSubmitProp }) {
                           border: '1px solid rgba(0,0,0,.15)',
                           background: '#fff',
                           color: '#303030',
-                          cursor: 'pointer',
+                          cursor: helpSubmitting ? 'not-allowed' : 'pointer',
+                          fontFamily: 'Poppins, sans-serif',
+                          opacity: helpSubmitting ? 0.7 : 1,
                         }}
                       >
                         Cancel
                       </button>
                       <button
                         type="submit"
+                        disabled={helpSubmitting}
+                        aria-busy={helpSubmitting}
                         style={{
                           height: 32,
                           padding: '0 12px',
@@ -481,10 +627,13 @@ export default function LoginPage({ onSubmit: onSubmitProp }) {
                           border: 'none',
                           background: '#303030',
                           color: '#ffe070',
-                          cursor: 'pointer',
+                          cursor: helpSubmitting ? 'not-allowed' : 'pointer',
+                          boxShadow: '0 1px 0 rgba(0,0,0,.2)',
+                          fontFamily: 'Poppins, sans-serif',
+                          opacity: helpSubmitting ? 0.7 : 1,
                         }}
                       >
-                        Send
+                        {helpSubmitting ? 'Sending...' : 'Send'}
                       </button>
                     </div>
                   </form>
@@ -516,7 +665,12 @@ function Field({ id, type = 'text', placeholder, value, onChange, onClear }) {
           autoComplete={id}
         />
         {!!value && (
-          <button type="button" aria-label="Clear" onClick={onClear} style={suffixBtn(12)}>
+          <button
+            type="button"
+            aria-label="Clear"
+            onClick={onClear}
+            style={suffixBtn(12)}
+          >
             ×
           </button>
         )}
