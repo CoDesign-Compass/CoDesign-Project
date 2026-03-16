@@ -93,12 +93,52 @@ public class AIDataProcessingService {
         return result;
     }
 
-    private void addIfValid(List<QAItemDto> list, int questionIndex, String rawAnswer) {
-        String cleaned = cleanText(rawAnswer);
-        if (cleaned != null) {
-            list.add(new QAItemDto(questionIndex, cleaned));
-        }
+    private boolean isMeaningfulAnswer(String text) {
+    if (text == null) {
+        return false;
     }
+
+    String lower = text.toLowerCase();
+
+    // common non-answer patterns
+    if (lower.equals("idk")
+            || lower.equals("i dont know")
+            || lower.equals("i don't know")
+            || lower.equals("n/a")
+            || lower.equals("na")
+            || lower.equals("none")) {
+        return false;
+    }
+
+    // remove spaces for checks
+    String compact = text.replaceAll("\\s+", "");
+
+    // only punctuation/symbols
+    if (compact.matches("^[\\p{Punct}\\p{S}]+$")) {
+        return false;
+    }
+
+    // only digits
+    if (compact.matches("^\\d+$")) {
+        return false;
+    }
+
+    // too short and no clear language value
+    if (compact.length() <= 2) {
+        return false;
+    }
+
+    return true;
+}
+
+    private void addIfValid(List<QAItemDto> list, int questionIndex, String rawAnswer) {
+    String cleaned = cleanText(rawAnswer);
+    if (isMeaningfulAnswer(cleaned)) {
+        list.add(new QAItemDto(questionIndex, cleaned));
+    }
+
+    
+}
 
     private String cleanText(String text) {
         if (text == null) {
