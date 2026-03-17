@@ -159,7 +159,7 @@ const CurrentQuestionDistribution = () => {
           currentQuestions.map((stat) => (
             <Link
               key={stat.questionId}
-              to={`/issue/${stat.questionId.toLowerCase()}`}
+              to={`/admin/issue-report/${stat.questionId}`}
             >
               <div className="rounded-xl border border-gray-200 bg-gradient-to-r from-gray-50 to-white p-4 transition-all hover:shadow-md dark:border-gray-700 dark:from-gray-800/50 dark:to-gray-800/30"
               >
