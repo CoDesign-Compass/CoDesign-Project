@@ -26,6 +26,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      ollama:
+        condition: service_started
     environment:
       SPRING_PROFILES_ACTIVE: docker
       POSTGRES_DB: ${POSTGRES_DB:-codesign}
@@ -33,6 +35,27 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     ports:
       - "${API_PORT:-8080}:8080"
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: cdc_ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - cdc_ollama_data:/root/.ollama
+
+  ollama-pull:
+    image: curlimages/curl:latest
+    container_name: cdc_ollama_pull
+    depends_on:
+      - ollama
+    command: >
+      sh -c "while ! curl -s http://ollama:11434/api/tags > /dev/null; do
+        sleep 5;
+      done;
+      echo 'Ollama is up, pulling model llama3.2:3b...';
+      curl -X POST http://ollama:11434/api/pull -d '{\"name\": \"llama3.2:3b\"}'"
 
   web:
     # Frontend build context and dockerfile location
@@ -50,3 +73,4 @@ services:
 
 volumes:
   cdc_pgdata:
+  cdc_ollama_data:
