@@ -17,6 +17,16 @@ services:
       timeout: 5s
       retries: 20
 
+  ollama:
+    image: ollama/ollama
+    container_name: cdc_ollama
+    restart: unless-stopped
+    ports:
+       - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
+
   api:
     build:
       context: ./backend
@@ -26,11 +36,20 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      ollama:
+        condition: service_started  
     environment:
       SPRING_PROFILES_ACTIVE: docker
+
+      DB_HOST: db
+      DB_PORT: 5432
       POSTGRES_DB: ${POSTGRES_DB:-codesign}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+
+      OLLAMA_BASE_URL: http://ollama:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.1:8b}
+      OLLAMA_TIMEOUT_MS: ${OLLAMA_TIMEOUT_MS:-60000}
     ports:
       - "${API_PORT:-8080}:8080"
 
@@ -50,3 +69,4 @@ services:
 
 volumes:
   cdc_pgdata:
+  ollama_data:
