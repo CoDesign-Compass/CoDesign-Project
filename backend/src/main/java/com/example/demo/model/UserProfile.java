@@ -14,7 +14,8 @@ import java.util.Set;
 @Table(name = "user_profiles")
 public class UserProfile {
     @Id
-    private String userId; // use userId as primary key
+    @Column(name = "submission_id")
+    private String submissionId;
 
     @Column(nullable = false)
     private String name;
@@ -22,7 +23,7 @@ public class UserProfile {
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "user_profile_tags",
-        joinColumns = @JoinColumn(name = "user_id"),
+        joinColumns = @JoinColumn(name = "submission_id"),
         inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private Set<Tag> selectedTags = new HashSet<>();

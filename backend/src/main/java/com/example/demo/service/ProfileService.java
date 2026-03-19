@@ -27,10 +27,10 @@ public class ProfileService {
         return tagRepository.findByCategory(category);
     }
 
-    public UserProfile saveProfile(String userId, String name, List<Long> tagIds) {
-        UserProfile profile = userProfileRepository.findById(userId)
+    public UserProfile saveProfile(String submissionId, String name, List<Long> tagIds) {
+        UserProfile profile = userProfileRepository.findById(submissionId)
                 .orElse(new UserProfile());
-        profile.setUserId(userId);
+        profile.setSubmissionId(submissionId);
         profile.setName(name);
 
         Set<Tag> tags = tagRepository.findAllById(tagIds).stream().collect(Collectors.toSet());
@@ -39,18 +39,18 @@ public class ProfileService {
         return userProfileRepository.save(profile);
     }
 
-    public Optional<UserProfile> getProfile(String userId) {
-        return userProfileRepository.findById(userId);
+    public Optional<UserProfile> getProfile(String submissionId) {
+        return userProfileRepository.findById(submissionId);
     }
 
     @Transactional
-    public Tag createCustomTag(String label, String category, String color, String userId) {
+    public Tag createCustomTag(String label, String category, String color, String submissionId) {
         Tag tag = new Tag();
         tag.setLabel(label);
         tag.setCategory(category);
         tag.setColor(color);
         tag.setSystem(false);
-        tag.setCreatedBy(userId);
+        tag.setCreatedBy(submissionId);
         return tagRepository.save(tag);
     }
 }
