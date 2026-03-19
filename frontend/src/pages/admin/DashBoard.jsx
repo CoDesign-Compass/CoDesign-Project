@@ -3,6 +3,12 @@ import MonthlySalesChart from '../../components/tailadmin/ecommerce/MonthlySales
 import EcommerceMetrics from '../../components/tailadmin/ecommerce/EcommerceMetrics'
 import MonthlyTarget from '../../components/tailadmin/ecommerce/AnalysisReport'
 import Issues from '../../components/tailadmin/ecommerce/Issues'
+import QuestionnaireMetrics from '../../components/questionnaire/QuestionnaireMetrics'
+import QuestionOptionDistributionChart from '../../components/questionnaire/QuestionOptionDistributionChart'
+import QuestionnaireFlowChart from '../../components/questionnaire/QuestionnaireFlowChart'
+// import WordCloudComponent from '../../components/questionnaire/WordCloudComponent'
+import CurrentQuestionDistribution from '../../components/questionnaire/CurrentQuestionDistribution'
+
 
 const SectionCard = ({
   title,
@@ -58,103 +64,55 @@ const EmptyStateCard = ({
 
 const DashBoard = () => {
   return (
-    <div className="space-y-6">
-      {/* Page header */}
-      <div className="flex flex-col gap-2">
-        <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
-          Dashboard
-        </h1>
-        <p className="text-sm leading-6 text-gray-500 dark:text-gray-400">
-          Review issue activity, metrics, charts, and analysis in a clearer and
-          more consistent layout.
-        </p>
-      </div>
-
-      {/* Main content grid */}
-      <div className="grid grid-cols-12 gap-4 md:gap-6">
-        {/* Full width issues section */}
-        <div className="col-span-12">
-          <SectionCard
-            title="Issues Overview"
-            subtitle="Monitor recent issue activity and quickly scan the current reporting status."
-            bodyClassName="p-0"
-          >
-            <div className="p-5 md:p-6">
-              <Issues />
-            </div>
-          </SectionCard>
+    <>
+      <div className="min-h-screen bg-gray-50 p-4 dark:bg-gray-900 md:p-6">
+      <div className="mx-auto max-w-[1600px]">
+        {/* Page Title */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white md:text-3xl">
+            Data Dashboard
+          </h1>
         </div>
 
-        {/* Left column */}
-        <div className="col-span-12 space-y-6 xl:col-span-7">
-          <SectionCard
-            title="Key Metrics"
-            subtitle="A concise summary of the most important issue and engagement indicators."
-          >
-            <EcommerceMetrics />
-          </SectionCard>
+        {/* Dashboard Grid Layout */}
+        <div className="grid grid-cols-12 gap-4 md:gap-6">
 
-          <SectionCard
-            title="Monthly Trends"
-            subtitle="Track changes over time to support better reporting and decision-making."
-          >
-            <MonthlySalesChart />
-          </SectionCard>
-        </div>
+          {/* Top KPI Overview */}
+          <div className="col-span-12">
+            <QuestionnaireMetrics />
+          </div>
 
-        {/* Right column */}
-        <div className="col-span-12 xl:col-span-5">
-          <SectionCard
-            title="Analysis Report"
-            subtitle="View the latest analysis summary in a dedicated panel with clearer separation."
-          >
-            <MonthlyTarget />
-          </SectionCard>
-        </div>
+          {/* Top Area - Question Reach Status */}
+          <div className="col-span-12">
+            <CurrentQuestionDistribution />
+          </div>
 
-        {/* Reserved block / future extension */}
-        <div className="col-span-12 xl:col-span-5">
-          <SectionCard
-            title="Additional Insights"
-            subtitle="This space is reserved for future dashboard content or supporting reports."
-          >
-            <EmptyStateCard
-              title="No content available yet"
-              description="This section is intentionally kept as a placeholder so future charts or supporting widgets can be added without changing the overall dashboard layout."
-              minHeight="min-h-[220px]"
-            />
-          </SectionCard>
-        </div>
+          {/* Left Middle Area - Quantitative Statistics (7 columns) */}
+          <div className="col-span-12 space-y-6 xl:col-span-7">
+            <QuestionOptionDistributionChart />
+          </div>
 
-        {/* Word cloud */}
-        <div className="col-span-12">
-          <SectionCard
-            title="Word Cloud"
-            subtitle="A visual summary of the most frequently appearing terms from issue-related content."
-          >
-            <EmptyStateCard
-              title="Word cloud preview"
-              description="The word cloud area is kept visually ready for content. When connected, this panel should display high-frequency terms in a clean and readable way."
-              minHeight="min-h-[320px]"
-            />
-          </SectionCard>
-        </div>
+          {/* Right Middle Area - Path Analysis (5 columns) */}
+          <div className="col-span-12 xl:col-span-5">
+            <QuestionnaireFlowChart />
+          </div>
 
-        {/* Reserved wide section */}
-        <div className="col-span-12 xl:col-span-7">
-          <SectionCard
-            title="Upcoming Panel"
-            subtitle="Reserved for future tables, reports, or other supporting content."
-          >
-            <EmptyStateCard
-              title="Nothing to display"
-              description="This empty state prevents the layout from feeling broken and makes unfinished areas look intentional rather than accidental."
-              minHeight="min-h-[220px]"
-            />
-          </SectionCard>
+          {/* Bottom Area - Qualitative Analysis (Word Cloud) */}
+          {/* <div className="col-span-12">
+            <WordCloudComponent />
+          </div> */}
+
+          
+
+
+      
+
         </div>
       </div>
     </div>
+
+
+    </>
   )
 }
 

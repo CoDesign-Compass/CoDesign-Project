@@ -156,6 +156,7 @@ function App() {
               <Route path="dashboard" element={<DashBoard />} />
               <Route path="new-issue" element={<CreateNewIssue />} />
               <Route path="issue-report" element={<IssueReport />} />
+              <Route path="issue-report/:issueId" element={<IssueReport />} />
               <Route path="why-report" element={<WhyReport />} />
               <Route path="how-report" element={<HowReport />} />
               <Route path="profile-report" element={<ProfileReport />} />
