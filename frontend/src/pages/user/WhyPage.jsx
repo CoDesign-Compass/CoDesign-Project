@@ -36,6 +36,8 @@ export default function WhyPage() {
   const hintCardBackground = isDark ? '#1f1f1f' : '#f8f9fa'
   const navigate = useNavigate()
 
+  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'
+
   const submitWhy = async () => {
     const body = {
       shareId: routeShareId,
@@ -47,7 +49,7 @@ export default function WhyPage() {
       answer5: answers[4],
     }
 
-    const response = await fetch('http://localhost:8080/api/why', {
+    const response = await fetch(`${API_BASE}/api/why`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
