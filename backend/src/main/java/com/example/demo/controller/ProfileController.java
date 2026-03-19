@@ -17,17 +17,17 @@ import java.util.List;
 public class ProfileController {
     private final ProfileService profileService;
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<UserProfile> getProfile(@PathVariable String userId) {
-        return ResponseEntity.ok(profileService.getProfile(userId)
-                .orElse(new UserProfile(userId, "", new java.util.HashSet<>())));
+    @GetMapping("/{submissionId}")
+    public ResponseEntity<UserProfile> getProfile(@PathVariable String submissionId) {
+        return ResponseEntity.ok(profileService.getProfile(submissionId)
+                .orElse(new UserProfile(submissionId, "", new java.util.HashSet<>())));
     }
 
-    @PostMapping("/{userId}")
+    @PostMapping("/{submissionId}")
     public ResponseEntity<UserProfile> saveProfile(
-            @PathVariable String userId,
+            @PathVariable String submissionId,
             @RequestBody ProfileRequest request) {
-        UserProfile profile = profileService.saveProfile(userId, request.getName(), request.getTagIds());
+        UserProfile profile = profileService.saveProfile(submissionId, request.getName(), request.getTagIds());
         return ResponseEntity.ok(profile);
     }
 
@@ -42,7 +42,7 @@ public class ProfileController {
                 request.getLabel(),
                 request.getCategory(),
                 request.getColor(),
-                request.getUserId()
+                request.getSubmissionId()
         );
         return ResponseEntity.ok(tag);
     }
@@ -58,6 +58,6 @@ public class ProfileController {
         private String label;
         private String category;
         private String color;
-        private String userId;
+        private String submissionId;
     }
 }
