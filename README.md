@@ -32,4 +32,5 @@ CoDesignCompass aims to provide a simple, secure, and user-friendly platform to 
 For detailed project documentation, including product backlog, user stories, risk log, and sprint retrospectives, please refer to our [wiki.md](https://github.com/AriaFung/CoDesign-Project/blob/main/wiki.md)
 
 ## Online Deployment
-Frontend prototype deployed to Netlify: [codesign-compass.netlify.app](https://codesign-compass.netlify.app/)
+Frontend deployed to Netlify: [codesign-compass.netlify.app](https://codesign-compass.netlify.app/)
+Backend and Database deployed to Render: [codesign-project.onrender](https://codesign-project.onrender.com)
