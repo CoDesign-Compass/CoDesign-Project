@@ -13,6 +13,7 @@ This is the central documentation hub for CoDesign Compass.
 [Project Introduction](https://github.com/AriaFung/CoDesign-Project/blob/main/docs/Persona%2C%20Product%20Vison%20and%20Project%20Introduction/Project%20Introduction.md)
 ## Project Vision
 [Product Vision](https://github.com/AriaFung/CoDesign-Project/blob/main/docs/Persona%2C%20Product%20Vison%20and%20Project%20Introduction/Product%20Vision.md)
+
 ## Programming Language
 Frontend: CSS, HTML, React
 <br>Backend: Java
@@ -55,11 +56,11 @@ Frontend: CSS, HTML, React
 ## Sprints
 |Sprint|Goals|Due Date|Sprint Review&Retro Meeting|Pre slides|
 |----|----|----|---|---|
-|Sprint 1|1.Set up<br>2.deliver user story, persona, scenario, product vision<br>3.Deliever a low-fidelity UI prototype|21 Aug 2025|--|--|
-|Sprint 2|1.Adopt Material Design 3 (MD3) across the prototype<br>2.Implement frontend UI work without interaction(user side)|2 Oct 2025|[Sprint 2 Retro](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/Sprint%202%20Retro.md)<br>[Sprint 2 review](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/Sprint%202%20Review.md)|[sprint 2 slides](https://www.canva.com/design/DAGz8eY40TQ/qhAQETG0Ld8WvToFRh5nmQ/edit?utm_content=DAGz8eY40TQ&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)|
-|Sprint 3|1.Implement frontend UI work without interaction(Admin side)<br>2.Modify the frontend based on the client's feedback|23 Oct 2025|[Sprint 3 Retro](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/Sprint%203%20Retro.md)<br>[Sprint 3 review](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/Sprint%203%20Review.md)||
-|Sprint 4|1.Establish the backend environment with Docker<br>2.Define the API technology stack and documentation tools<br>3.Implement backend and initial APIs integrated with the frontend.|12 March 2026||[Sprint 4 slides](https://www.canva.com/design/DAHDC0efrws/KXlTu1u4qoX7xVbqe59hGw/view?utm_content=DAHDC0efrws&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h33a915251c)|
-|Sprint 5||2 April 2026|||
+|Sprint 1|1. Set up<br>2. deliver user story, persona, scenario, product vision<br>3. Deliever a low-fidelity UI prototype|21 Aug 2025|--|--|
+|Sprint 2|1. Adopt Material Design 3 (MD3) across the prototype<br>2. Implement frontend UI work without interaction(user side)|2 Oct 2025|[Sprint 2 Retro](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/Sprint%202%20Retro.md)<br>[Sprint 2 review](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/Sprint%202%20Review.md)|[sprint 2 slides](https://www.canva.com/design/DAGz8eY40TQ/qhAQETG0Ld8WvToFRh5nmQ/edit?utm_content=DAGz8eY40TQ&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)|
+|Sprint 3|1. Implement frontend UI work without interaction(Admin side)<br>2. Modify the frontend based on the client's feedback|23 Oct 2025|[Sprint 3 Retro](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/Sprint%203%20Retro.md)<br>[Sprint 3 review](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/Sprint%203%20Review.md)||
+|Sprint 4|1. Establish the backend environment with Docker<br>2. Define the API technology stack and documentation tools<br>3. Implement backend and initial APIs integrated with the frontend.|12 March 2026|[Sprint 4 Retro](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/Sprint%204%20Retro.md)<br>[Sprint 4 review](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/Sprint%204%20Review.md)|[Sprint 4 slides](https://www.canva.com/design/DAHDC0efrws/KXlTu1u4qoX7xVbqe59hGw/view?utm_content=DAHDC0efrws&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h33a915251c)|
+|Sprint 5|1. Refine and enhance core system features based on stakeholder feedback, including authentication, email and coupon distribution, data analysis, and report improvements.<br>2. Improve the overall UI/UX to deliver a more intuitive, consistent, and polished user experience.<br>3. Strengthen system infrastructure by integrating persistent database connectivity and advancing AI-powered functionality.<br>4. Implement report export capabilities to support reporting and documentation needs.<br>5. Deploy the full system, including frontend, backend, and database services, to a live online environment.|2 April 2026|||
 |Sprint 6||7 May 2026|||
 
 ## Meeting Records
@@ -80,7 +81,7 @@ Frontend: CSS, HTML, React
 |---|---|
 |week 1|[S1 Week1 Tutoring Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week1%20Tutor%20Meeting.md)<br>[S1 Week1 Team Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%201%20Team%20Meeting.md)|
 |week 2|[S1 Week2 Tutor Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%202%20Tutor%20Meeting.md)<br>[S1 Week2 Team Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%202%20Team%20Meeting.md)|
-|week 3||
+|week 3|[S1 Week3 Tutor Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%203%20Tutor%20Meeting.md)<br>[S1 Week3 Team Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%203%20Team%20Meeting.md)<br>[S1 Week3 Client Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%203%20Client%20Meeting.md)|
 |week 4||
 |week 5||
 |week 6||
@@ -92,13 +93,13 @@ Frontend: CSS, HTML, React
 | Task  | Estimate (Story Points) |
 |------|-------|
 | 9 Meeting Minutes | 4 SP |
-| Low-Fidelity UI Prototype| 8 SP | 
+| Low-Fidelity UI Prototype| 8 SP |
 | User Story + Persona + Scenario| 7 SP |
 | Product Vision, Product Discription and Analysis| 3 SP |
 | Initial Project Setup (GitHub, ReadMe, etc.) | 3 SP |
 | **Total**| 22 SP|
 ### Sprint 2
-| Task| Estimate (Story Points) | 
+| Task| Estimate (Story Points) |
 |----|----|
 |Meeting minutes|3 SP|
 |Risk log & reflection log & project challenges|4 SP|
@@ -125,4 +126,15 @@ Frontend: CSS, HTML, React
 |Implement backend and initial APIs integrated with the frontend|36 SP|
 |Deploy frontend prototype to Netlify|1 SP|
 |**Total** |46 SP|
-
+### Sprint 5
+| Task| Estimate (Story Points) |
+| ---------------------------------------------------------------------------- | ----------------------- |
+| Meeting minutes & Risk log & reflection log & project challenges (documents) | 6 SP                    |
+| Implement login functionality and user authentication flow                   | 6 SP                    |
+| Implement email notification and coupon sending feature                      | 5 SP                    |
+| Connect backend services with database and ensure stable integration         | 4 SP                    |
+| Implement AI data processing and analysis module                             | 10 SP                   |
+| Generate structured AI reports and support report export                     | 8 SP                    |
+| Deploy AI components and backend services to server environment              | 5 SP                    |
+| Deploy full application prototype to server (frontend + backend)             | 4 SP                    |
+| **Total**                                                                    | 48 SP                   |

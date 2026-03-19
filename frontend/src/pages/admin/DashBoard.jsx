@@ -1,5 +1,4 @@
 import React from 'react'
-import BarChartOne from '../../components/tailadmin/charts/bar/BarChartOne'
 import MonthlySalesChart from '../../components/tailadmin/ecommerce/MonthlySalesChart'
 import EcommerceMetrics from '../../components/tailadmin/ecommerce/EcommerceMetrics'
 import MonthlyTarget from '../../components/tailadmin/ecommerce/AnalysisReport'
@@ -11,7 +10,57 @@ import QuestionnaireFlowChart from '../../components/questionnaire/Questionnaire
 import CurrentQuestionDistribution from '../../components/questionnaire/CurrentQuestionDistribution'
 
 
-// --- dashboard components ---
+const SectionCard = ({
+  title,
+  subtitle,
+  children,
+  className = '',
+  bodyClassName = '',
+}) => {
+  return (
+    <section
+      className={`overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-white/[0.03] ${className}`}
+    >
+      {(title || subtitle) && (
+        <div className="border-b border-gray-100 px-5 py-4 dark:border-gray-800 md:px-6">
+          {title && (
+            <h2 className="text-base font-semibold text-gray-800 dark:text-white/90">
+              {title}
+            </h2>
+          )}
+          {subtitle && (
+            <p className="mt-1 text-sm leading-6 text-gray-500 dark:text-gray-400">
+              {subtitle}
+            </p>
+          )}
+        </div>
+      )}
+
+      <div className={`p-5 md:p-6 ${bodyClassName}`}>{children}</div>
+    </section>
+  )
+}
+
+const EmptyStateCard = ({
+  title,
+  description,
+  minHeight = 'min-h-[260px]',
+}) => {
+  return (
+    <div
+      className={`flex ${minHeight} flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-gray-50/60 px-6 py-10 text-center dark:border-gray-700 dark:bg-white/[0.02]`}
+    >
+      <div className="max-w-md">
+        <h3 className="text-base font-semibold text-gray-800 dark:text-white/90">
+          {title}
+        </h3>
+        <p className="mt-2 text-sm leading-6 text-gray-500 dark:text-gray-400">
+          {description}
+        </p>
+      </div>
+    </div>
+  )
+}
 
 const DashBoard = () => {
   return (

@@ -4,11 +4,15 @@ import { useIssue } from '../../context/IssueContext'
 
 export default function LoginPage({ onSubmit: onSubmitProp }) {
   const { shareId: routeShareId } = useParams()
-  const { setShareId } = useIssue()
-  const { shareId } = useIssue()
-const currentShareId = routeShareId || shareId
+  const { shareId, setShareId } = useIssue()
+  const currentShareId = routeShareId || shareId
 
-const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
+  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'
+
+  // DEV admin shortcut (from .env)
+  const ADMIN_EMAIL = process.env.REACT_APP_ADMIN_EMAIL || ''
+  const ADMIN_PASSWORD = process.env.REACT_APP_ADMIN_PASSWORD || ''
+
   // ---- FORM ----
   const [form, setForm] = useState({
     email: '',
@@ -17,23 +21,51 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
   })
   const [showPw, setShowPw] = useState(false)
 
-  // ---- Help bubble outside-click ----
+  // ---- Login feedback ----
+  const [loginErr, setLoginErr] = useState('')
+  const [loginSubmitting, setLoginSubmitting] = useState(false)
+
+  // ---- Help bubble ----
   const [open, setOpen] = useState(false)
+  const [helpForm, setHelpForm] = useState({ email: '', message: '' })
+  const [helpSent, setHelpSent] = useState(false)
+  const [helpErr, setHelpErr] = useState('')
+  const [helpSubmitting, setHelpSubmitting] = useState(false)
+
   const popRef = useRef(null)
+  const helpEmailRef = useRef(null)
   const navigate = useNavigate()
 
   useEffect(() => {
     const onDown = (e) => {
-      if (popRef.current && !popRef.current.contains(e.target)) setOpen(false)
+      if (popRef.current && !popRef.current.contains(e.target)) {
+        setOpen(false)
+      }
     }
+
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setOpen(false)
+      }
+    }
+
     document.addEventListener('mousedown', onDown)
-    return () => document.removeEventListener('mousedown', onDown)
+    document.addEventListener('keydown', onKeyDown)
+
+    return () => {
+      document.removeEventListener('mousedown', onDown)
+      document.removeEventListener('keydown', onKeyDown)
+    }
   }, [])
 
   useEffect(() => {
-    if (routeShareId) {
-      setShareId(routeShareId)
+    if (open) {
+      helpEmailRef.current?.focus()
     }
+  }, [open])
+
+  useEffect(() => {
+    if (routeShareId) setShareId(routeShareId)
   }, [routeShareId, setShareId])
 
   const change = (k) => (e) =>
@@ -42,50 +74,104 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
       [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value,
     }))
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    onSubmitProp?.(form)
+    setLoginErr('')
+
+    try {
+      setLoginSubmitting(true)
+
+      const res = await fetch(`${API_BASE}/api/users/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: form.email.trim(),
+          password: form.password,
+        }),
+      })
+
+      const text = await res.text()
+      const data = text ? JSON.parse(text) : {}
+
+      if (!res.ok) {
+        throw new Error(data?.message || text || `HTTP ${res.status}`)
+      }
+
+      localStorage.setItem('userId', String(data.userId || data.id || ''))
+      localStorage.setItem('userRole', data.role || 'USER')
+
+      const role = (data.role || '').toUpperCase()
+      if (role === 'ADMIN') {
+        navigate('/admin/dashboard')
+        return
+      }
+
+      if (currentShareId) navigate(`/share/${currentShareId}/profile`)
+      else navigate('/profile')
+    } catch (err) {
+      console.error(err)
+      setLoginErr('Login failed: ' + err.message)
+    } finally {
+      setLoginSubmitting(false)
+    }
   }
 
-  // help form
-  const [helpForm, setHelpForm] = useState({ email: '', message: '' })
-  const [helpSent, setHelpSent] = useState(false)
-  const [helpErr, setHelpErr] = useState('')
+  const handleHelpToggle = () => {
+    setOpen((prev) => {
+      const next = !prev
+      if (next) {
+        setHelpErr('')
+        setHelpSent(false)
+      }
+      return next
+    })
+  }
 
   const handleHelpSubmit = async (e) => {
-    e.preventDefault();
-    setHelpErr("");
-    const validEmail = /^\S+@\S+\.\S+$/.test(helpForm.email);
-    if (!validEmail) return setHelpErr("Please enter a valid email.");
-    if (helpForm.message.trim().length < 5) {
-      return setHelpErr("Tell us a bit more (≥ 5 characters).");
+    e.preventDefault()
+    setHelpErr('')
+
+    const validEmail = /^\S+@\S+\.\S+$/.test(helpForm.email)
+    if (!validEmail) {
+      setHelpErr('Please enter a valid email address.')
+      return
     }
+
+    if (helpForm.message.trim().length < 5) {
+      setHelpErr('Please provide a little more detail (at least 5 characters).')
+      return
+    }
+
+    setHelpSubmitting(true)
 
     try {
       const payload = {
         email: helpForm.email.trim(),
         message: helpForm.message.trim(),
-        shareId: currentShareId || localStorage.getItem("shareId") || null,
-        issueId: Number(localStorage.getItem("issueId")) || null,
-        submissionId: Number(localStorage.getItem("submissionId")) || null,
+        shareId: currentShareId || localStorage.getItem('shareId') || null,
+        issueId: Number(localStorage.getItem('issueId')) || null,
+        submissionId: Number(localStorage.getItem('submissionId')) || null,
         pagePath: window.location.pathname,
-      };
+      }
 
       const res = await fetch(`${API_BASE}/api/help`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
-      });
+      })
 
-      const text = await res.text();
-      if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
+      const text = await res.text()
+      if (!res.ok) throw new Error(text || `HTTP ${res.status}`)
 
-      setHelpSent(true);
-      } catch (err) {
-      console.error(err);
-      setHelpErr("Send failed: " + err.message);
+      setHelpSent(true)
+      setHelpForm({ email: '', message: '' })
+    } catch (err) {
+      console.error(err)
+      setHelpErr('We could not send your message. Please try again.')
+    } finally {
+      setHelpSubmitting(false)
     }
-  };
+  }
 
   const container = { width: 'min(960px, 92vw)', margin: '0 auto' }
 
@@ -143,7 +229,7 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
         >
           <style>{`
             .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,1px,1px);white-space:nowrap;border:0;}
-            .input{width:100%;height:44px;border-radius:8px;border:1px solid #d8d8d8;background:#fff;color:#111;padding:0 44px 0 12px;font-size:16px;outline:none;}
+            .input{width:100%;height:44px;border-radius:8px;border:1px solid #d8d8d8;background:#fff;color:#111;padding:0 44px 0 12px;font-size:16px;outline:none;box-sizing:border-box;}
             .input:focus{border-color:#7aa2ff;}
           `}</style>
 
@@ -167,7 +253,6 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
               onClear={() => setForm((f) => ({ ...f, email: '' }))}
             />
 
-            {/* Password */}
             <div style={{ display: 'grid', gap: 6 }}>
               <label className="sr-only" htmlFor="password">
                 Password
@@ -181,6 +266,7 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
                   onChange={change('password')}
                   placeholder="Password"
                   autoComplete="current-password"
+                  aria-invalid={loginErr ? 'true' : 'false'}
                 />
                 <button
                   type="button"
@@ -237,13 +323,30 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
               <span>Remember me</span>
             </label>
 
+            {loginErr && (
+              <div
+                role="alert"
+                aria-live="assertive"
+                style={{
+                  color: '#9b1c1c',
+                  fontSize: 14,
+                  lineHeight: 1.45,
+                  textAlign: 'center',
+                  fontFamily: 'inherit',
+                }}
+              >
+                {loginErr}
+              </div>
+            )}
+
             <div
               style={{ display: 'grid', justifyItems: 'center', marginTop: 10 }}
             >
               <button
                 className="cta-btn"
                 type="submit"
-                onClick={() => navigate('/why')}
+                disabled={loginSubmitting}
+                aria-busy={loginSubmitting}
                 style={{
                   minWidth: 240,
                   padding: '12px 24px',
@@ -251,7 +354,8 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
                   background: '#2f2f2f',
                   border: '3px solid #ffe070',
                   color: '#fff',
-                  cursor: 'pointer',
+                  cursor: loginSubmitting ? 'not-allowed' : 'pointer',
+                  opacity: loginSubmitting ? 0.7 : 1,
                   boxShadow:
                     '0 2px 0 rgba(0,0,0,.25), inset 0 0 0 1px rgba(0,0,0,.08)',
                 }}
@@ -266,7 +370,7 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
                     textUnderlineOffset: '4px',
                   }}
                 >
-                  Login
+                  {loginSubmitting ? 'Logging in...' : 'Login'}
                 </span>
               </button>
             </div>
@@ -276,8 +380,12 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
             >
               <button
                 className="cta-btn"
-                type="submit"
-                onClick={() => navigate('/admin/dashboard')}
+                type="button"
+                onClick={() => {
+                  if (currentShareId)
+                    navigate(`/share/${currentShareId}/createaccount`)
+                  else navigate('/createaccount')
+                }}
                 style={{
                   minWidth: 240,
                   padding: '12px 24px',
@@ -300,7 +408,7 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
                     textUnderlineOffset: '4px',
                   }}
                 >
-                  Login to Admin
+                  Sign Up
                 </span>
               </button>
             </div>
@@ -320,7 +428,9 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
             <button
               aria-label="Help"
               title="Help"
-              onClick={() => setOpen((v) => !v)}
+              aria-expanded={open}
+              aria-controls="help-dialog"
+              onClick={handleHelpToggle}
               style={{
                 border: 'none',
                 background: 'transparent',
@@ -334,9 +444,13 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
                 style={{ height: 30, display: 'block' }}
               />
             </button>
+
             {open && (
               <div
-                role="tooltip"
+                id="help-dialog"
+                role="dialog"
+                aria-modal="false"
+                aria-labelledby="help-dialog-title"
                 style={{
                   position: 'absolute',
                   bottom: 'calc(100% + 8px)',
@@ -344,104 +458,182 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
                   width: 'min(320px, 86vw)',
                   background: '#ffe070',
                   color: '#303030',
-                  padding: '12px 14px',
+                  padding: '12px',
                   borderRadius: 8,
                   boxShadow: '0 8px 24px rgba(0,0,0,.18)',
                   zIndex: 1000,
                 }}
               >
-                <div
+                <h2
+                  id="help-dialog-title"
                   style={{
-                    position: 'absolute',
-                    bottom: -6,
-                    right: 14,
-                    width: 12,
-                    height: 12,
-                    background: '#fff',
-                    transform: 'rotate(45deg)',
-                    boxShadow: '-1px 1px 2px rgba(0,0,0,.05)',
+                    margin: '0 0 8px',
+                    fontSize: 16,
+                    fontWeight: 600,
+                    fontFamily: 'Poppins, sans-serif',
+                    color: '#303030',
                   }}
-                />
+                >
+                  Need help?
+                </h2>
+
+                <p
+                  style={{
+                    margin: '0 0 10px',
+                    fontSize: 13,
+                    lineHeight: 1.5,
+                    color: '#303030',
+                    fontFamily: 'Poppins, sans-serif',
+                  }}
+                >
+                  Send us your question and we’ll get back to you.
+                </p>
+
                 {helpSent ? (
-                  <div style={{ lineHeight: 1.55 }}>
+                  <div
+                    style={{
+                      lineHeight: 1.55,
+                      fontFamily: 'Poppins, sans-serif',
+                      color: '#303030',
+                    }}
+                  >
                     <p style={{ margin: 0, fontWeight: 600 }}>Thanks! 🎉</p>
                     <p style={{ margin: '6px 0 0' }}>
                       We’ve received your message and will get back to you soon.
                     </p>
                   </div>
                 ) : (
-                  <form onSubmit={handleHelpSubmit} style={{ display: "grid", gap: 8 }}>
-                    <label style={{ fontSize: 13 }}>
+                  <form
+                    onSubmit={handleHelpSubmit}
+                    style={{ display: 'grid', gap: 8 }}
+                  >
+                    <label
+                      style={{
+                        fontSize: 13,
+                        fontFamily: 'Poppins, sans-serif',
+                        color: '#303030',
+                      }}
+                    >
                       Email address
                       <input
+                        ref={helpEmailRef}
                         type="email"
                         value={helpForm.email}
-                        onChange={(e) => setHelpForm((f) => ({ ...f, email: e.target.value }))}
+                        onChange={(e) =>
+                          setHelpForm((f) => ({ ...f, email: e.target.value }))
+                        }
                         placeholder="you@example.com"
+                        aria-describedby={helpErr ? 'help-error' : undefined}
                         style={{
-                          width: "100%",
+                          width: '100%',
                           height: 38,
                           marginTop: 4,
                           borderRadius: 6,
-                          border: "1px solid #d8c25b",
-                          background: "#fff9c6",
-                          padding: "0 10px",
-                          outline: "none",
+                          border: '1px solid #d8c25b',
+                          background: '#fff9c6',
+                          padding: '0 10px',
+                          outline: 'none',
+                          fontFamily: 'Poppins, sans-serif',
+                          color: '#303030',
+                          boxSizing: 'border-box',
                         }}
                       />
                     </label>
 
-                    <label style={{ fontSize: 13 }}>
+                    <label
+                      style={{
+                        fontSize: 13,
+                        fontFamily: 'Poppins, sans-serif',
+                        color: '#303030',
+                      }}
+                    >
                       Your question
                       <textarea
                         rows={3}
                         value={helpForm.message}
-                        onChange={(e) => setHelpForm((f) => ({ ...f, message: e.target.value }))}
+                        onChange={(e) =>
+                          setHelpForm((f) => ({
+                            ...f,
+                            message: e.target.value,
+                          }))
+                        }
                         placeholder="Tell us what's going on…"
+                        aria-describedby={helpErr ? 'help-error' : undefined}
                         style={{
-                          width: "100%",
+                          width: '100%',
                           marginTop: 4,
                           borderRadius: 6,
-                          border: "1px solid #d8c25b",
-                          background: "#fffef0",
-                          padding: "8px 10px",
-                          resize: "vertical",
-                          outline: "none",
+                          border: '1px solid #d8c25b',
+                          background: '#fffef0',
+                          padding: '8px 10px',
+                          resize: 'vertical',
+                          outline: 'none',
+                          fontFamily: 'Poppins, sans-serif',
+                          color: '#303030',
+                          boxSizing: 'border-box',
                         }}
                       />
                     </label>
 
-                    {helpErr && <div style={{ color: "#9b1c1c", fontSize: 12 }}>{helpErr}</div>}
+                    {helpErr && (
+                      <div
+                        id="help-error"
+                        role="alert"
+                        style={{
+                          color: '#9b1c1c',
+                          fontSize: 12,
+                          fontFamily: 'Poppins, sans-serif',
+                          lineHeight: 1.45,
+                        }}
+                      >
+                        {helpErr}
+                      </div>
+                    )}
 
-                    <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        gap: 8,
+                        justifyContent: 'flex-end',
+                        marginTop: 2,
+                      }}
+                    >
                       <button
                         type="button"
                         onClick={() => setOpen(false)}
+                        disabled={helpSubmitting}
                         style={{
                           height: 32,
-                          padding: "0 10px",
+                          padding: '0 10px',
                           borderRadius: 6,
-                          border: "1px solid rgba(0,0,0,.15)",
-                          background: "#fff",
-                          color: "#303030",
-                          cursor: "pointer",
+                          border: '1px solid rgba(0,0,0,.15)',
+                          background: '#fff',
+                          color: '#303030',
+                          cursor: helpSubmitting ? 'not-allowed' : 'pointer',
+                          fontFamily: 'Poppins, sans-serif',
+                          opacity: helpSubmitting ? 0.7 : 1,
                         }}
                       >
                         Cancel
                       </button>
                       <button
                         type="submit"
+                        disabled={helpSubmitting}
+                        aria-busy={helpSubmitting}
                         style={{
                           height: 32,
-                          padding: "0 12px",
+                          padding: '0 12px',
                           borderRadius: 6,
-                          border: "none",
-                          background: "#303030",
-                          color: "#ffe070",
-                          cursor: "pointer",
+                          border: 'none',
+                          background: '#303030',
+                          color: '#ffe070',
+                          cursor: helpSubmitting ? 'not-allowed' : 'pointer',
+                          boxShadow: '0 1px 0 rgba(0,0,0,.2)',
+                          fontFamily: 'Poppins, sans-serif',
+                          opacity: helpSubmitting ? 0.7 : 1,
                         }}
                       >
-                        Send
+                        {helpSubmitting ? 'Sending...' : 'Send'}
                       </button>
                     </div>
                   </form>
@@ -487,7 +679,6 @@ function Field({ id, type = 'text', placeholder, value, onChange, onClear }) {
   )
 }
 
-/*clear all button(×) */
 function suffixBtn(rightPx) {
   return {
     position: 'absolute',

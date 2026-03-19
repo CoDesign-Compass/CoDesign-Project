@@ -1,4 +1,29 @@
-# misc
-# VS Code specific settings
+# Dependencies
+/node_modules
+/backend/target
+/frontend/node_modules
+/frontend/build
+
+# IDEs
+/.idea
 /.vscode
+*.iml
+*.iws
+*.ipr
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Misc
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.log
+
+# Maven
+.mvn/
+mvnw
+mvnw.cmd
