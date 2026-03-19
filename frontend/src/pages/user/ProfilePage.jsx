@@ -6,9 +6,11 @@ import { useTheme } from '../../context/ThemeContext'
 import '../../components/ProfilePage/ProfilePage.css'
 
 const API_BASE_URL = 'http://localhost:8080/api/profile'
-const CURRENT_USER_ID = 'dev-user' // Will be integrated with Auth module later
 
 export default function ProfilePage({ setOnNext }) {
+  // Retrieve submissionId from localStorage as the temporary userId
+  const [userId] = useState(() => localStorage.getItem('submissionId') || '')
+  
   const [tags, setTags] = useState([])
   const [name, setName] = useState('')
   const [activeTab, setActiveTab] = useState('Demographics')
@@ -36,6 +38,14 @@ export default function ProfilePage({ setOnNext }) {
 
   // 1. Define validation and save logic
   const handleSaveAndValidate = useCallback(async () => {
+    if (!userId) {
+      openModal(
+        'Session Error',
+        'We could not find your active session. Please go back to the start page.',
+      )
+      return false
+    }
+
     // Validation
     if (selectedTags.length === 0) {
       openModal(
@@ -51,7 +61,7 @@ export default function ProfilePage({ setOnNext }) {
       .map((t) => t.id)
 
     try {
-      const response = await fetch(`${API_BASE_URL}/${CURRENT_USER_ID}`, {
+      const response = await fetch(`${API_BASE_URL}/${userId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -74,7 +84,7 @@ export default function ProfilePage({ setOnNext }) {
       )
       return false // Intercept navigation on error
     }
-  }, [name, selectedTags, tags])
+  }, [name, selectedTags, tags, userId])
 
   // 2. Register callback to parent Layout
   useEffect(() => {
@@ -112,13 +122,13 @@ export default function ProfilePage({ setOnNext }) {
         const allTags = await tagsRes.json()
         setTags(allTags)
 
-        const profileRes = await fetch(`${API_BASE_URL}/${CURRENT_USER_ID}`)
-        if (profileRes.ok) {
-          const profile = await profileRes.json()
-          setName(profile.name || '')
-          setSelectedTags((profile.selectedTags || []).map((t) => t.label))
-
-          setSelectedTags([])
+        if (userId) {
+          const profileRes = await fetch(`${API_BASE_URL}/${userId}`)
+          if (profileRes.ok) {
+            const profile = await profileRes.json()
+            setName(profile.name || '')
+            setSelectedTags((profile.selectedTags || []).map((t) => t.label))
+          }
         }
       } catch (error) {
         console.error('Failed to fetch data:', error)
@@ -127,7 +137,7 @@ export default function ProfilePage({ setOnNext }) {
       }
     }
     fetchData()
-  }, [])
+  }, [userId])
 
   const handleTagClick = (tagLabel) => {
     setSelectedTags((prevSelected) =>
@@ -138,7 +148,7 @@ export default function ProfilePage({ setOnNext }) {
   }
 
   const handleCreateTag = async () => {
-    if (!inputValue.trim()) return
+    if (!inputValue.trim() || !userId) return
     const colors = [
       'yellow',
       'blue',
@@ -158,7 +168,7 @@ export default function ProfilePage({ setOnNext }) {
           label: inputValue.trim(),
           category: activeTab,
           color: randomColor,
-          userId: CURRENT_USER_ID,
+          userId: userId,
         }),
       })
 

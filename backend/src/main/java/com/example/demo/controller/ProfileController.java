@@ -19,9 +19,8 @@ public class ProfileController {
 
     @GetMapping("/{userId}")
     public ResponseEntity<UserProfile> getProfile(@PathVariable String userId) {
-        return profileService.getProfile(userId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(profileService.getProfile(userId)
+                .orElse(new UserProfile(userId, "", new java.util.HashSet<>())));
     }
 
     @PostMapping("/{userId}")
