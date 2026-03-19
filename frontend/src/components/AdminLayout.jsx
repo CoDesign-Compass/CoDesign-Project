@@ -28,10 +28,10 @@ const CloseIcon = (p) => (
 const navs = [
   { name: 'Dashboard', path: '/admin/dashboard' },
   { name: 'New Issue', path: '/admin/new-issue' },
-  { name: 'Why Report', path: '/admin/why-report' },
-  { name: 'How Report', path: '/admin/how-report' },
-  { name: 'Profile Report', path: '/admin/profile-report' },
-  { name: 'Engagement Report', path: '/admin/engagement-report' },
+  // { name: 'Why Report', path: '/admin/why-report' },
+  // { name: 'How Report', path: '/admin/how-report' },
+  // { name: 'Profile Report', path: '/admin/profile-report' },
+  // { name: 'Engagement Report', path: '/admin/engagement-report' },
   { name: 'Manage Users', path: '/admin/manage-users' },
 ]
 
