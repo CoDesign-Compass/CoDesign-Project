@@ -102,20 +102,6 @@ const DashBoard = () => {
             <MonthlySalesChart />
           </SectionCard>
         </div>
-
-        {/* Word cloud */}
-        <div className="col-span-12">
-          <SectionCard
-            title="Word Cloud"
-            subtitle="A visual summary of the most frequently appearing terms from issue-related content."
-          >
-            <EmptyStateCard
-              title="Word cloud preview"
-              description="The word cloud area is kept visually ready for content. When connected, this panel should display high-frequency terms in a clean and readable way."
-              minHeight="min-h-[320px]"
-            />
-          </SectionCard>
-        </div>
       </div>
     </div>
   )
