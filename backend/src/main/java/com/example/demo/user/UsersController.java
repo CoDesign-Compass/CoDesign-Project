@@ -4,13 +4,19 @@ import com.example.demo.user.dto.SignupRequest;
 import com.example.demo.user.dto.SignupResponse;
 import com.example.demo.user.dto.LoginRequest;
 import com.example.demo.user.dto.LoginResponse;
+import com.example.demo.user.dto.UserListItemResponse;
+import com.example.demo.user.dto.UpdateUserWantsUpdatesRequest;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
@@ -28,6 +34,41 @@ public class UsersController {
 
   public UsersController(UserRepository userRepository) {
     this.userRepository = userRepository;
+  }
+
+  @GetMapping
+  public ResponseEntity<List<UserListItemResponse>> listUsers() {
+    List<UserListItemResponse> payload = userRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"))
+        .stream()
+        .map(u -> new UserListItemResponse(
+            u.getId(),
+            u.getUsername(),
+            u.getEmail(),
+            u.isWantsUpdates(),
+            u.getCreatedAt()
+        ))
+        .toList();
+
+    return ResponseEntity.ok()
+        .cacheControl(CacheControl.noStore())
+        .body(payload);
+  }
+
+  @PatchMapping("/{id}/wants-updates")
+  public ResponseEntity<?> updateWantsUpdates(
+      @PathVariable Long id,
+      @Valid @RequestBody UpdateUserWantsUpdatesRequest req
+  ) {
+    User user = userRepository.findById(id)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found"));
+
+    user.setWantsUpdates(Boolean.TRUE.equals(req.getWantsUpdates()));
+    User saved = userRepository.save(user);
+
+    return ResponseEntity.ok(Map.of(
+        "id", saved.getId(),
+        "wantsUpdates", saved.isWantsUpdates()
+    ));
   }
 
   @PostMapping("/signup")

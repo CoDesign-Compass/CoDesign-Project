@@ -1,24 +1,114 @@
 import React, { useEffect, useState } from 'react'
+import Chart from 'react-apexcharts'
+import { useParams } from 'react-router-dom'
 import '../../components/AdminIssue/IssueReport.css'
 
 export default function IssueReport() {
   const [issue, setIssue] = useState(null)
+  const [participantCount, setParticipantCount] = useState(null)
+  const [avgResponseSeconds, setAvgResponseSeconds] = useState(null)
+  const [trendGranularity, setTrendGranularity] = useState('month')
+  const [trendSeriesData, setTrendSeriesData] = useState([])
+  const [trendCategories, setTrendCategories] = useState([])
+  const [trendLoading, setTrendLoading] = useState(false)
+  const [trendError, setTrendError] = useState('')
   const [loading, setLoading] = useState(true)
   const [pageError, setPageError] = useState('')
+  const [exportingRawType, setExportingRawType] = useState('')
 
   const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'
-  const handleExportRawData = () => {
-    console.log('export raw data')
+  const { issueId: routeIssueId } = useParams()
+  const params = new URLSearchParams(window.location.search)
+  const queryIssueId = params.get('issueId')
+  const issueId = routeIssueId || queryIssueId
+
+  const exportRawCsv = (type) => {
+    if (!issueId || exportingRawType) return
+    setExportingRawType(type)
+
+    try {
+      const encodedIssueId = encodeURIComponent(issueId)
+      const link = document.createElement('a')
+      link.href = `${API_BASE}/api/submissions/raw-data/${type}?issueId=${encodedIssueId}`
+      link.download = ''
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    } catch (err) {
+      console.error(err)
+      window.alert(`Failed to export ${type} raw data.`)
+    } finally {
+      setTimeout(() => setExportingRawType(''), 300)
+    }
   }
 
   const handleExportIssueReport = () => {
-    console.log('export issue report')
+    window.print()
   }
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const issueId = params.get('issueId')
+  const formatAverageResponseTime = (secondsValue) => {
+    if (secondsValue === null || !Number.isFinite(secondsValue)) return '--'
 
+    const totalSeconds = Math.max(0, Math.round(secondsValue))
+    const days = Math.floor(totalSeconds / 86400)
+    const hours = Math.floor((totalSeconds % 86400) / 3600)
+    const minutes = Math.floor((totalSeconds % 3600) / 60)
+    const secs = totalSeconds % 60
+
+    if (days > 0) return `${days}d ${hours}h`
+    if (hours > 0) return `${hours}h ${minutes}m`
+    if (minutes > 0) return `${minutes}m ${secs}s`
+    return `${secs}s`
+  }
+
+  const trendOptions = {
+    chart: {
+      fontFamily: 'Outfit, sans-serif',
+      type: 'line',
+      toolbar: { show: false },
+    },
+    stroke: {
+      curve: 'smooth',
+      width: 3,
+    },
+    colors: ['#465fff'],
+    xaxis: {
+      categories: trendCategories,
+      axisBorder: { show: false },
+      axisTicks: { show: false },
+      labels: {
+        rotate: -45,
+        hideOverlappingLabels: true,
+      },
+    },
+    yaxis: {
+      min: 0,
+      forceNiceScale: true,
+      title: { text: 'Submissions' },
+    },
+    grid: {
+      yaxis: { lines: { show: true } },
+      xaxis: { lines: { show: false } },
+    },
+    markers: {
+      size: 4,
+      hover: { size: 6 },
+    },
+    tooltip: {
+      y: {
+        formatter: (val) => `${val}`,
+      },
+    },
+  }
+
+  const trendSeries = [
+    {
+      name: 'Submissions',
+      data: trendSeriesData,
+    },
+  ]
+
+  useEffect(() => {
     if (!issueId) {
       setPageError('No issueId was provided in the URL.')
       setLoading(false)
@@ -30,25 +120,94 @@ export default function IssueReport() {
       setPageError('')
 
       try {
-        const res = await fetch(`${API_BASE}/api/issues/${issueId}`)
-        const text = await res.text()
+        const [issueRes, countRes, avgRes] = await Promise.all([
+          fetch(`${API_BASE}/api/issues/${issueId}`),
+          fetch(`${API_BASE}/api/submissions/count?issueId=${issueId}`),
+          fetch(`${API_BASE}/api/submissions/avg-response-time?issueId=${issueId}`),
+        ])
 
-        if (!res.ok) {
-          throw new Error(text || 'Failed to load issue.')
+        const issueText = await issueRes.text()
+        const countText = await countRes.text()
+        const avgText = await avgRes.text()
+
+        if (!issueRes.ok) {
+          throw new Error(issueText || 'Failed to load issue.')
+        }
+        if (!countRes.ok) {
+          throw new Error(countText || 'Failed to load participant count.')
+        }
+        if (!avgRes.ok) {
+          throw new Error(avgText || 'Failed to load average response time.')
         }
 
-        const data = text ? JSON.parse(text) : {}
-        setIssue(data)
+        const issueData = issueText ? JSON.parse(issueText) : {}
+        const countData = countText ? JSON.parse(countText) : {}
+        const avgData = avgText ? JSON.parse(avgText) : {}
+
+        setIssue(issueData)
+        setParticipantCount(Number(countData?.count ?? 0))
+        setAvgResponseSeconds(Number(avgData?.avgResponseSeconds ?? 0))
       } catch (err) {
         console.error(err)
         setPageError('Failed to load issue report.')
+        setParticipantCount(null)
+        setAvgResponseSeconds(null)
       } finally {
         setLoading(false)
       }
     }
 
     fetchIssue()
-  }, [API_BASE])
+  }, [API_BASE, issueId])
+
+  useEffect(() => {
+    if (!issueId) return
+
+    const fetchTrend = async () => {
+      setTrendLoading(true)
+      setTrendError('')
+
+      try {
+        const points = trendGranularity === 'day' ? 30 : 12
+        const res = await fetch(
+          `${API_BASE}/api/submissions/trend?issueId=${issueId}&granularity=${trendGranularity}&points=${points}`,
+        )
+        const text = await res.text()
+        if (!res.ok) {
+          throw new Error(text || 'Failed to load engagement trend.')
+        }
+
+        const data = text ? JSON.parse(text) : []
+        const rows = Array.isArray(data) ? data : []
+
+        const categories = rows.map((row) => {
+          const period = String(row?.period || '')
+          if (trendGranularity === 'month') {
+            const [year, month] = period.split('-')
+            const date = new Date(Number(year), Number(month) - 1, 1)
+            return date.toLocaleString('en-US', { month: 'short' })
+          }
+          const [year, month, day] = period.split('-')
+          const date = new Date(Number(year), Number(month) - 1, Number(day))
+          return date.toLocaleString('en-US', { month: 'short', day: 'numeric' })
+        })
+
+        const series = rows.map((row) => Number(row?.count ?? 0))
+
+        setTrendCategories(categories)
+        setTrendSeriesData(series)
+      } catch (err) {
+        console.error(err)
+        setTrendError('Failed to load engagement trend.')
+        setTrendCategories([])
+        setTrendSeriesData([])
+      } finally {
+        setTrendLoading(false)
+      }
+    }
+
+    fetchTrend()
+  }, [API_BASE, issueId, trendGranularity])
 
   const shareId = issue?.shareId || ''
   const shareLink = shareId ? `${window.location.origin}/share/${shareId}` : ''
@@ -85,9 +244,34 @@ export default function IssueReport() {
                     <button
                       type="button"
                       className="issue-action-button issue-action-button-secondary"
-                      onClick={handleExportRawData}
+                      onClick={() => exportRawCsv('profile')}
+                      disabled={Boolean(exportingRawType)}
                     >
-                      Export Raw Data
+                      {exportingRawType === 'profile'
+                        ? 'Exporting...'
+                        : 'Export Profile Raw Data'}
+                    </button>
+
+                    <button
+                      type="button"
+                      className="issue-action-button issue-action-button-secondary"
+                      onClick={() => exportRawCsv('why')}
+                      disabled={Boolean(exportingRawType)}
+                    >
+                      {exportingRawType === 'why'
+                        ? 'Exporting...'
+                        : 'Export Why Raw Data'}
+                    </button>
+
+                    <button
+                      type="button"
+                      className="issue-action-button issue-action-button-secondary"
+                      onClick={() => exportRawCsv('how')}
+                      disabled={Boolean(exportingRawType)}
+                    >
+                      {exportingRawType === 'how'
+                        ? 'Exporting...'
+                        : 'Export How Raw Data'}
                     </button>
 
                     <button
@@ -109,7 +293,7 @@ export default function IssueReport() {
                   </div>
                 </div>
 
-                <div className="issue-section">
+                <div className="issue-section issue-share-section">
                   <h2 className="issue-section-title">Share Link</h2>
                   <div className="share-link-box">
                     {shareLink ? (
@@ -138,21 +322,59 @@ export default function IssueReport() {
                         <h3 className="report-card-title">
                           Total Participants
                         </h3>
-                        <div className="metric-value">--</div>
+                        <div className="metric-value">
+                          {participantCount === null
+                            ? '--'
+                            : participantCount.toLocaleString()}
+                        </div>
                       </div>
 
                       <div className="analysis-inner-card metric-card">
                         <h3 className="report-card-title">
                           Average Response Time
                         </h3>
-                        <div className="metric-value">--</div>
+                        <div className="metric-value">
+                          {formatAverageResponseTime(avgResponseSeconds)}
+                        </div>
                       </div>
                     </div>
 
                     <div className="analysis-inner-card">
-                      <h3 className="report-card-title">Participation Trend</h3>
-                      <div className="report-large-placeholder">
-                        Participation trend chart placeholder
+                      <div className="trend-header-row">
+                        <h3 className="report-card-title">Participation Trend</h3>
+                        <div className="trend-toggle-group">
+                          <button
+                            type="button"
+                            onClick={() => setTrendGranularity('month')}
+                            className={`trend-toggle-button ${trendGranularity === 'month' ? 'is-active' : ''}`}
+                          >
+                            Month
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setTrendGranularity('day')}
+                            className={`trend-toggle-button ${trendGranularity === 'day' ? 'is-active' : ''}`}
+                          >
+                            Day
+                          </button>
+                        </div>
+                      </div>
+                      <div className="trend-chart-wrap">
+                        <Chart
+                          options={trendOptions}
+                          series={trendSeries}
+                          type="line"
+                          height={320}
+                        />
+                      </div>
+                      <div className="trend-note">
+                        {trendError
+                          ? trendError
+                          : trendLoading
+                            ? 'Loading engagement trend...'
+                            : trendGranularity === 'month'
+                              ? 'Showing month-to-month submission changes.'
+                              : 'Showing day-to-day submission changes (last 30 days).'}
                       </div>
                     </div>
 
