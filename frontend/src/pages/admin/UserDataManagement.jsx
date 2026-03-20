@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 
 /* Gift icon */
 const GiftIcon = (props) => (
@@ -46,25 +46,72 @@ function downloadTextAsFile(text, filename) {
 }
 
 export default function UserDataManagement() {
-  const seed = [
-    { id: 'u-1001', name: 'User One', email: 'one@email.com', Sent: true },
-    { id: 'u-1002', name: 'User Two', email: 'two@email.com', Sent: false },
-    { id: 'u-1003', name: 'User Three', email: 'three@email.com', Sent: true },
-    { id: 'u-1004', name: 'User Four', email: 'four@email.com', Sent: false },
-    { id: 'u-1005', name: 'User Five', email: 'five@email.com', Sent: false },
-    { id: 'u-1006', name: 'User Six', email: 'six@email.com', Sent: true },
-    { id: 'u-1007', name: 'User Seven', email: 'seven@email.com', Sent: false },
-    { id: 'u-1008', name: 'User Eight', email: 'eight@email.com', Sent: true },
-    { id: 'u-1009', name: 'User Nine', email: 'nine@email.com', Sent: false },
-    { id: 'u-1010', name: 'User Ten', email: 'ten@email.com', Sent: false },
-  ]
-
-  const [rows, setRows] = useState(seed)
+  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'
+  const [rows, setRows] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
   const [q, setQ] = useState('')
   const [nextBulkToSent, setNextBulkToSent] = useState(true)
   const [selected, setSelected] = useState(new Set())
   const [pageSize, setPageSize] = useState(10)
   const [page, setPage] = useState(1)
+  const [updatingStatus, setUpdatingStatus] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+
+    const fetchUsers = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/users?ts=${Date.now()}`, {
+          cache: 'no-store',
+        })
+        const text = await res.text()
+        if (!res.ok) {
+          throw new Error(text || `HTTP ${res.status}`)
+        }
+
+        const data = text ? JSON.parse(text) : []
+        const users = Array.isArray(data) ? data : []
+
+        if (!cancelled) {
+          setRows(() => {
+            return users.map((u) => ({
+              id: String(u.id),
+              name: u.username || '',
+              email: u.email || '',
+              Sent: Boolean(u.wantsUpdates),
+            }))
+          })
+          setSelected((prevSelected) => {
+            const validIds = new Set(users.map((u) => String(u.id)))
+            const next = new Set()
+            prevSelected.forEach((id) => {
+              if (validIds.has(id)) next.add(id)
+            })
+            return next
+          })
+          setLoadError('')
+        }
+      } catch (err) {
+        console.error(err)
+        if (!cancelled) {
+          setLoadError('Failed to load users from database.')
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false)
+        }
+      }
+    }
+
+    fetchUsers()
+    const timer = setInterval(fetchUsers, 3000)
+
+    return () => {
+      cancelled = true
+      clearInterval(timer)
+    }
+  }, [API_BASE])
 
   const filtered = useMemo(() => {
     const k = q.trim().toLowerCase()
@@ -95,23 +142,64 @@ export default function UserDataManagement() {
     })
   }
 
-  const toggleSent = (id) => {
-    setRows((list) =>
-      list.map((r) => (r.id === id ? { ...r, Sent: !r.Sent } : r)),
-    )
+  async function persistUserStatus(userId, wantsUpdates) {
+    const res = await fetch(`${API_BASE}/api/users/${userId}/wants-updates`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ wantsUpdates }),
+    })
+    const text = await res.text()
+    if (!res.ok) {
+      throw new Error(text || `HTTP ${res.status}`)
+    }
   }
 
-  function handleBulkToggleStatus() {
+  async function toggleSent(id) {
+    if (updatingStatus) return
+
+    const row = rows.find((r) => r.id === id)
+    if (!row) return
+
+    setUpdatingStatus(true)
+    try {
+      const nextValue = !row.Sent
+      await persistUserStatus(id, nextValue)
+      setRows((list) =>
+        list.map((r) => (r.id === id ? { ...r, Sent: nextValue } : r)),
+      )
+      setLoadError('')
+    } catch (err) {
+      console.error(err)
+      setLoadError('Failed to update user status.')
+    } finally {
+      setUpdatingStatus(false)
+    }
+  }
+
+  async function handleBulkToggleStatus() {
     if (selected.size === 0) return
 
-    setRows((prev) =>
-      prev.map((u) =>
-        selected.has(u.id) ? { ...u, Sent: nextBulkToSent } : u,
-      ),
-    )
+    setUpdatingStatus(true)
+    try {
+      const ids = Array.from(selected)
+      await Promise.all(ids.map((id) => persistUserStatus(id, nextBulkToSent)))
 
-    setNextBulkToSent((v) => !v)
-    setSelected(new Set())
+      setRows((prev) =>
+        prev.map((u) =>
+          selected.has(u.id) ? { ...u, Sent: nextBulkToSent } : u,
+        ),
+      )
+      setNextBulkToSent((v) => !v)
+      setSelected(new Set())
+      setLoadError('')
+    } catch (err) {
+      console.error(err)
+      setLoadError('Failed to update selected users.')
+    } finally {
+      setUpdatingStatus(false)
+    }
   }
 
   function handleExport(scope = 'selected') {
@@ -177,11 +265,23 @@ export default function UserDataManagement() {
           </div>
         </div>
 
+        {loading && (
+          <div className="mb-3 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-sm text-blue-700">
+            Loading users from database...
+          </div>
+        )}
+
+        {!loading && loadError && (
+          <div className="mb-3 rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-700">
+            {loadError}
+          </div>
+        )}
+
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <button
               onClick={handleBulkToggleStatus}
-              disabled={!selected.size}
+              disabled={!selected.size || updatingStatus}
               className="inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-40"
               title={
                 selected.size
@@ -194,7 +294,7 @@ export default function UserDataManagement() {
 
             <button
               onClick={() => handleExport('selected')}
-              disabled={!selected.size}
+              disabled={!selected.size || updatingStatus}
               className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
               title="Export selected rows to CSV"
             >
@@ -203,6 +303,7 @@ export default function UserDataManagement() {
 
             <button
               onClick={() => handleExport('all')}
+              disabled={updatingStatus}
               className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
               title="Export all rows to CSV"
             >
@@ -275,6 +376,7 @@ export default function UserDataManagement() {
             <div className="mt-3 flex justify-end gap-2">
               <button
                 onClick={() => toggleSent(r.id)}
+                disabled={updatingStatus}
                 className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-200 bg-white px-3 py-1.5 text-xs font-medium text-indigo-700 hover:bg-indigo-50"
               >
                 <GiftIcon className="h-4 w-4" />
@@ -371,6 +473,7 @@ export default function UserDataManagement() {
                     <div className="flex justify-end gap-2">
                       <button
                         onClick={() => toggleSent(r.id)}
+                        disabled={updatingStatus}
                         className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-200 bg-white px-3 py-1.5 text-xs font-medium text-indigo-700 hover:bg-indigo-50"
                       >
                         <GiftIcon className="h-4 w-4" />

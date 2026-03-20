@@ -1,7 +1,74 @@
-import { ArrowDownIcon, ArrowUpIcon, BoxIconLine, GroupIcon } from '../icons'
+import { useEffect, useMemo, useState } from 'react'
+import { BoxIconLine, GroupIcon } from '../icons'
 import Badge from '../ui/badge/Badge'
 
 export default function EcommerceMetrics() {
+  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'
+  const [submissionCount, setSubmissionCount] = useState(null)
+  const [issueCount, setIssueCount] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    let cancelled = false
+
+    const fetchMetrics = async () => {
+      setLoading(true)
+      setError('')
+
+      try {
+        const [submissionRes, issuesRes] = await Promise.all([
+          fetch(`${API_BASE}/api/submissions/count`),
+          fetch(`${API_BASE}/api/issues`),
+        ])
+
+        if (!submissionRes.ok) {
+          throw new Error(
+            `Failed to load submission count: ${submissionRes.status}`,
+          )
+        }
+        if (!issuesRes.ok) {
+          throw new Error(`Failed to load issues: ${issuesRes.status}`)
+        }
+
+        const submissionData = await submissionRes.json()
+        const issuesData = await issuesRes.json()
+
+        if (!cancelled) {
+          setSubmissionCount(Number(submissionData?.count ?? 0))
+          setIssueCount(Array.isArray(issuesData) ? issuesData.length : 0)
+        }
+      } catch (err) {
+        console.error(err)
+        if (!cancelled) {
+          setError('Failed to load metrics')
+          setSubmissionCount(null)
+          setIssueCount(null)
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false)
+        }
+      }
+    }
+
+    fetchMetrics()
+
+    return () => {
+      cancelled = true
+    }
+  }, [API_BASE])
+
+  const formattedSubmissions = useMemo(() => {
+    if (submissionCount === null) return '--'
+    return submissionCount.toLocaleString()
+  }, [submissionCount])
+
+  const formattedIssues = useMemo(() => {
+    if (issueCount === null) return '--'
+    return issueCount.toLocaleString()
+  }, [issueCount])
+
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6">
       {/* <!-- Metric Item Start --> */}
@@ -13,16 +80,13 @@ export default function EcommerceMetrics() {
         <div className="flex items-end justify-between mt-5">
           <div>
             <span className="text-sm text-gray-500 dark:text-gray-400">
-              Answers
+              Submissions
             </span>
             <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
-              3,782
+              {formattedSubmissions}
             </h4>
           </div>
-          <Badge color="success">
-            <ArrowUpIcon />
-            11.01%
-          </Badge>
+          <Badge color="success">{loading ? 'Loading' : 'All issues'}</Badge>
         </div>
       </div>
       {/* <!-- Metric Item End --> */}
@@ -35,16 +99,15 @@ export default function EcommerceMetrics() {
         <div className="flex items-end justify-between mt-5">
           <div>
             <span className="text-sm text-gray-500 dark:text-gray-400">
-              issues
+              Issues
             </span>
             <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
-              5,359
+              {formattedIssues}
             </h4>
           </div>
 
-          <Badge color="error">
-            <ArrowDownIcon />
-            9.05%
+          <Badge color={error ? 'error' : 'success'}>
+            {error ? 'Unavailable' : loading ? 'Loading' : 'Live'}
           </Badge>
         </div>
       </div>

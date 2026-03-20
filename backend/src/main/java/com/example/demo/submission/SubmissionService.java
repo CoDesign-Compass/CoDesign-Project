@@ -1,18 +1,52 @@
 package com.example.demo.submission;
 
+import com.example.demo.entity.HowResponse;
+import com.example.demo.entity.WhyResponse;
+import com.example.demo.model.Tag;
+import com.example.demo.model.UserProfile;
+import com.example.demo.repository.HowResponseRepository;
+import com.example.demo.repository.IssueRepository;
+import com.example.demo.repository.UserProfileRepository;
+import com.example.demo.repository.WhyResponseRepository;
 import com.example.demo.submission.dto.CreateSubmissionRequest;
+import com.example.demo.submission.dto.MonthlySubmissionCountResponse;
+import com.example.demo.submission.dto.SubmissionTrendPointResponse;
 import com.example.demo.submission.dto.SubmitSubmissionRequest;
 import com.example.demo.submission.dto.SubmitSubmissionResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class SubmissionService {
     private final SubmissionRepository repo;
+    private final IssueRepository issueRepository;
+    private final UserProfileRepository userProfileRepository;
+    private final WhyResponseRepository whyResponseRepository;
+    private final HowResponseRepository howResponseRepository;
 
-    public SubmissionService(SubmissionRepository repo){
+    public SubmissionService(
+            SubmissionRepository repo,
+            IssueRepository issueRepository,
+            UserProfileRepository userProfileRepository,
+            WhyResponseRepository whyResponseRepository,
+            HowResponseRepository howResponseRepository
+    ){
         this.repo = repo;
+        this.issueRepository = issueRepository;
+        this.userProfileRepository = userProfileRepository;
+        this.whyResponseRepository = whyResponseRepository;
+        this.howResponseRepository = howResponseRepository;
     }
 
     @Transactional
@@ -68,5 +102,307 @@ public class SubmissionService {
         s.setUserId(userId);
         return repo.save(s);
     }
-    
+
+    public long getTotalSubmissions() {
+        return repo.countByStatus(Submission.Status.SUBMITTED);
+    }
+
+    public long getTotalSubmissionsByIssue(Long issueId) {
+        if (issueId == null) {
+            throw new IllegalArgumentException("ISSUE_ID_REQUIRED");
+        }
+        return repo.countByIssueIdAndStatus(issueId, Submission.Status.SUBMITTED);
+    }
+
+    public Double getAverageResponseSecondsByIssue(Long issueId) {
+        if (issueId == null) {
+            throw new IllegalArgumentException("ISSUE_ID_REQUIRED");
+        }
+
+        Double avgSeconds = repo.findAverageResponseSecondsByIssueId(issueId);
+        return avgSeconds == null ? 0D : avgSeconds;
+    }
+
+    public List<MonthlySubmissionCountResponse> getMonthlySubmittedCounts(int months) {
+        int windowSize = Math.max(1, months);
+        YearMonth currentMonth = YearMonth.now();
+        YearMonth startMonth = currentMonth.minusMonths(windowSize - 1L);
+
+        Map<YearMonth, Long> monthlyCounts = new LinkedHashMap<>();
+        for (int i = 0; i < windowSize; i++) {
+            YearMonth month = startMonth.plusMonths(i);
+            monthlyCounts.put(month, 0L);
+        }
+
+        List<Object[]> rows = repo.findMonthlySubmittedCounts();
+        for (Object[] row : rows) {
+            if (row == null || row.length < 2 || row[0] == null || row[1] == null) {
+                continue;
+            }
+
+            LocalDateTime monthStart = ((java.sql.Timestamp) row[0]).toLocalDateTime();
+            YearMonth month = YearMonth.from(monthStart);
+
+            if (monthlyCounts.containsKey(month)) {
+                monthlyCounts.put(month, ((Number) row[1]).longValue());
+            }
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+        List<MonthlySubmissionCountResponse> result = new ArrayList<>();
+        for (Map.Entry<YearMonth, Long> entry : monthlyCounts.entrySet()) {
+            result.add(new MonthlySubmissionCountResponse(
+                    entry.getKey().format(formatter),
+                    entry.getValue()
+            ));
+        }
+
+        return result;
+    }
+
+    public List<SubmissionTrendPointResponse> getIssueSubmissionTrend(
+            Long issueId,
+            String granularity,
+            int points
+    ) {
+        if (issueId == null) {
+            throw new IllegalArgumentException("ISSUE_ID_REQUIRED");
+        }
+
+        String normalized = granularity == null ? "month" : granularity.toLowerCase();
+        return switch (normalized) {
+            case "day" -> getDailyTrend(issueId, points);
+            case "month" -> getMonthlyTrend(issueId, points);
+            default -> throw new IllegalArgumentException("INVALID_GRANULARITY");
+        };
+    }
+
+    private List<SubmissionTrendPointResponse> getMonthlyTrend(Long issueId, int points) {
+        int windowSize = Math.max(1, points);
+        YearMonth currentMonth = YearMonth.now();
+        YearMonth startMonth = currentMonth.minusMonths(windowSize - 1L);
+
+        Map<YearMonth, Long> monthlyCounts = new LinkedHashMap<>();
+        for (int i = 0; i < windowSize; i++) {
+            YearMonth month = startMonth.plusMonths(i);
+            monthlyCounts.put(month, 0L);
+        }
+
+        List<Object[]> rows = repo.findMonthlySubmittedCountsByIssueId(issueId);
+        for (Object[] row : rows) {
+            if (row == null || row.length < 2 || row[0] == null || row[1] == null) {
+                continue;
+            }
+
+            LocalDateTime monthStart = ((java.sql.Timestamp) row[0]).toLocalDateTime();
+            YearMonth month = YearMonth.from(monthStart);
+
+            if (monthlyCounts.containsKey(month)) {
+                monthlyCounts.put(month, ((Number) row[1]).longValue());
+            }
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+        List<SubmissionTrendPointResponse> result = new ArrayList<>();
+        for (Map.Entry<YearMonth, Long> entry : monthlyCounts.entrySet()) {
+            result.add(new SubmissionTrendPointResponse(
+                    entry.getKey().format(formatter),
+                    entry.getValue()
+            ));
+        }
+        return result;
+    }
+
+    private List<SubmissionTrendPointResponse> getDailyTrend(Long issueId, int points) {
+        int windowSize = Math.max(1, points);
+        LocalDate today = LocalDate.now();
+        LocalDate startDate = today.minusDays(windowSize - 1L);
+
+        Map<LocalDate, Long> dailyCounts = new LinkedHashMap<>();
+        for (int i = 0; i < windowSize; i++) {
+            LocalDate day = startDate.plusDays(i);
+            dailyCounts.put(day, 0L);
+        }
+
+        List<Object[]> rows = repo.findDailySubmittedCountsByIssueId(issueId);
+        for (Object[] row : rows) {
+            if (row == null || row.length < 2 || row[0] == null || row[1] == null) {
+                continue;
+            }
+
+            LocalDate day = ((java.sql.Timestamp) row[0]).toLocalDateTime().toLocalDate();
+            if (dailyCounts.containsKey(day)) {
+                dailyCounts.put(day, ((Number) row[1]).longValue());
+            }
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        List<SubmissionTrendPointResponse> result = new ArrayList<>();
+        for (Map.Entry<LocalDate, Long> entry : dailyCounts.entrySet()) {
+            result.add(new SubmissionTrendPointResponse(
+                    entry.getKey().format(formatter),
+                    entry.getValue()
+            ));
+        }
+        return result;
+    }
+
+    public String generateIssueProfileRawDataCsv(Long issueId) {
+        if (issueId == null) {
+            throw new IllegalArgumentException("ISSUE_ID_REQUIRED");
+        }
+
+        RawDataContext context = buildRawDataContext(issueId);
+
+        StringBuilder csv = new StringBuilder();
+        csv.append('\uFEFF');
+        csv.append("issueId,submissionId,tagLabel\n");
+
+        for (Submission submission : context.submissions) {
+            UserProfile profile = context.profilesBySubmissionId.get(String.valueOf(submission.getId()));
+            List<String> tagLabels = profile == null || profile.getSelectedTags() == null
+                    ? Collections.emptyList()
+                    : profile.getSelectedTags().stream()
+                    .map(Tag::getLabel)
+                    .map(this::safe)
+                    .filter(v -> !v.isBlank())
+                    .sorted()
+                    .toList();
+
+            if (tagLabels.isEmpty()) {
+                appendCsvRow(csv, List.of(
+                        String.valueOf(context.issueId),
+                        String.valueOf(submission.getId()),
+                        ""
+                ));
+            } else {
+                for (String tagLabel : tagLabels) {
+                    appendCsvRow(csv, List.of(
+                            String.valueOf(context.issueId),
+                            String.valueOf(submission.getId()),
+                            tagLabel
+                    ));
+                }
+            }
+        }
+
+        return csv.toString();
+    }
+
+    public String generateIssueWhyRawDataCsv(Long issueId) {
+        if (issueId == null) {
+            throw new IllegalArgumentException("ISSUE_ID_REQUIRED");
+        }
+
+        RawDataContext context = buildRawDataContext(issueId);
+
+        StringBuilder csv = new StringBuilder();
+        csv.append('\uFEFF');
+        csv.append("issueId,whyResponseId,stance,answer1,answer2,answer3,answer4,answer5\n");
+
+        for (WhyResponse why : context.whyResponses) {
+            appendCsvRow(csv, List.of(
+                    String.valueOf(context.issueId),
+                    String.valueOf(why.getId()),
+                    safe(why.getStance()),
+                    safe(why.getAnswer1()),
+                    safe(why.getAnswer2()),
+                    safe(why.getAnswer3()),
+                    safe(why.getAnswer4()),
+                    safe(why.getAnswer5())
+            ));
+        }
+
+        return csv.toString();
+    }
+
+    public String generateIssueHowRawDataCsv(Long issueId) {
+        if (issueId == null) {
+            throw new IllegalArgumentException("ISSUE_ID_REQUIRED");
+        }
+
+        RawDataContext context = buildRawDataContext(issueId);
+
+        StringBuilder csv = new StringBuilder();
+        csv.append('\uFEFF');
+        csv.append("issueId,howResponseId,answer1,answer2,answer3,answer4,answer5\n");
+
+        for (HowResponse how : context.howResponses) {
+            appendCsvRow(csv, List.of(
+                    String.valueOf(context.issueId),
+                    String.valueOf(how.getId()),
+                    safe(how.getAnswer1()),
+                    safe(how.getAnswer2()),
+                    safe(how.getAnswer3()),
+                    safe(how.getAnswer4()),
+                    safe(how.getAnswer5())
+            ));
+        }
+
+        return csv.toString();
+    }
+
+    private RawDataContext buildRawDataContext(Long issueId) {
+        String shareId = issueRepository.findById(issueId)
+                .map(i -> i.getShareId())
+                .orElseThrow(() -> new IllegalArgumentException("ISSUE_NOT_FOUND"));
+        String safeShareId = safe(shareId);
+
+        List<Submission> submissions = repo.findByIssueIdOrderByCreatedAtDesc(issueId);
+        List<String> submissionIds = submissions.stream()
+                .map(Submission::getId)
+                .map(String::valueOf)
+                .toList();
+
+        Map<String, UserProfile> profilesBySubmissionId = userProfileRepository.findAllById(submissionIds)
+                .stream()
+                .collect(Collectors.toMap(UserProfile::getSubmissionId, p -> p));
+
+        List<WhyResponse> whyResponses = whyResponseRepository.findByShareId(shareId);
+        List<HowResponse> howResponses = howResponseRepository.findByShareId(shareId);
+
+        return new RawDataContext(
+                issueId,
+                safeShareId,
+                submissions,
+                profilesBySubmissionId,
+                whyResponses,
+                howResponses
+        );
+    }
+
+    private record RawDataContext(
+            Long issueId,
+            String safeShareId,
+            List<Submission> submissions,
+            Map<String, UserProfile> profilesBySubmissionId,
+            List<WhyResponse> whyResponses,
+            List<HowResponse> howResponses
+    ) {}
+
+    private void appendCsvRow(StringBuilder csv, List<String> values) {
+        List<String> row = values == null ? Collections.emptyList() : values;
+        for (int i = 0; i < row.size(); i++) {
+            if (i > 0) {
+                csv.append(',');
+            }
+            csv.append(escapeCsv(row.get(i)));
+        }
+        csv.append('\n');
+    }
+
+    private String escapeCsv(String value) {
+        String text = value == null ? "" : value;
+        String escaped = text.replace("\"", "\"\"");
+        return "\"" + escaped + "\"";
+    }
+
+    private String safe(String value) {
+        return value == null ? "" : value;
+    }
+
+    private String stringify(LocalDateTime value) {
+        return value == null ? "" : value.toString();
+    }
+
 }
