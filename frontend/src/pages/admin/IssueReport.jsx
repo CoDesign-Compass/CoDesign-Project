@@ -15,12 +15,48 @@ export default function IssueReport() {
   const [loading, setLoading] = useState(true)
   const [pageError, setPageError] = useState('')
   const [exportingRawType, setExportingRawType] = useState('')
+  const [generatingAiReport, setGeneratingAiReport] = useState(false)
+  const [aiReport, setAiReport] = useState(null)
 
   const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'
   const { issueId: routeIssueId } = useParams()
   const params = new URLSearchParams(window.location.search)
   const queryIssueId = params.get('issueId')
   const issueId = routeIssueId || queryIssueId
+
+  const handleGenerateAiReport = async () => {
+    const storedShareId = localStorage.getItem('shareId')
+    if (!storedShareId) {
+      window.alert('No shareId found in localStorage.')
+      return
+    }
+
+    setGeneratingAiReport(true)
+    try {
+      const response = await fetch(`${API_BASE}/api/ai-report/generate-by-share`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ shareId: storedShareId }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Failed to generate AI report.')
+      }
+
+      const result = await response.json()
+      console.log('AI Report Result:', result)
+      setAiReport(result)
+      window.alert('AI Report generated successfully!')
+    } catch (err) {
+      console.error(err)
+      window.alert(`Error generating AI report: ${err.message}`)
+    } finally {
+      setGeneratingAiReport(false)
+    }
+  }
 
   const exportRawCsv = (type) => {
     if (!issueId || exportingRawType) return
@@ -244,6 +280,15 @@ export default function IssueReport() {
                     <button
                       type="button"
                       className="issue-action-button issue-action-button-secondary"
+                      onClick={handleGenerateAiReport}
+                      disabled={generatingAiReport}
+                    >
+                      {generatingAiReport ? 'Generating...' : 'Generate AI Report'}
+                    </button>
+
+                    <button
+                      type="button"
+                      className="issue-action-button issue-action-button-secondary"
                       onClick={() => exportRawCsv('profile')}
                       disabled={Boolean(exportingRawType)}
                     >
@@ -407,16 +452,126 @@ export default function IssueReport() {
 
                     <div className="analysis-inner-card">
                       <h3 className="report-card-title">Sentiment Analysis</h3>
-                      <div className="report-large-placeholder">
-                        Sentiment analysis placeholder
-                      </div>
+                      {aiReport && aiReport.sentimentAnalysis ? (
+                        <div className="sentiment-analysis-content">
+                          <div className="sentiment-chart-wrap">
+                            <Chart
+                              type="bar"
+                              height={150}
+                              series={(() => {
+                                const counts = {}
+                                aiReport.sentimentAnalysis.participantSentiments?.forEach((p) => {
+                                  const s = p.sentiment || 'Neutral'
+                                  counts[s] = (counts[s] || 0) + 1
+                                })
+                                return Object.entries(counts).map(([name, count]) => ({
+                                  name,
+                                  data: [count],
+                                }))
+                              })()}
+                              options={{
+                                chart: {
+                                  stacked: true,
+                                  stackType: '100%',
+                                  toolbar: { show: false },
+                                  sparkline: { enabled: false },
+                                },
+                                plotOptions: {
+                                  bar: {
+                                    horizontal: true,
+                                    barHeight: '50%',
+                                  },
+                                },
+                                dataLabels: {
+                                  enabled: true,
+                                  formatter: (val, opts) => {
+                                    return `${opts.w.config.series[opts.seriesIndex].name}: ${opts.w.config.series[opts.seriesIndex].data[0]}`
+                                  },
+                                },
+                                xaxis: {
+                                  categories: ['Participants'],
+                                  labels: { show: false },
+                                  axisBorder: { show: false },
+                                  axisTicks: { show: false },
+                                },
+                                yaxis: {
+                                  labels: { show: false },
+                                },
+                                grid: { show: false },
+                                fill: { opacity: 1 },
+                                legend: {
+                                  position: 'top',
+                                  horizontalAlign: 'left',
+                                },
+                                tooltip: {
+                                  y: {
+                                    formatter: (val) => `${val} participants`,
+                                  },
+                                },
+                              }}
+                            />
+                          </div>
+                          <p style={{ marginTop: '1rem', fontSize: '14px', color: '#555', lineHeight: '1.5' }}>
+                            {aiReport.sentimentAnalysis.summary}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="report-large-placeholder">
+                          Generate AI report to see sentiment analysis.
+                        </div>
+                      )}
                     </div>
 
                     <div className="analysis-inner-card">
-                      <h3 className="report-card-title">Insights</h3>
-                      <div className="report-large-placeholder">
-                        Insight summary placeholder
-                      </div>
+                      <h3 className="report-card-title">Insights & Themes</h3>
+                      {aiReport ? (
+                        <div className="ai-insights-content" style={{ fontSize: '14px', lineHeight: '1.6' }}>
+                          <p style={{ marginBottom: '1.5rem', fontWeight: 500 }}>{aiReport.summary}</p>
+                          
+                          <h4 style={{ fontSize: '16px', marginBottom: '0.8rem', borderBottom: '1px solid #eee', paddingBottom: '4px' }}>Key Insights</h4>
+                          <ul style={{ paddingLeft: '1.2rem', marginBottom: '2rem' }}>
+                            {aiReport.keyInsights?.map((item, idx) => (
+                              <li key={idx} style={{ marginBottom: '0.8rem' }}>
+                                <strong>{item.insight}</strong>
+                                <span style={{ marginLeft: '10px', color: '#888', fontSize: '12px' }}>
+                                  ({Math.round(item.confidence * 100)}% confidence)
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+
+                          {aiReport.themes && aiReport.themes.length > 0 && (
+                            <>
+                              <h4 style={{ fontSize: '16px', marginBottom: '1rem', borderBottom: '1px solid #eee', paddingBottom: '4px' }}>Identified Themes</h4>
+                              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
+                                {aiReport.themes.map((t, idx) => (
+                                  <div key={idx} style={{ padding: '12px', background: '#f9f9f9', borderRadius: '8px', borderLeft: '4px solid #465fff' }}>
+                                    <div style={{ fontWeight: 600, fontSize: '15px', marginBottom: '8px', color: '#333' }}>{t.theme}</div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                      {t.painPoints && t.painPoints.length > 0 && (
+                                        <div>
+                                          <span style={{ fontSize: '12px', fontWeight: 600, color: '#d32f2f', textTransform: 'uppercase' }}>Pain Points: </span>
+                                          <span style={{ color: '#555' }}>{t.painPoints.join(', ')}</span>
+                                        </div>
+                                      )}
+                                      {t.opportunities && t.opportunities.length > 0 && (
+                                        <div>
+                                          <span style={{ fontSize: '12px', fontWeight: 600, color: '#2e7d32', textTransform: 'uppercase' }}>Opportunities: </span>
+                                          <span style={{ color: '#555' }}>{t.opportunities.join(', ')}</span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="report-large-placeholder">
+                          Generate AI report to see insights and themes.
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

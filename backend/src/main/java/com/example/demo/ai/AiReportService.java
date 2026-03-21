@@ -162,6 +162,17 @@ Return only valid JSON matching this schema:
     }
   ],
   "risksAndLimitations": ["string"],
+  "sentimentAnalysis": {
+    "overallSentiment": "string",
+    "participantSentiments": [
+      {
+        "participantId": "string",
+        "sentiment": "string",
+        "rationale": "string"
+      }
+    ],
+    "summary": "string"
+  },
   "metadata": {
     "model": "string",
     "generatedAt": "string"
@@ -345,9 +356,12 @@ If evidence is limited, clearly reflect that in the summary, insights, and risks
 
         sb.append("\nInstructions:\n");
         sb.append("Generate a structured AI report based on the issue context and all why/how user responses above.\n");
-        sb.append("Summarise common themes, disagreements, pain points, and actionable opportunities.\n");
-        sb.append("Prioritise actual user responses over generic assumptions.\n");
-        sb.append("Do not invent facts. If data is limited, state this clearly in risks and limitations.\n");
+        sb.append("1. Summarise common themes, disagreements, pain points, and actionable opportunities.\n");
+        sb.append("2. Perform Sentiment Analysis for each participant. Match Why response #N with How response #N (if both exist) as the same participant.\n");
+        sb.append("   - For each participant, identify their primary sentiment (e.g., Positive, Anxious, Expectant, Frustrated, Neutral).\n");
+        sb.append("   - Provide a brief rationale for that sentiment.\n");
+        sb.append("3. Prioritise actual user responses over generic assumptions.\n");
+        sb.append("4. Do not invent facts. If data is limited, state this clearly in risks and limitations.\n");
 
         return sb.toString();
     }
