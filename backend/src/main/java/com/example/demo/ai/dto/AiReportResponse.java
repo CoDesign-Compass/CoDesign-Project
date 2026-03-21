@@ -1,18 +1,52 @@
 package com.example.demo.ai.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.List;
 
 public class AiReportResponse {
     private String title;
     private String summary;
+    @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     private List<KeyInsight> keyInsights;
+    @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     private List<ThemeBlock> themes;
+    @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     private List<Recommendation> recommendations;
+    @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     private List<String> risksAndLimitations;
+    private SentimentAnalysis sentimentAnalysis;
     private Metadata metadata;
+
+    public static class SentimentAnalysis {
+        private String overallSentiment;
+        @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+        private List<ParticipantSentiment> participantSentiments;
+        private String summary;
+
+        public static class ParticipantSentiment {
+            private String participantId;
+            private String sentiment; // e.g. "Positive", "Anxious", "Expectant", "Negative", "Neutral"
+            private String rationale;
+
+            public String getParticipantId() { return participantId; }
+            public void setParticipantId(String participantId) { this.participantId = participantId; }
+            public String getSentiment() { return sentiment; }
+            public void setSentiment(String sentiment) { this.sentiment = sentiment; }
+            public String getRationale() { return rationale; }
+            public void setRationale(String rationale) { this.rationale = rationale; }
+        }
+
+        public String getOverallSentiment() { return overallSentiment; }
+        public void setOverallSentiment(String overallSentiment) { this.overallSentiment = overallSentiment; }
+        public List<ParticipantSentiment> getParticipantSentiments() { return participantSentiments; }
+        public void setParticipantSentiments(List<ParticipantSentiment> participantSentiments) { this.participantSentiments = participantSentiments; }
+        public String getSummary() { return summary; }
+        public void setSummary(String summary) { this.summary = summary; }
+    }
 
     public static class KeyInsight {
         private String insight;
+        @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
         private List<String> evidence;
         private double confidence;
 
@@ -28,9 +62,13 @@ public class AiReportResponse {
 
     public static class ThemeBlock {
         private String theme;
+        @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
         private List<String> why;
+        @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
         private List<String> how;
+        @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
         private List<String> painPoints;
+        @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
         private List<String> opportunities;
 
         public String getTheme() { return theme; }
@@ -92,6 +130,9 @@ public class AiReportResponse {
 
     public List<String> getRisksAndLimitations() { return risksAndLimitations; }
     public void setRisksAndLimitations(List<String> risksAndLimitations) { this.risksAndLimitations = risksAndLimitations; }
+
+    public SentimentAnalysis getSentimentAnalysis() { return sentimentAnalysis; }
+    public void setSentimentAnalysis(SentimentAnalysis sentimentAnalysis) { this.sentimentAnalysis = sentimentAnalysis; }
 
     public Metadata getMetadata() { return metadata; }
     public void setMetadata(Metadata metadata) { this.metadata = metadata; }
