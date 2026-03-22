@@ -82,7 +82,7 @@ Frontend: CSS, HTML, React
 |week 1|[S1 Week1 Tutoring Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week1%20Tutor%20Meeting.md)<br>[S1 Week1 Team Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%201%20Team%20Meeting.md)|
 |week 2|[S1 Week2 Tutor Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%202%20Tutor%20Meeting.md)<br>[S1 Week2 Team Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%202%20Team%20Meeting.md)|
 |week 3|[S1 Week3 Tutor Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%203%20Tutor%20Meeting.md)<br>[S1 Week3 Team Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%203%20Team%20Meeting.md)<br>[S1 Week3 Client Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%203%20Client%20Meeting.md)|
-|week 4||
+|week 4|[S1 Week4 Tutor Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%204%20Tutor%20Meeting.md) <br>[S1 Week4 Team Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%204%20Team%20Meeting)|
 |week 5||
 |week 6||
 |week 7||
