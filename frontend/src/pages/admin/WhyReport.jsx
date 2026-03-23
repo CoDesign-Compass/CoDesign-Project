@@ -1,44 +1,64 @@
-import React from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
+import { useParams } from 'react-router-dom'
 
 export default function WhyReport() {
-  /**
-   * TODO (backend integration):
-   * Replace this mock demo state with real request state.
-   *
-   * Expected mapping:
-   * - 'loading': request in progress
-   * - 'error': request failed
-   * - 'empty': request succeeded but returned no usable report data
-   * - 'success': request succeeded and returned renderable report data
-   */
-  const demoState = 'success'
+  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'
+  const { issueId: routeIssueId } = useParams()
+  const queryIssueId = new URLSearchParams(window.location.search).get('issueId')
+  const savedIssueId = localStorage.getItem('issueId')
+  const issueId = routeIssueId || queryIssueId || savedIssueId
 
-  /**
-   * TODO (backend integration):
-   * Replace this mock summary data with real backend response data.
-   *
-   * This area is currently styled as a simple word-frequency style summary block.
-   * Expected frontend shape:
-   * [
-   *   { label: string, value: number },
-   *   { label: string, value: number },
-   *   ...
-   * ]
-   *
-   * Example:
-   * [
-   *   { label: 'communication', value: 18 },
-   *   { label: 'support', value: 14 },
-   *   { label: 'timing', value: 9 }
-   * ]
-   */
-  const summaryTerms = [
-    { label: 'communication', value: 18 },
-    { label: 'support', value: 14 },
-    { label: 'timing', value: 11 },
-    { label: 'clarity', value: 9 },
-    { label: 'feedback', value: 7 },
-  ]
+  const [reportState, setReportState] = useState('loading')
+  const [stateText, setStateText] = useState('')
+  const [wordCloudTerms, setWordCloudTerms] = useState([])
+
+  const summaryTerms = useMemo(() => wordCloudTerms.slice(0, 5), [wordCloudTerms])
+  const demoState = reportState
+
+  useEffect(() => {
+    if (!issueId) {
+      setReportState('error')
+      setStateText('No issueId was provided. Please open this report with an issueId.')
+      setWordCloudTerms([])
+      return
+    }
+
+    const fetchWordCloud = async () => {
+      setReportState('loading')
+      setStateText('')
+
+      try {
+        const res = await fetch(
+          `${API_BASE}/api/submissions/word-cloud/why?issueId=${encodeURIComponent(issueId)}`,
+        )
+        const text = await res.text()
+
+        if (!res.ok) {
+          throw new Error(text || 'Failed to load why report word cloud.')
+        }
+
+        const data = text ? JSON.parse(text) : []
+        const normalized = Array.isArray(data)
+          ? data
+              .map((item) => ({
+                label: String(item?.label ?? '').trim(),
+                value: Number(item?.value ?? 0),
+              }))
+              .filter((item) => item.label && Number.isFinite(item.value) && item.value > 0)
+          : []
+
+        setWordCloudTerms(normalized)
+        setReportState(normalized.length ? 'success' : 'empty')
+      } catch (err) {
+        console.error(err)
+        setWordCloudTerms([])
+        setReportState('error')
+        setStateText('Something went wrong while loading report data from database.')
+      }
+    }
+
+    fetchWordCloud()
+  }, [API_BASE, issueId])
 
   /**
    * This report card list is currently frontend-defined for UI/UX consistency.
@@ -273,6 +293,69 @@ export default function WhyReport() {
                 {item.value}
               </div>
             </div>
+          )
+        })}
+      </div>
+    )
+  }
+
+  const renderWordCloud = () => {
+    if (!wordCloudTerms.length) {
+      return (
+        <div
+          style={{
+            minHeight: '180px',
+            border: '1px dashed #d1d5db',
+            borderRadius: '16px',
+            background: '#f9fafb',
+            padding: '24px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#6b7280',
+            textAlign: 'center',
+          }}
+        >
+          <p style={{ margin: 0 }}>No keyword data available for this issue.</p>
+        </div>
+      )
+    }
+
+    const values = wordCloudTerms.map((item) => item.value)
+    const minValue = Math.min(...values)
+    const maxValue = Math.max(...values)
+    const palette = ['#111827', '#1f2937', '#374151', '#4b5563', '#6b7280']
+
+    return (
+      <div
+        style={{
+          border: '1px solid #e5e7eb',
+          borderRadius: '16px',
+          background: '#f9fafb',
+          padding: '20px',
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '10px 14px',
+          alignItems: 'center',
+          lineHeight: 1.35,
+        }}
+      >
+        {wordCloudTerms.map((item, index) => {
+          const ratio = maxValue === minValue ? 1 : (item.value - minValue) / (maxValue - minValue)
+          const fontSize = 14 + ratio * 22
+
+          return (
+            <span
+              key={`${item.label}-${index}`}
+              style={{
+                fontSize: `${fontSize}px`,
+                fontWeight: 500 + Math.round(ratio * 200),
+                color: palette[index % palette.length],
+              }}
+              title={`${item.label}: ${item.value}`}
+            >
+              {item.label}
+            </span>
           )
         })}
       </div>
@@ -624,6 +707,44 @@ export default function WhyReport() {
 
         {renderDetailSections()}
       </section>
+
+      <section
+        style={{
+          border: '1px solid #e5e7eb',
+          borderRadius: '20px',
+          background: '#ffffff',
+          boxShadow: '0 6px 18px rgba(15, 23, 42, 0.04)',
+          padding: '24px',
+        }}
+      >
+        <div style={{ marginBottom: '16px' }}>
+          <h2
+            style={{
+              margin: 0,
+              fontSize: '1.125rem',
+              lineHeight: 1.5,
+              fontWeight: 600,
+              color: '#111827',
+            }}
+          >
+            Word Cloud
+          </h2>
+
+          <p
+            style={{
+              margin: '6px 0 0 0',
+              fontSize: '0.95rem',
+              lineHeight: 1.7,
+              color: '#6b7280',
+            }}
+          >
+            Keywords below are generated from why responses (answer1 to answer5)
+            for the current issue.
+          </p>
+        </div>
+
+        {renderWordCloud()}
+      </section>
     </>
   )
 
@@ -660,7 +781,8 @@ export default function WhyReport() {
           {demoState === 'error' &&
             renderStateCard(
               'Unable to load this report',
-              'Something went wrong while preparing the report view. Please try again later.',
+              stateText ||
+                'Something went wrong while preparing the report view. Please try again later.',
               true,
             )}
 

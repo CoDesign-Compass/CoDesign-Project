@@ -12,6 +12,10 @@ export default function IssueReport() {
   const [trendCategories, setTrendCategories] = useState([])
   const [trendLoading, setTrendLoading] = useState(false)
   const [trendError, setTrendError] = useState('')
+  const [whyWordCloudTerms, setWhyWordCloudTerms] = useState([])
+  const [howWordCloudTerms, setHowWordCloudTerms] = useState([])
+  const [whyWordCloudStatus, setWhyWordCloudStatus] = useState('idle')
+  const [howWordCloudStatus, setHowWordCloudStatus] = useState('idle')
   const [loading, setLoading] = useState(true)
   const [pageError, setPageError] = useState('')
   const [exportingRawType, setExportingRawType] = useState('')
@@ -245,6 +249,129 @@ export default function IssueReport() {
     fetchTrend()
   }, [API_BASE, issueId, trendGranularity])
 
+  useEffect(() => {
+    if (!issueId) {
+      setWhyWordCloudStatus('error')
+      setHowWordCloudStatus('error')
+      setWhyWordCloudTerms([])
+      setHowWordCloudTerms([])
+      return
+    }
+
+    const fetchWordCloudByType = async (type, setStatus, setTerms) => {
+      setStatus('loading')
+
+      try {
+        const res = await fetch(
+          `${API_BASE}/api/submissions/word-cloud/${type}?issueId=${encodeURIComponent(issueId)}`,
+        )
+        const text = await res.text()
+
+        if (!res.ok) {
+          throw new Error(text || `Failed to load ${type} word cloud.`)
+        }
+
+        const data = text ? JSON.parse(text) : []
+        const normalized = Array.isArray(data)
+          ? data
+              .map((item) => ({
+                label: String(item?.label ?? '').trim(),
+                value: Number(item?.value ?? 0),
+              }))
+              .filter((item) => item.label && Number.isFinite(item.value) && item.value > 0)
+          : []
+
+        setTerms(normalized)
+        setStatus(normalized.length ? 'success' : 'empty')
+      } catch (err) {
+        console.error(err)
+        setTerms([])
+        setStatus('error')
+      }
+    }
+
+    fetchWordCloudByType('why', setWhyWordCloudStatus, setWhyWordCloudTerms)
+    fetchWordCloudByType('how', setHowWordCloudStatus, setHowWordCloudTerms)
+  }, [API_BASE, issueId])
+
+  const renderWordCloud = (status, terms, typeLabel) => {
+    if (status === 'loading') {
+      return <div className="report-medium-placeholder">Loading {typeLabel} word cloud...</div>
+    }
+
+    if (status === 'error') {
+      return (
+        <div className="report-medium-placeholder">
+          Failed to load {typeLabel} word cloud data for this issue.
+        </div>
+      )
+    }
+
+    if (!terms.length) {
+      return <div className="report-medium-placeholder">No {typeLabel} keywords found for this issue.</div>
+    }
+
+    const values = terms.map((item) => item.value)
+    const minValue = Math.min(...values)
+    const maxValue = Math.max(...values)
+    const palette = [
+      '#e11d48',
+      '#f97316',
+      '#eab308',
+      '#22c55e',
+      '#06b6d4',
+      '#3b82f6',
+      '#6366f1',
+      '#a855f7',
+      '#ec4899',
+      '#14b8a6',
+    ]
+
+    return (
+      <div
+        className="report-medium-placeholder"
+        style={{
+          justifyContent: 'flex-start',
+          alignItems: 'flex-start',
+          textAlign: 'left',
+          gap: '12px 16px',
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignContent: 'flex-start',
+          background:
+            'linear-gradient(135deg, rgba(250, 245, 255, 0.95) 0%, rgba(240, 249, 255, 0.95) 45%, rgba(255, 251, 235, 0.95) 100%)',
+          borderStyle: 'solid',
+        }}
+      >
+        {terms.map((item, index) => {
+          const ratio =
+            maxValue === minValue ? 1 : (item.value - minValue) / (maxValue - minValue)
+          const weight = Math.round(500 + ratio * 300)
+          const fontSize = 12 + ratio * 30
+          const rotate = index % 5 === 0 ? -5 : index % 7 === 0 ? 5 : 0
+
+          return (
+            <span
+              key={`${typeLabel}-${item.label}-${index}`}
+              style={{
+                fontSize: `${fontSize}px`,
+                fontWeight: weight,
+                color: palette[index % palette.length],
+                lineHeight: 1.3,
+                transform: `rotate(${rotate}deg)`,
+                display: 'inline-block',
+                textShadow: '0 1px 0 rgba(255, 255, 255, 0.7)',
+              }}
+              title={`${item.label}: ${item.value}`}
+            >
+              {item.label}
+            </span>
+          )
+        })}
+      </div>
+    )
+  }
+
   const shareId = issue?.shareId || ''
   const shareLink = shareId ? `${window.location.origin}/share/${shareId}` : ''
 
@@ -436,16 +563,20 @@ export default function IssueReport() {
 
                         <div className="wordcloud-block">
                           <h4 className="report-card-title">Why Word Cloud</h4>
-                          <div className="report-medium-placeholder">
-                            Why word cloud placeholder
-                          </div>
+                          {renderWordCloud(
+                            whyWordCloudStatus,
+                            whyWordCloudTerms,
+                            'why',
+                          )}
                         </div>
 
                         <div className="wordcloud-block">
                           <h4 className="report-card-title">How Word Cloud</h4>
-                          <div className="report-medium-placeholder">
-                            How word cloud placeholder
-                          </div>
+                          {renderWordCloud(
+                            howWordCloudStatus,
+                            howWordCloudTerms,
+                            'how',
+                          )}
                         </div>
                       </div>
                     </div>

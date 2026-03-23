@@ -13,9 +13,14 @@ import com.example.demo.submission.dto.MonthlySubmissionCountResponse;
 import com.example.demo.submission.dto.SubmissionTrendPointResponse;
 import com.example.demo.submission.dto.SubmitSubmissionRequest;
 import com.example.demo.submission.dto.SubmitSubmissionResponse;
+import com.example.demo.submission.dto.WordCloudTermResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
@@ -24,11 +29,23 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
 import java.util.stream.Collectors;
 
 @Service
 public class SubmissionService {
+    private static final int WORD_CLOUD_LIMIT = 80;
+    private static final Set<String> STOP_WORDS = new HashSet<>(Arrays.asList(
+            "a", "an", "and", "are", "as", "at", "be", "been", "but", "by", "for", "from",
+            "has", "have", "he", "her", "hers", "him", "his", "i", "if", "in", "into", "is",
+            "it", "its", "me", "my", "of", "on", "or", "our", "ours", "she", "so", "that",
+            "the", "their", "theirs", "them", "they", "this", "to", "us", "was", "we", "were",
+            "what", "when", "where", "which", "who", "why", "with", "you", "your", "yours"
+    ));
+
     private final SubmissionRepository repo;
     private final IssueRepository issueRepository;
     private final UserProfileRepository userProfileRepository;
@@ -342,6 +359,44 @@ public class SubmissionService {
         return csv.toString();
     }
 
+    public List<WordCloudTermResponse> getIssueWhyWordCloud(Long issueId) {
+        if (issueId == null) {
+            throw new IllegalArgumentException("ISSUE_ID_REQUIRED");
+        }
+
+        RawDataContext context = buildRawDataContext(issueId);
+        List<String> answers = context.whyResponses.stream()
+                .flatMap(response -> Stream.of(
+                        response.getAnswer1(),
+                        response.getAnswer2(),
+                        response.getAnswer3(),
+                        response.getAnswer4(),
+                        response.getAnswer5()
+                ))
+                .toList();
+
+        return buildWordCloudTerms(answers);
+    }
+
+    public List<WordCloudTermResponse> getIssueHowWordCloud(Long issueId) {
+        if (issueId == null) {
+            throw new IllegalArgumentException("ISSUE_ID_REQUIRED");
+        }
+
+        RawDataContext context = buildRawDataContext(issueId);
+        List<String> answers = context.howResponses.stream()
+                .flatMap(response -> Stream.of(
+                        response.getAnswer1(),
+                        response.getAnswer2(),
+                        response.getAnswer3(),
+                        response.getAnswer4(),
+                        response.getAnswer5()
+                ))
+                .toList();
+
+        return buildWordCloudTerms(answers);
+    }
+
     private RawDataContext buildRawDataContext(Long issueId) {
         String shareId = issueRepository.findById(issueId)
                 .map(i -> i.getShareId())
@@ -379,6 +434,42 @@ public class SubmissionService {
             List<WhyResponse> whyResponses,
             List<HowResponse> howResponses
     ) {}
+
+    private List<WordCloudTermResponse> buildWordCloudTerms(List<String> answers) {
+        if (answers == null || answers.isEmpty()) {
+            return List.of();
+        }
+
+        Map<String, Integer> counts = new HashMap<>();
+
+        for (String answer : answers) {
+            if (answer == null || answer.isBlank()) {
+                continue;
+            }
+
+            String[] tokens = answer
+                    .toLowerCase(Locale.ROOT)
+                    .split("[^\\p{L}\\p{N}]+");
+
+            for (String token : tokens) {
+                String normalized = token == null ? "" : token.trim();
+                if (normalized.length() < 2 || STOP_WORDS.contains(normalized)) {
+                    continue;
+                }
+                counts.merge(normalized, 1, Integer::sum);
+            }
+        }
+
+        return counts.entrySet().stream()
+                .sorted(
+                        Comparator.<Map.Entry<String, Integer>>comparingInt(Map.Entry::getValue)
+                                .reversed()
+                                .thenComparing(Map.Entry::getKey)
+                )
+                .limit(WORD_CLOUD_LIMIT)
+                .map(entry -> new WordCloudTermResponse(entry.getKey(), entry.getValue()))
+                .toList();
+    }
 
     private void appendCsvRow(StringBuilder csv, List<String> values) {
         List<String> row = values == null ? Collections.emptyList() : values;

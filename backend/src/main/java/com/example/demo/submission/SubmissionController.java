@@ -5,6 +5,7 @@ import com.example.demo.submission.dto.MonthlySubmissionCountResponse;
 import com.example.demo.submission.dto.SubmissionTrendPointResponse;
 import com.example.demo.submission.dto.SubmitSubmissionRequest;
 import com.example.demo.submission.dto.SubmitSubmissionResponse;
+import com.example.demo.submission.dto.WordCloudTermResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -120,5 +121,19 @@ public class SubmissionController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
                 .header(HttpHeaders.CACHE_CONTROL, "no-store")
                 .body(csv.getBytes(StandardCharsets.UTF_8));
+    }
+
+    @GetMapping("/word-cloud/why")
+    public ResponseEntity<List<WordCloudTermResponse>> getIssueWhyWordCloud(
+            @RequestParam Long issueId
+    ) {
+        return ResponseEntity.ok(service.getIssueWhyWordCloud(issueId));
+    }
+
+    @GetMapping("/word-cloud/how")
+    public ResponseEntity<List<WordCloudTermResponse>> getIssueHowWordCloud(
+            @RequestParam Long issueId
+    ) {
+        return ResponseEntity.ok(service.getIssueHowWordCloud(issueId));
     }
 }
