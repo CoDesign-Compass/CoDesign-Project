@@ -29,7 +29,7 @@ public class ProfileService {
 
     public UserProfile saveProfile(String submissionId, String name, List<Long> tagIds) {
 
-        UserProfile profile = userProfileRepository.findById(submissionId)
+        UserProfile profile = userProfileRepository.findBySubmissionId(submissionId)
                 .orElse(new UserProfile(submissionId, "", new java.util.HashSet<>()));
 
         profile.setSubmissionId(submissionId);
@@ -46,7 +46,7 @@ public class ProfileService {
     }
 
     public Optional<UserProfile> getProfile(String submissionId) {
-        return userProfileRepository.findById(submissionId);
+        return userProfileRepository.findBySubmissionId(submissionId);
     }
 
     @Transactional
