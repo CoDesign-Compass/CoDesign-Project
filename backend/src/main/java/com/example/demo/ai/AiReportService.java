@@ -5,9 +5,12 @@ import com.example.demo.ai.ollama.OllamaChatRequest;
 import com.example.demo.ai.ollama.OllamaChatResponse;
 import com.example.demo.entity.HowResponse;
 import com.example.demo.entity.Issue;
+import com.example.demo.model.Tag;
+import com.example.demo.model.UserProfile;
 import com.example.demo.entity.WhyResponse;
 import com.example.demo.repository.HowResponseRepository;
 import com.example.demo.repository.IssueRepository;
+import com.example.demo.repository.UserProfileRepository;
 import com.example.demo.repository.WhyResponseRepository;
 import com.example.demo.submission.Submission;
 import com.example.demo.submission.SubmissionRepository;
@@ -17,9 +20,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.Set;
 
 @Service
 public class AiReportService {
@@ -31,6 +37,7 @@ public class AiReportService {
     private final IssueRepository issueRepository;
     private final WhyResponseRepository whyResponseRepository;
     private final HowResponseRepository howResponseRepository;
+    private final UserProfileRepository userProfileRepository;
 
     @Value("${ollama.model}")
     private String ollamaModel;
@@ -42,7 +49,8 @@ public class AiReportService {
             SubmissionRepository submissionRepository,
             IssueRepository issueRepository,
             WhyResponseRepository whyResponseRepository,
-            HowResponseRepository howResponseRepository
+            HowResponseRepository howResponseRepository,
+            UserProfileRepository userProfileRepository
     ) {
         this.ollamaClient = ollamaClient;
         this.objectMapper = objectMapper;
@@ -51,6 +59,7 @@ public class AiReportService {
         this.issueRepository = issueRepository;
         this.whyResponseRepository = whyResponseRepository;
         this.howResponseRepository = howResponseRepository;
+        this.userProfileRepository = userProfileRepository;
     }
 
     // ===== submission version =====
@@ -74,7 +83,9 @@ public class AiReportService {
             }
         }
 
-        String inputText = buildInputTextForSubmission(submission, issue);
+        UserProfile profile = userProfileRepository.findById(String.valueOf(submissionId)).orElse(null);
+
+        String inputText = buildInputTextForSubmission(submission, issue, profile);
 
         AiReportResponse report = callOllamaAndParse(inputText);
 
@@ -120,7 +131,7 @@ public class AiReportService {
                 .orElseThrow(() -> new RuntimeException("AI report not found"));
     }
 
-    // ===== 公共：调 Ollama 并解析 =====
+    // ===== use Ollama and analyse =====
     private AiReportResponse callOllamaAndParse(String inputText) {
         String schemaInstruction = """
 Return only valid JSON matching this schema:
@@ -151,6 +162,17 @@ Return only valid JSON matching this schema:
     }
   ],
   "risksAndLimitations": ["string"],
+  "sentimentAnalysis": {
+    "overallSentiment": "string",
+    "participantSentiments": [
+      {
+        "participantId": "string",
+        "sentiment": "string",
+        "rationale": "string"
+      }
+    ],
+    "summary": "string"
+  },
   "metadata": {
     "model": "string",
     "generatedAt": "string"
@@ -163,7 +185,7 @@ Do not invent facts.
 """;
 
         String userPrompt = """
-Generate a structured AI report from the following input.
+Generate a structured report from the following input.
 
 Input:
 %s
@@ -208,11 +230,11 @@ Input:
         }
     }
 
-    // ===== 公共：保存 ai_reports =====
+    // ===== save ai_reports =====
     private void saveAiReport(Long submissionId, Long issueId, String shareId, AiReportResponse report) {
         try {
             String parsedReportJson = objectMapper.writeValueAsString(report);
-            String rawOutput = parsedReportJson; // 当前直接保存解析后的 JSON；若要保留原始字符串可再分开
+            String rawOutput = parsedReportJson; 
 
             AiReport entity = new AiReport();
             entity.setSubmissionId(submissionId);
@@ -235,7 +257,7 @@ Input:
     }
 
     // ===== submission version input =====
-    private String buildInputTextForSubmission(Submission submission, Issue issue) {
+    private String buildInputTextForSubmission(Submission submission, Issue issue, UserProfile profile){
         return """
 Submission metadata:
 - Submission ID: %d
@@ -256,8 +278,13 @@ Issue context:
 - Issue content:
 %s
 
+Profile context:
+- Profile submission ID: %s
+- Profile name: %s
+- Selected tags: %s
+
 Instructions:
-Generate a structured AI report based only on the submission metadata and the issue context above.
+Generate a structured report based only on the submission metadata and the issue context above.
 Do not invent user feedback that is not present in the input.
 If evidence is limited, clearly reflect that in the summary, insights, and risks/limitations.
 """.formatted(
@@ -274,7 +301,10 @@ If evidence is limited, clearly reflect that in the summary, insights, and risks
                 issue == null ? "" : safe(issue.getShareId()),
                 issue == null || issue.getState() == null ? "" : issue.getState().name(),
                 issue == null ? "" : stringify(issue.getPublishedAt()),
-                issue == null ? "" : safe(issue.getIssueContent())
+                issue == null ? "" : safe(issue.getIssueContent()),
+                profile == null ? "" : safe(profile.getSubmissionId()),
+                profile == null ? "" : safe(profile.getName()),
+                formatTags(profile == null ? null : profile.getSelectedTags())
         );
     }
 
@@ -326,11 +356,24 @@ If evidence is limited, clearly reflect that in the summary, insights, and risks
 
         sb.append("\nInstructions:\n");
         sb.append("Generate a structured AI report based on the issue context and all why/how user responses above.\n");
-        sb.append("Summarise common themes, disagreements, pain points, and actionable opportunities.\n");
-        sb.append("Prioritise actual user responses over generic assumptions.\n");
-        sb.append("Do not invent facts. If data is limited, state this clearly in risks and limitations.\n");
+        sb.append("1. Summarise common themes, disagreements, pain points, and actionable opportunities.\n");
+        sb.append("2. Perform Sentiment Analysis for each participant. Match Why response #N with How response #N (if both exist) as the same participant.\n");
+        sb.append("   - For each participant, identify their primary sentiment (e.g., Positive, Anxious, Expectant, Frustrated, Neutral).\n");
+        sb.append("   - Provide a brief rationale for that sentiment.\n");
+        sb.append("3. Prioritise actual user responses over generic assumptions.\n");
+        sb.append("4. Do not invent facts. If data is limited, state this clearly in risks and limitations.\n");
 
         return sb.toString();
+    }
+
+    private String formatTags(Set<Tag> tags) {
+        if (tags == null || tags.isEmpty()) {
+            return "";
+        }
+        return tags.stream()
+                .map(Tag::getLabel)
+                .filter(label -> label != null && !label.isBlank())
+                .collect(Collectors.joining(", "));
     }
 
     private String safe(String value) {

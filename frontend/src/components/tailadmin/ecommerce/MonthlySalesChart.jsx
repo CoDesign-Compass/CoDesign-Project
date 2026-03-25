@@ -1,11 +1,66 @@
 import Chart from 'react-apexcharts'
-import { ApexOptions } from 'apexcharts'
 import { Dropdown } from '../ui/dropdown/Dropdown'
 import { DropdownItem } from '../ui/dropdown/DropdownItem'
 import { MoreDotIcon } from '../icons'
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 export default function MonthlySalesChart() {
+  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'
+  const [isOpen, setIsOpen] = useState(false)
+  const [monthlyData, setMonthlyData] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    let cancelled = false
+
+    const fetchMonthlySubmissions = async () => {
+      setLoading(true)
+      setError('')
+
+      try {
+        const res = await fetch(`${API_BASE}/api/submissions/monthly?months=12`)
+        if (!res.ok) {
+          throw new Error(`Failed to load monthly submissions: ${res.status}`)
+        }
+
+        const data = await res.json()
+        if (!cancelled) {
+          setMonthlyData(Array.isArray(data) ? data : [])
+        }
+      } catch (err) {
+        console.error(err)
+        if (!cancelled) {
+          setError('Failed to load chart data')
+          setMonthlyData([])
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false)
+        }
+      }
+    }
+
+    fetchMonthlySubmissions()
+
+    return () => {
+      cancelled = true
+    }
+  }, [API_BASE])
+
+  const categories = useMemo(() => {
+    return monthlyData.map((item) => {
+      const [year, month] = String(item.month || '').split('-')
+      if (!year || !month) return String(item.month || '')
+      const dt = new Date(Number(year), Number(month) - 1, 1)
+      return dt.toLocaleString('en-US', { month: 'short' })
+    })
+  }, [monthlyData])
+
+  const seriesData = useMemo(() => {
+    return monthlyData.map((item) => Number(item.count || 0))
+  }, [monthlyData])
+
   const options = {
     colors: ['#465fff'],
     chart: {
@@ -33,20 +88,7 @@ export default function MonthlySalesChart() {
       colors: ['transparent'],
     },
     xaxis: {
-      categories: [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec',
-      ],
+      categories,
       axisBorder: {
         show: false,
       },
@@ -78,20 +120,20 @@ export default function MonthlySalesChart() {
 
     tooltip: {
       x: {
-        show: false,
+        show: true,
       },
       y: {
         formatter: (val) => `${val}`,
       },
     },
   }
+
   const series = [
     {
       name: 'Submissions',
-      data: [168, 385, 201, 298, 187, 195, 291, 110, 215, 390, 280, 112],
+      data: seriesData,
     },
   ]
-  const [isOpen, setIsOpen] = useState(false)
 
   function toggleDropdown() {
     setIsOpen(!isOpen)
@@ -135,6 +177,9 @@ export default function MonthlySalesChart() {
         <div className="-ml-5 min-w-[650px] xl:min-w-full pl-2">
           <Chart options={options} series={series} type="bar" height={180} />
         </div>
+      </div>
+      <div className="pb-4 text-xs text-gray-500 dark:text-gray-400">
+        {error ? error : loading ? 'Loading monthly submissions...' : 'Showing the last 12 months of submitted responses.'}
       </div>
     </div>
   )

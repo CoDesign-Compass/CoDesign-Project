@@ -8,6 +8,7 @@ export default function Issues() {
 
   const [issues, setIssues] = useState([])
   const [loading, setLoading] = useState(true)
+  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'
 
   useEffect(() => {
     const fetchIssues = async () => {
@@ -23,7 +24,7 @@ export default function Issues() {
     }
 
     fetchIssues()
-  }, [])
+  }, [API_BASE])
 
   if (loading) {
     return <div>Loading issues...</div>
