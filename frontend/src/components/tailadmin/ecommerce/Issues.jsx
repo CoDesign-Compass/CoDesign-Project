@@ -13,7 +13,7 @@ export default function Issues() {
   useEffect(() => {
     const fetchIssues = async () => {
       try {
-        const res = await fetch(`${API_BASE}/api/issues`)
+        const res = await fetch('https://codesign-project.onrender.com/api/issues')
         const data = await res.json()
         setIssues(data)
       } catch (err) {

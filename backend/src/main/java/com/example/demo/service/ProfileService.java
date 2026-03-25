@@ -28,19 +28,25 @@ public class ProfileService {
     }
 
     public UserProfile saveProfile(String submissionId, String name, List<Long> tagIds) {
-        UserProfile profile = userProfileRepository.findById(submissionId)
-                .orElse(new UserProfile());
+
+        UserProfile profile = userProfileRepository.findBySubmissionId(submissionId)
+                .orElse(new UserProfile(submissionId, "", new java.util.HashSet<>()));
+
         profile.setSubmissionId(submissionId);
         profile.setName(name);
 
-        Set<Tag> tags = tagRepository.findAllById(tagIds).stream().collect(Collectors.toSet());
+        Set<Tag> tags = tagIds == null ? Set.of() :
+                tagRepository.findAllById(tagIds)
+                        .stream()
+                        .collect(Collectors.toSet());
+
         profile.setSelectedTags(tags);
 
         return userProfileRepository.save(profile);
     }
 
     public Optional<UserProfile> getProfile(String submissionId) {
-        return userProfileRepository.findById(submissionId);
+        return userProfileRepository.findBySubmissionId(submissionId);
     }
 
     @Transactional
