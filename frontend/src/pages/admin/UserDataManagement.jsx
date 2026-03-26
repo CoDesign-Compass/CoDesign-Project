@@ -51,11 +51,16 @@ export default function UserDataManagement() {
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
   const [q, setQ] = useState('')
-  const [nextBulkToSent, setNextBulkToSent] = useState(true)
   const [selected, setSelected] = useState(new Set())
   const [pageSize, setPageSize] = useState(10)
   const [page, setPage] = useState(1)
   const [updatingStatus, setUpdatingStatus] = useState(false)
+  const [voucherCode, setVoucherCode] = useState('')
+  const [showTemplateEditor, setShowTemplateEditor] = useState(false)
+  const [notice, setNotice] = useState('')
+  const [emailTemplateDraft, setEmailTemplateDraft] = useState(
+    'Dear {{name}},\n\nThank you so much for taking the time to answer our questions. We sincerely appreciate your support and contribution.\n\nAs a small token of our appreciation, we are happy to share your voucher code: {{voucherCode}}.\n\nPlease feel free to contact us if you have any questions.\n\nKind regards,\nCoDesign Team',
+  )
 
   useEffect(() => {
     let cancelled = false
@@ -79,7 +84,7 @@ export default function UserDataManagement() {
               id: String(u.id),
               name: u.username || '',
               email: u.email || '',
-              Sent: Boolean(u.wantsUpdates),
+              Sent: Boolean(u.wantsGift),
             }))
           })
           setSelected((prevSelected) => {
@@ -142,13 +147,30 @@ export default function UserDataManagement() {
     })
   }
 
-  async function persistUserStatus(userId, wantsUpdates) {
-    const res = await fetch(`${API_BASE}/api/users/${userId}/wants-updates`, {
+  async function persistUserStatus(userId, wantsGift) {
+    const res = await fetch(`${API_BASE}/api/users/${userId}/wants-gift`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ wantsUpdates }),
+      body: JSON.stringify({ wantsGift }),
+    })
+    const text = await res.text()
+    if (!res.ok) {
+      throw new Error(text || `HTTP ${res.status}`)
+    }
+  }
+
+  async function sendGiftEmailToUser(userId, voucherCode) {
+    const res = await fetch(`${API_BASE}/api/users/${userId}/send-gift-email`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        voucherCode,
+        template: emailTemplateDraft,
+      }),
     })
     const text = await res.text()
     if (!res.ok) {
@@ -162,41 +184,93 @@ export default function UserDataManagement() {
     const row = rows.find((r) => r.id === id)
     if (!row) return
 
+    const defaultCode = voucherCode.trim()
+    const enteredCode = window.prompt(
+      `Enter voucher code for ${row.name || row.email || row.id}:`,
+      defaultCode,
+    )
+    if (enteredCode == null) return
+
+    const code = enteredCode.trim()
+    if (!code) {
+      setLoadError('Voucher code is required to send gift email.')
+      return
+    }
+
     setUpdatingStatus(true)
     try {
-      const nextValue = !row.Sent
-      await persistUserStatus(id, nextValue)
+      await sendGiftEmailToUser(id, code)
       setRows((list) =>
-        list.map((r) => (r.id === id ? { ...r, Sent: nextValue } : r)),
+        list.map((r) => (r.id === id ? { ...r, Sent: true } : r)),
       )
+      setVoucherCode(code)
+      setNotice(`Gift email sent to ${row.email}.`)
       setLoadError('')
     } catch (err) {
       console.error(err)
-      setLoadError('Failed to update user status.')
+      const message = err instanceof Error ? err.message : ''
+      setLoadError(message || 'Failed to send gift email.')
     } finally {
       setUpdatingStatus(false)
     }
   }
 
-  async function handleBulkToggleStatus() {
+  async function handleSendSelected() {
     if (selected.size === 0) return
+
+    const defaultCode = voucherCode.trim()
+    const enteredCode = window.prompt(
+      'Enter voucher code for selected users:',
+      defaultCode,
+    )
+    if (enteredCode == null) return
+
+    const code = enteredCode.trim()
+    if (!code) {
+      setLoadError('Voucher code is required to send gift emails.')
+      return
+    }
 
     setUpdatingStatus(true)
     try {
       const ids = Array.from(selected)
-      await Promise.all(ids.map((id) => persistUserStatus(id, nextBulkToSent)))
-
-      setRows((prev) =>
-        prev.map((u) =>
-          selected.has(u.id) ? { ...u, Sent: nextBulkToSent } : u,
-        ),
+      const settled = await Promise.allSettled(
+        ids.map(async (id) => {
+          await sendGiftEmailToUser(id, code)
+          await persistUserStatus(id, true)
+          return id
+        }),
       )
-      setNextBulkToSent((v) => !v)
-      setSelected(new Set())
-      setLoadError('')
+
+      const successIds = []
+      const failedIds = []
+
+      settled.forEach((result, idx) => {
+        const id = ids[idx]
+        if (result.status === 'fulfilled') successIds.push(id)
+        else failedIds.push(id)
+      })
+
+      const successSet = new Set(successIds)
+      setRows((prev) =>
+        prev.map((u) => (successSet.has(u.id) ? { ...u, Sent: true } : u)),
+      )
+      setSelected(new Set(failedIds))
+      setVoucherCode(code)
+      setNotice(
+        `Send Selected completed. Success: ${successIds.length}, Failed: ${failedIds.length}.`,
+      )
+
+      if (failedIds.length > 0) {
+        setLoadError(
+          `Failed users: ${failedIds.join(', ')}. Please retry for the failed users.`,
+        )
+      } else {
+        setLoadError('')
+      }
     } catch (err) {
       console.error(err)
-      setLoadError('Failed to update selected users.')
+      setLoadError('Failed to send emails to selected users.')
     } finally {
       setUpdatingStatus(false)
     }
@@ -214,6 +288,29 @@ export default function UserDataManagement() {
     const csv = usersToCSV(data)
     const ts = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')
     downloadTextAsFile(csv, `users-${scope}-${ts}.csv`)
+  }
+
+  function handleConfirmVoucher() {
+    const code = voucherCode.trim()
+    if (!selected.size) {
+      setLoadError('Please select at least one user before confirming voucher.')
+      return
+    }
+    if (!code) {
+      setLoadError('Please enter a vouchor code before confirming.')
+      return
+    }
+
+    const sampleMessage = emailTemplateDraft
+      .replace('{{name}}', 'User')
+      .replace('{{voucherCode}}', code)
+
+    setNotice(
+      `Voucher confirmed for ${selected.size} selected user${
+        selected.size === 1 ? '' : 's'
+      }. Sample email prepared:\n${sampleMessage}`,
+    )
+    setLoadError('')
   }
 
   const hasSearch = q.trim().length > 0
@@ -276,60 +373,153 @@ export default function UserDataManagement() {
             {loadError}
           </div>
         )}
+        {!loading && notice && (
+          <div className="mb-3 whitespace-pre-line rounded-xl border border-emerald-100 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+            {notice}
+          </div>
+        )}
 
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-            <button
-              onClick={handleBulkToggleStatus}
-              disabled={!selected.size || updatingStatus}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-40"
-              title={
-                selected.size
-                  ? `Set selected to ${nextBulkToSent ? 'Sent' : 'Not Sent'}`
-                  : 'No rows selected'
-              }
-            >
-              {`Set ${nextBulkToSent ? 'Sent' : 'Not Sent'} (Selected)`}
-            </button>
+        <div className="space-y-4">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+              <button
+                onClick={handleSendSelected}
+                disabled={!selected.size || updatingStatus}
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-40"
+                title={
+                  selected.size
+                    ? 'Send emails to selected users'
+                    : 'No rows selected'
+                }
+              >
+                Send Selected
+              </button>
 
-            <button
-              onClick={() => handleExport('selected')}
-              disabled={!selected.size || updatingStatus}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
-              title="Export selected rows to CSV"
-            >
-              Export Selected
-            </button>
+              <button
+                onClick={() => handleExport('selected')}
+                disabled={!selected.size || updatingStatus}
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+                title="Export selected rows to CSV"
+              >
+                Export Selected
+              </button>
 
-            <button
-              onClick={() => handleExport('all')}
-              disabled={updatingStatus}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-              title="Export all rows to CSV"
-            >
-              Export All
-            </button>
+              <button
+                onClick={() => handleExport('all')}
+                disabled={updatingStatus}
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                title="Export all rows to CSV"
+              >
+                Export All
+              </button>
+            </div>
+
+            <div className="relative">
+              <input
+                value={q}
+                onChange={(e) => {
+                  setQ(e.target.value)
+                  setPage(1)
+                }}
+                placeholder="Search by name / email / id"
+                className="h-10 w-full rounded-xl border border-gray-200 pl-10 pr-3 text-sm outline-none focus:ring-2 focus:ring-indigo-200 sm:w-[300px]"
+              />
+              <svg
+                className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <circle cx="11" cy="11" r="7" strokeWidth="1.8" />
+                <path
+                  d="M20 20L17 17"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </div>
           </div>
 
-          <div className="relative">
-            <input
-              value={q}
-              onChange={(e) => {
-                setQ(e.target.value)
-                setPage(1)
-              }}
-              placeholder="Search by name / email / id"
-              className="h-10 w-full rounded-xl border border-gray-200 pl-10 pr-3 text-sm outline-none focus:ring-2 focus:ring-indigo-200 sm:w-[300px]"
-            />
-            <svg
-              className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-            >
-              <circle cx="11" cy="11" r="7" strokeWidth="1.8" />
-              <path d="M20 20L17 17" strokeWidth="1.8" strokeLinecap="round" />
-            </svg>
+          <div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-4 md:p-5">
+            <div className="mb-3 text-sm font-semibold text-indigo-900">
+              Vouchor Code
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <input
+                id="vouchor-code"
+                value={voucherCode}
+                onChange={(e) => {
+                  setVoucherCode(e.target.value)
+                  if (notice) setNotice('')
+                }}
+                placeholder="Enter voucher code for selected users"
+                className="h-11 w-full rounded-xl border border-indigo-200 bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-indigo-300 sm:max-w-md"
+              />
+              <button
+                onClick={handleConfirmVoucher}
+                disabled={updatingStatus}
+                className="inline-flex h-11 items-center justify-center rounded-xl border border-indigo-300 bg-white px-5 text-sm font-semibold text-indigo-700 hover:bg-indigo-100 disabled:cursor-not-allowed disabled:opacity-40"
+                title="Confirm voucher for selected users"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 md:p-5">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <div className="text-sm font-semibold text-amber-900">
+                  Email Template
+                </div>
+                <p className="text-xs text-amber-700">
+                  Use <code>{'{{name}}'}</code> and{' '}
+                  <code>{'{{voucherCode}}'}</code> as placeholders.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowTemplateEditor((v) => !v)}
+                disabled={updatingStatus}
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-amber-300 bg-white px-4 py-2 text-sm font-medium text-amber-800 hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-40"
+                title="Edit email template used for voucher emails"
+              >
+                {showTemplateEditor
+                  ? 'Hide Email Template'
+                  : 'Edit Email Template'}
+              </button>
+            </div>
+
+            {showTemplateEditor && (
+              <div className="mt-4">
+                <textarea
+                  value={emailTemplateDraft}
+                  onChange={(e) => {
+                    setEmailTemplateDraft(e.target.value)
+                    if (notice) setNotice('')
+                  }}
+                  rows={10}
+                  className="w-full rounded-xl border border-amber-200 bg-white p-3 text-sm text-gray-800 outline-none focus:ring-2 focus:ring-amber-300"
+                />
+                <div className="mt-3 flex gap-2">
+                  <button
+                    onClick={() => {
+                      setShowTemplateEditor(false)
+                      setNotice('Email template updated.')
+                      setLoadError('')
+                    }}
+                    className="inline-flex items-center justify-center rounded-lg border border-amber-300 bg-white px-3 py-1.5 text-sm font-medium text-amber-800 hover:bg-amber-100"
+                  >
+                    Save Template
+                  </button>
+                  <button
+                    onClick={() => setShowTemplateEditor(false)}
+                    className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </section>
