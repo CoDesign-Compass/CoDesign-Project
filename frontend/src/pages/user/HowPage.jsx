@@ -1,21 +1,85 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { useIssue } from '../../context/IssueContext'
 import { useTheme } from '../../context/ThemeContext'
-import { useNavigate } from 'react-router-dom'
+
+function InfoHint({ title, text, isDark }) {
+  const bg = isDark ? '#1f1f1f' : '#f8f9fa'
+  const border = isDark ? 'rgba(255,255,255,0.12)' : '#e9ecef'
+  const titleColor = isDark ? '#f5f5f5' : '#111111'
+  const textColor = isDark ? '#cfcfcf' : '#555555'
+  const iconBg = isDark ? 'rgba(255,255,255,0.08)' : '#e9ecef'
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        gap: 12,
+        alignItems: 'flex-start',
+        padding: '14px 16px',
+        borderRadius: 10,
+        background: bg,
+        border: `1px solid ${border}`,
+        marginBottom: 16,
+      }}
+    >
+      <div
+        aria-hidden="true"
+        style={{
+          width: 22,
+          height: 22,
+          minWidth: 22,
+          borderRadius: '50%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: iconBg,
+          color: titleColor,
+          fontSize: 13,
+          fontWeight: 700,
+          lineHeight: 1,
+          marginTop: 1,
+        }}
+      >
+        i
+      </div>
+
+      <div>
+        <div
+          style={{
+            fontWeight: 600,
+            marginBottom: 4,
+            color: titleColor,
+          }}
+        >
+          {title}
+        </div>
+
+        <div
+          style={{
+            fontSize: 14,
+            lineHeight: 1.6,
+            color: textColor,
+          }}
+        >
+          {text}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function HowPage() {
   const { theme } = useTheme()
   const { shareId: routeShareId } = useParams()
   const { setShareId } = useIssue()
+  const navigate = useNavigate()
 
   const [step, setStep] = useState(0)
-
   const questions = Array(5).fill(
     'Write in your own words. No names or identifiers.',
   )
-
   const [answers, setAnswers] = useState(Array(questions.length).fill(''))
   const inputRef = useRef(null)
   const endRef = useRef(null)
@@ -24,7 +88,6 @@ export default function HowPage() {
 
   const pageTextColor = isDark ? '#f5f5f5' : '#111111'
   const secondaryTextColor = isDark ? '#cfcfcf' : '#555555'
-  const cardBackground = isDark ? '#232323' : '#f5f5f5'
   const answeredCardBackground = isDark ? '#1f1f1f' : '#f1f3f5'
   const borderColor = isDark ? 'rgba(255,255,255,0.12)' : '#e9ecef'
   const inputBackground = isDark ? '#1a1a1a' : '#ffffff'
@@ -32,7 +95,6 @@ export default function HowPage() {
   const inputTextColor = isDark ? '#f5f5f5' : '#111111'
   const buttonBackground = '#ffe071'
   const buttonTextColor = '#000000'
-  const navigate = useNavigate()
 
   const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'
 
@@ -72,7 +134,6 @@ export default function HowPage() {
     }
   }, [routeShareId, setShareId])
 
-  //const next = () => setStep((s) => Math.min(s + 1, questions.length))
   const next = async () => {
     const isLastQuestion = step === questions.length - 1
 
@@ -83,10 +144,11 @@ export default function HowPage() {
 
     setStep((s) => s + 1)
   }
-  //const finish = () => setStep(questions.length)
+
   const finish = async () => {
     await submitHow()
   }
+
   return (
     <div
       style={{
@@ -100,18 +162,12 @@ export default function HowPage() {
         <strong>How could this be improved?</strong>
       </p>
 
-      <div
-        style={{
-          fontSize: 14,
-          lineHeight: 1.5,
-          color: secondaryTextColor,
-          marginBottom: 16,
-        }}
-      >
-        Follow-up question {step + 1} of {questions.length}
-      </div>
+      <InfoHint
+        isDark={isDark}
+        title={`Follow-up question ${step + 1} of ${questions.length}`}
+        text="Write in your own words. No names or identifiers."
+      />
 
-      {/* Answered questions displayed */}
       {questions.slice(0, step).map((q, i) => (
         <div
           key={i}
@@ -173,16 +229,6 @@ export default function HowPage() {
             marginTop: 8,
           }}
         >
-          <div
-            style={{
-              fontSize: 14,
-              lineHeight: 1.5,
-              color: secondaryTextColor,
-            }}
-          >
-            {questions[step]}
-          </div>
-
           <textarea
             ref={inputRef}
             placeholder="Type your answer here..."

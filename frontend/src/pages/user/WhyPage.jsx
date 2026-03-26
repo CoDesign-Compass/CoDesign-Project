@@ -1,14 +1,80 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { useIssue } from '../../context/IssueContext'
 import { useTheme } from '../../context/ThemeContext'
-import { useNavigate } from 'react-router-dom'
+
+function InfoHint({ title, text, isDark }) {
+  const bg = isDark ? '#1f1f1f' : '#f8f9fa'
+  const border = isDark ? 'rgba(255,255,255,0.12)' : '#e9ecef'
+  const titleColor = isDark ? '#f5f5f5' : '#111111'
+  const textColor = isDark ? '#cfcfcf' : '#555555'
+  const iconBg = isDark ? 'rgba(255,255,255,0.08)' : '#e9ecef'
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        gap: 12,
+        alignItems: 'flex-start',
+        padding: '14px 16px',
+        borderRadius: 10,
+        background: bg,
+        border: `1px solid ${border}`,
+        marginBottom: 16,
+      }}
+    >
+      <div
+        aria-hidden="true"
+        style={{
+          width: 22,
+          height: 22,
+          minWidth: 22,
+          borderRadius: '50%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: iconBg,
+          color: titleColor,
+          fontSize: 13,
+          fontWeight: 700,
+          lineHeight: 1,
+          marginTop: 1,
+        }}
+      >
+        i
+      </div>
+
+      <div>
+        <div
+          style={{
+            fontWeight: 600,
+            marginBottom: 4,
+            color: titleColor,
+          }}
+        >
+          {title}
+        </div>
+
+        <div
+          style={{
+            fontSize: 14,
+            lineHeight: 1.6,
+            color: textColor,
+          }}
+        >
+          {text}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function WhyPage() {
   const { theme } = useTheme()
   const { shareId: routeShareId } = useParams()
   const { setShareId, issueContent } = useIssue()
+  const navigate = useNavigate()
 
   const [step, setStep] = useState(0)
   const questions = Array(5).fill(
@@ -34,9 +100,8 @@ export default function WhyPage() {
   const actionButtonBackground = '#ffe071'
   const actionButtonTextColor = '#000000'
   const hintCardBackground = isDark ? '#1f1f1f' : '#f8f9fa'
-  const navigate = useNavigate()
 
-  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'
+  const API_BASE = process.env.REACT_APP_API_BASE_URL 
 
   const submitWhy = async () => {
     const body = {
@@ -77,30 +142,40 @@ export default function WhyPage() {
     }
   }, [routeShareId, setShareId])
 
-  const getTopChoiceStyle = (key, baseColor, hoverColor, selectedColor) => ({
-    flex: 1,
-    backgroundColor:
-      selectedButton === key
+  const getTopChoiceStyle = (key, baseColor, hoverColor, selectedColor) => {
+    const hasSelection = !!selectedButton
+    const isSelected = selectedButton === key
+    const isHovered = hoveredButton === key
+    const isOtherDimmed = hasSelection && !isSelected
+
+    return {
+      flex: 1,
+      backgroundColor: isSelected
         ? selectedColor
-        : hoveredButton === key
+        : isHovered
           ? hoverColor
           : baseColor,
-    transform: hoveredButton === key ? 'translateY(-2px)' : 'translateY(0)',
-    boxShadow:
-      selectedButton === key
-        ? '0 0 0 2px rgba(0,0,0,0.08), 0 6px 14px rgba(0,0,0,0.18)'
-        : hoveredButton === key
-          ? '0 6px 14px rgba(0,0,0,0.18)'
+      transform: isSelected
+        ? 'translateY(-2px)'
+        : isHovered
+          ? 'translateY(-2px)'
+          : 'translateY(0)',
+      boxShadow: isSelected
+        ? '0 0 0 3px rgba(0,0,0,0.18), 0 10px 20px rgba(0,0,0,0.18)'
+        : isHovered
+          ? '0 6px 14px rgba(0,0,0,0.14)'
           : '0 2px 6px rgba(0,0,0,0.08)',
-    opacity: 1,
-    cursor: 'pointer',
-    transition: 'all 0.15s ease',
-    border: 'none',
-    borderRadius: '6px',
-    padding: '0.75rem',
-    fontWeight: 'bold',
-    color: '#000000',
-  })
+      opacity: isOtherDimmed ? 0.45 : 1,
+      filter: isOtherDimmed ? 'saturate(0.65)' : 'none',
+      cursor: 'pointer',
+      transition: 'all 0.18s ease',
+      border: isSelected ? '2px solid rgba(0,0,0,0.28)' : '1px solid rgba(0,0,0,0.06)',
+      borderRadius: '8px',
+      padding: '0.85rem',
+      fontWeight: 700,
+      color: '#000000',
+    }
+  }
 
   const next = async () => {
     const isLastQuestion = step === questions.length - 1
@@ -127,7 +202,6 @@ export default function WhyPage() {
         color: pageTextColor,
       }}
     >
-      {/* Issue Section */}
       <div style={{ marginBottom: '2rem' }}>
         <span
           style={{
@@ -186,9 +260,16 @@ export default function WhyPage() {
             onMouseEnter={() => setHoveredButton('agree')}
             onMouseLeave={() => setHoveredButton(null)}
             onClick={() => setSelectedButton('agree')}
-            style={getTopChoiceStyle('agree', '#d8f5dc', '#c7f7cd', '#b2f2bb')}
+            style={getTopChoiceStyle('agree', '#d8f5dc', '#c7f7cd', '#69db7c')}
           >
-            Agree
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+              {selectedButton === 'agree' && (
+                <span aria-hidden="true" style={{ fontSize: 14, fontWeight: 900 }}>
+                  ✓
+                </span>
+              )}
+              <span>Agree</span>
+            </span>
           </button>
 
           <button
@@ -200,10 +281,17 @@ export default function WhyPage() {
               'disagree',
               '#ffd6d6',
               '#ffc2c2',
-              '#ffa8a8',
+              '#ff8787',
             )}
           >
-            Disagree
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+              {selectedButton === 'disagree' && (
+                <span aria-hidden="true" style={{ fontSize: 14, fontWeight: 900 }}>
+                  ✓
+                </span>
+              )}
+              <span>Disagree</span>
+            </span>
           </button>
 
           <button
@@ -215,10 +303,17 @@ export default function WhyPage() {
               'unknown',
               '#f8f9fa',
               '#f1f3f5',
-              '#e9ecef',
+              '#dee2e6',
             )}
           >
-            I don’t know
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+              {selectedButton === 'unknown' && (
+                <span aria-hidden="true" style={{ fontSize: 14, fontWeight: 900 }}>
+                  ✓
+                </span>
+              )}
+              <span>I don't know</span>
+            </span>
           </button>
         </div>
       </div>
@@ -268,18 +363,12 @@ export default function WhyPage() {
             Why does this issue matter to you?
           </div>
 
-          <div
-            style={{
-              fontSize: 14,
-              lineHeight: 1.5,
-              color: secondaryTextColor,
-              marginBottom: 16,
-            }}
-          >
-            Follow-up question {step + 1} of {questions.length}
-          </div>
+          <InfoHint
+            isDark={isDark}
+            title={`Follow-up question ${step + 1} of ${questions.length}`}
+            text="Write in your own words. No names or identifiers."
+          />
 
-          {/* Previously answered questions */}
           {questions.slice(0, step).map((q, i) => (
             <div
               key={i}
@@ -341,16 +430,6 @@ export default function WhyPage() {
                 marginTop: 8,
               }}
             >
-              <div
-                style={{
-                  fontSize: 14,
-                  lineHeight: 1.5,
-                  color: secondaryTextColor,
-                }}
-              >
-                {questions[step]}
-              </div>
-
               <textarea
                 ref={inputRef}
                 placeholder="Type your answer here..."

@@ -3,7 +3,7 @@ import { BoxIconLine, GroupIcon } from '../icons'
 import Badge from '../ui/badge/Badge'
 
 export default function EcommerceMetrics() {
-  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'
+  const API_BASE = process.env.REACT_APP_API_BASE_URL 
   const [submissionCount, setSubmissionCount] = useState(null)
   const [issueCount, setIssueCount] = useState(null)
   const [loading, setLoading] = useState(true)

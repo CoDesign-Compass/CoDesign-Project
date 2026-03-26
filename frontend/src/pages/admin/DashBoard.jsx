@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import MonthlySalesChart from '../../components/tailadmin/ecommerce/MonthlySalesChart'
 import EcommerceMetrics from '../../components/tailadmin/ecommerce/EcommerceMetrics'
 import MonthlyTarget from '../../components/tailadmin/ecommerce/AnalysisReport'
@@ -10,23 +10,30 @@ const SectionCard = ({
   children,
   className = '',
   bodyClassName = '',
+  headerRight = null,
 }) => {
   return (
     <section
       className={`overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-white/[0.03] ${className}`}
     >
-      {(title || subtitle) && (
+      {(title || subtitle || headerRight) && (
         <div className="border-b border-gray-100 px-5 py-4 dark:border-gray-800 md:px-6">
-          {title && (
-            <h2 className="text-base font-semibold text-gray-800 dark:text-white/90">
-              {title}
-            </h2>
-          )}
-          {subtitle && (
-            <p className="mt-1 text-sm leading-6 text-gray-500 dark:text-gray-400">
-              {subtitle}
-            </p>
-          )}
+          <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+            <div>
+              {title && (
+                <h2 className="text-base font-semibold text-gray-800 dark:text-white/90">
+                  {title}
+                </h2>
+              )}
+              {subtitle && (
+                <p className="mt-1 text-sm leading-6 text-gray-500 dark:text-gray-400">
+                  {subtitle}
+                </p>
+              )}
+            </div>
+
+            {headerRight && <div className="shrink-0">{headerRight}</div>}
+          </div>
         </div>
       )}
 
@@ -57,6 +64,8 @@ const EmptyStateCard = ({
 }
 
 const DashBoard = () => {
+  const [issueSortBy, setIssueSortBy] = useState('updated-desc')
+
   return (
     <div className="space-y-6">
       {/* Page header */}
@@ -76,11 +85,38 @@ const DashBoard = () => {
         <div className="col-span-12">
           <SectionCard
             title="Issues Overview"
-            subtitle="Monitor recent issue activity and quickly scan the current reporting status."
+            subtitle="Monitor recent issue activity and quickly scan the current reporting status. By default, issues are shown by most recently modified first."
             bodyClassName="p-0"
+            headerRight={
+              <div className="flex items-center gap-2">
+                <label
+                  htmlFor="issue-sort"
+                  className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Sort by
+                </label>
+                <select
+                  id="issue-sort"
+                  value={issueSortBy}
+                  onChange={(e) => setIssueSortBy(e.target.value)}
+                  className="min-w-[280px] rounded-xl border border-gray-300 bg-white px-4 py-3 text-base text-gray-700 outline-none transition focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
+                >
+                  <option value="updated-desc">
+                    Last modified: newest first
+                  </option>
+                  <option value="updated-asc">
+                    Last modified: oldest first
+                  </option>
+                  <option value="created-desc">Created: newest first</option>
+                  <option value="created-asc">Created: oldest first</option>
+                  <option value="id-asc">Issue ID: ascending</option>
+                  <option value="title-asc">Title: A to Z</option>
+                </select>
+              </div>
+            }
           >
             <div className="p-5 md:p-6">
-              <Issues />
+              <Issues sortBy={issueSortBy} />
             </div>
           </SectionCard>
         </div>

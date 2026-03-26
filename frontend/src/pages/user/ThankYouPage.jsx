@@ -341,7 +341,7 @@ export default function ThankPage() {
               fontFamily: 'Poppins, sans-serif',
             }}
           >
-            Give us your email for $10 Coles voucher or more
+            Give us your email for $10 shopping voucher or more
           </p>
 
           <p
@@ -537,7 +537,7 @@ export default function ThankPage() {
                 lineHeight: 1.45,
               }}
             >
-              Send me a $10 Coles voucher
+              Send me a $10 shopping voucher
             </span>
           </label>
 
