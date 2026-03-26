@@ -101,7 +101,7 @@ export default function WhyPage() {
   const actionButtonTextColor = '#000000'
   const hintCardBackground = isDark ? '#1f1f1f' : '#f8f9fa'
 
-  const API_BASE = process.env.REACT_APP_API_BASE_URL 
+  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://codesign-project.onrender.com'
 
   const submitWhy = async () => {
     const body = {

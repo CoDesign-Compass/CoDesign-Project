@@ -31,7 +31,7 @@ export default function WelcomePage() {
   const helpEmailRef = useRef(null)
   const navigate = useNavigate()
 
-  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'
+  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://codesign-project.onrender.com'
 
   useEffect(() => {
     const onDown = (e) => {

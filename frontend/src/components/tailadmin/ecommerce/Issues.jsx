@@ -8,10 +8,10 @@ export default function Issues({ sortBy = 'updated-desc' }) {
 
   const [issues, setIssues] = useState([])
   const [loading, setLoading] = useState(true)
-  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'
+  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://codesign-project.onrender.com'
 
   useEffect(() => {
-    const fetchIssues = async () => {const res = await fetch('https://codesign-project.onrender.com/api/issues')
+    const fetchIssues = async () => {
       try {
         const res = await fetch(`${API_BASE}/api/issues`)
         const data = await res.json()
@@ -31,36 +31,36 @@ export default function Issues({ sortBy = 'updated-desc' }) {
     return Number.isNaN(time) ? 0 : time
   }
 
-  const sortedIssues = useMemo(() => {
-    const items = [...issues]
+const sortedIssues = useMemo(() => {
+  const items = [...issues]
 
-    items.sort((a, b) => {
-      switch (sortBy) {
-        case 'updated-desc':
-          return getTime(b.updatedAt) - getTime(a.updatedAt)
+  items.sort((a, b) => {
+    switch (sortBy) {
+      case 'updated-desc':
+        return getTime(b.updatedAt || b.publishedAt) - getTime(a.updatedAt || a.publishedAt)
 
-        case 'updated-asc':
-          return getTime(a.updatedAt) - getTime(b.updatedAt)
+      case 'updated-asc':
+        return getTime(a.updatedAt || a.publishedAt) - getTime(b.updatedAt || b.publishedAt)
 
-        case 'created-desc':
-          return getTime(b.createdAt) - getTime(a.createdAt)
+      case 'created-desc':
+        return getTime(b.createdAt || b.publishedAt) - getTime(a.createdAt || a.publishedAt)
 
-        case 'created-asc':
-          return getTime(a.createdAt) - getTime(b.createdAt)
+      case 'created-asc':
+        return getTime(a.createdAt || a.publishedAt) - getTime(b.createdAt || b.publishedAt)
 
-        case 'id-asc':
-          return (a.issueId ?? 0) - (b.issueId ?? 0)
+      case 'id-asc':
+        return (a.issueId ?? 0) - (b.issueId ?? 0)
 
-        case 'title-asc':
-          return (a.issueContent ?? '').localeCompare(b.issueContent ?? '')
+      case 'title-asc':
+        return (a.issueContent ?? '').localeCompare(b.issueContent ?? '')
 
-        default:
-          return getTime(b.updatedAt) - getTime(a.updatedAt)
-      }
-    })
+      default:
+        return getTime(b.updatedAt || b.publishedAt) - getTime(a.updatedAt || a.publishedAt)
+    }
+  })
 
-    return items
-  }, [issues, sortBy])
+  return items
+}, [issues, sortBy])
 
   if (loading) {
     return <div>Loading issues...</div>
@@ -110,7 +110,9 @@ export default function Issues({ sortBy = 'updated-desc' }) {
                   ? `Last modified: ${new Date(issue.updatedAt).toLocaleString()}`
                   : issue.createdAt
                     ? `Created: ${new Date(issue.createdAt).toLocaleString()}`
-                    : 'Date unavailable'}
+                    : issue.publishedAt
+                      ? `Published: ${new Date(issue.publishedAt).toLocaleString()}`
+                      : 'Date unavailable'}
               </p>
             </div>
 

@@ -34,7 +34,7 @@ export default function ThankPage() {
   const helpEmailRef = useRef(null)
   const navigate = useNavigate()
 
-  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'
+  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://codesign-project.onrender.com'
 
   async function createSubmission(issueId) {
     const res = await fetch(`${API_BASE}/api/submissions`, {

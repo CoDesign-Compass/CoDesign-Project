@@ -17,7 +17,7 @@ export default function CreateNewIssue() {
   const [copyStatus, setCopyStatus] = useState('')
   const [isCopying, setIsCopying] = useState(false)
 
-  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'
+  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://codesign-project.onrender.com'
 
   const handleSubmit = async () => {
     const content = issueContent.trim()
