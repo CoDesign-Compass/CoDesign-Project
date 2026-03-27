@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 export default function WhyReport() {
-  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'
+  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://codesign-project.onrender.com'
   const { issueId: routeIssueId } = useParams()
   const queryIssueId = new URLSearchParams(window.location.search).get('issueId')
   const savedIssueId = localStorage.getItem('issueId')

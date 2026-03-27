@@ -22,7 +22,7 @@ export default function IssueReport() {
   const [generatingAiReport, setGeneratingAiReport] = useState(false)
   const [aiReport, setAiReport] = useState(null)
 
-  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'
+  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://codesign-project.onrender.com'
   const { issueId: routeIssueId } = useParams()
   const params = new URLSearchParams(window.location.search)
   const queryIssueId = params.get('issueId')
