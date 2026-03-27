@@ -28,9 +28,17 @@ CoDesignCompass aims to provide a simple, secure, and user-friendly platform to 
 - Privacy-conscious or casual participants who prefer quick, anonymous contributions without logging in or sharing personal information.
 - Administrators and facilitators who need to manage secure publication of issues, collect anonymised responses reliably, and analyse patterns to identify emerging themes and gaps.
 
+## Getting Started
+
+To run the project locally, follow these steps:
+1. **Clone the repository**: `git clone https://github.com/AriaFung/CoDesign-Project.git`
+2. **Install dependencies**: Run `npm install` in both the root and client directories.
+3. **Environment Setup**: Create a `.env` file for backend configurations (Database URLs, API keys).
+4. **Run the Application**: Use `npm start` to launch the development server.
+
 ## Wiki
 For detailed project documentation, including product backlog, user stories, risk log, and sprint retrospectives, please refer to our [wiki.md](https://github.com/AriaFung/CoDesign-Project/blob/main/wiki.md)
 
 ## Online Deployment
 Frontend deployed to Netlify: [codesign-compass.netlify.app](https://codesign-compass.netlify.app/)
-<br> Backend and Database deployed to Render: [codesign-project.onrender](https://codesign-project.onrender.com)
+<br> Backend and Database deployed to Render: [codesign-project.onrender.com](https://codesign-project.onrender.com)
