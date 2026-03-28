@@ -15,7 +15,7 @@ public class CorsConfig {
             .allowedOrigins(
                     "http://localhost:3000",
                     "http://localhost:3001",
-                    "https://codesign-compass.netlify.app")
+                    "https://co-design-project.vercel.app")
             .allowedMethods("GET","POST","PUT","PATCH","DELETE","OPTIONS")
             .allowedHeaders("*")
             .allowCredentials(false);
