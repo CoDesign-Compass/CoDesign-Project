@@ -136,4 +136,11 @@ public class SubmissionController {
     ) {
         return ResponseEntity.ok(service.getIssueHowWordCloud(issueId));
     }
+
+    @GetMapping("/word-cloud/profile")
+    public ResponseEntity<List<WordCloudTermResponse>> getIssueProfileWordCloud(
+            @RequestParam Long issueId
+    ) {
+        return ResponseEntity.ok(service.getIssueProfileWordCloud(issueId));
+    }
 }

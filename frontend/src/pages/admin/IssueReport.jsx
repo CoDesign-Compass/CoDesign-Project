@@ -14,6 +14,8 @@ export default function IssueReport() {
   const [trendError, setTrendError] = useState('')
   const [whyWordCloudTerms, setWhyWordCloudTerms] = useState([])
   const [howWordCloudTerms, setHowWordCloudTerms] = useState([])
+  const [profileWordCloudTerms, setProfileWordCloudTerms] = useState([])
+  const [profileWordCloudStatus, setProfileWordCloudStatus] = useState('idle')
   const [whyWordCloudStatus, setWhyWordCloudStatus] = useState('idle')
   const [howWordCloudStatus, setHowWordCloudStatus] = useState('idle')
   const [loading, setLoading] = useState(true)
@@ -185,7 +187,6 @@ export default function IssueReport() {
         const avgData = avgText ? JSON.parse(avgText) : {}
 
         setIssue(issueData)
-        localStorage.setItem('shareId', issueData.shareId)
         setParticipantCount(Number(countData?.count ?? 0))
         setAvgResponseSeconds(Number(avgData?.avgResponseSeconds ?? 0))
       } catch (err) {
@@ -252,8 +253,10 @@ export default function IssueReport() {
 
   useEffect(() => {
     if (!issueId) {
+      setProfileWordCloudStatus('error')
       setWhyWordCloudStatus('error')
       setHowWordCloudStatus('error')
+      setProfileWordCloudTerms([])
       setWhyWordCloudTerms([])
       setHowWordCloudTerms([])
       return
@@ -291,6 +294,7 @@ export default function IssueReport() {
       }
     }
 
+    fetchWordCloudByType('profile', setProfileWordCloudStatus, setProfileWordCloudTerms)
     fetchWordCloudByType('why', setWhyWordCloudStatus, setWhyWordCloudTerms)
     fetchWordCloudByType('how', setHowWordCloudStatus, setHowWordCloudTerms)
   }, [API_BASE, issueId])
@@ -557,9 +561,11 @@ export default function IssueReport() {
                           <h4 className="report-card-title">
                             Profile Word Cloud
                           </h4>
-                          <div className="report-medium-placeholder">
-                            Profile word cloud placeholder
-                          </div>
+                          {renderWordCloud(
+                            profileWordCloudStatus,
+                            profileWordCloudTerms,
+                            'profile',
+                          )}
                         </div>
 
                         <div className="wordcloud-block">
