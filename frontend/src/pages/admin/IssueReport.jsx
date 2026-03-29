@@ -372,6 +372,9 @@ export default function IssueReport() {
     const values = terms.map((item) => item.value)
     const minValue = Math.min(...values)
     const maxValue = Math.max(...values)
+    const sortedTerms = [...terms].sort((a, b) => b.value - a.value || a.label.localeCompare(b.label))
+    const maxRadiusX = 360
+    const maxRadiusY = 140
     const palette = [
       '#e11d48',
       '#f97316',
@@ -385,40 +388,113 @@ export default function IssueReport() {
       '#14b8a6',
     ]
 
+    const placedWords = []
+    const separationPadding = 18
+
+    const intersects = (a, b) =>
+      !(
+        a.right + separationPadding < b.left ||
+        a.left > b.right + separationPadding ||
+        a.bottom + separationPadding < b.top ||
+        a.top > b.bottom + separationPadding
+      )
+
+    const cloudItems = sortedTerms.map((item, index) => {
+      const ratio =
+        maxValue === minValue ? 1 : (item.value - minValue) / (maxValue - minValue)
+      const weight = Math.round(500 + ratio * 300)
+      const fontSize = 17 + ratio * 42
+      const rotate = index % 4 === 0 ? -6 : index % 6 === 0 ? 6 : 0
+
+      const estimatedWidth = Math.max(24, item.label.length * fontSize * 0.58)
+      const estimatedHeight = Math.max(18, fontSize * 1.35)
+
+      const progress = sortedTerms.length <= 1 ? 0 : index / (sortedTerms.length - 1)
+      const preferredRadiusX = Math.pow(progress, 0.72) * maxRadiusX
+      const preferredRadiusY = Math.pow(progress, 0.72) * maxRadiusY
+      const baseAngle = index * 137.5 * (Math.PI / 180)
+
+      let chosenX = 0
+      let chosenY = 0
+      let found = false
+
+      for (let attempt = 0; attempt < 260; attempt += 1) {
+        const ringOffset = Math.floor(attempt / 11) * 12
+        const radiusX = preferredRadiusX + ringOffset
+        const radiusY = preferredRadiusY + ringOffset * 0.62
+        const angle = baseAngle + attempt * 0.42
+        const x = Math.cos(angle) * radiusX
+        const y = Math.sin(angle) * radiusY
+
+        const candidate = {
+          left: x - estimatedWidth / 2,
+          right: x + estimatedWidth / 2,
+          top: y - estimatedHeight / 2,
+          bottom: y + estimatedHeight / 2,
+        }
+
+        if (!placedWords.some((w) => intersects(candidate, w))) {
+          chosenX = x
+          chosenY = y
+          placedWords.push(candidate)
+          found = true
+          break
+        }
+      }
+
+      if (!found) {
+        const fallbackRadiusX = preferredRadiusX + maxRadiusX * 0.28
+        const fallbackRadiusY = preferredRadiusY + maxRadiusY * 0.28
+        chosenX = Math.cos(baseAngle) * fallbackRadiusX
+        chosenY = Math.sin(baseAngle) * fallbackRadiusY
+        placedWords.push({
+          left: chosenX - estimatedWidth / 2,
+          right: chosenX + estimatedWidth / 2,
+          top: chosenY - estimatedHeight / 2,
+          bottom: chosenY + estimatedHeight / 2,
+        })
+      }
+
+      return {
+        item,
+        index,
+        weight,
+        fontSize,
+        rotate,
+        x: chosenX,
+        y: chosenY,
+      }
+    })
+
     return (
       <div
         className="report-medium-placeholder"
         style={{
-          justifyContent: 'flex-start',
-          alignItems: 'flex-start',
-          textAlign: 'left',
-          gap: '12px 16px',
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignContent: 'flex-start',
+          position: 'relative',
+          minHeight: '380px',
+          textAlign: 'center',
+          overflow: 'hidden',
           background:
             'linear-gradient(135deg, rgba(250, 245, 255, 0.95) 0%, rgba(240, 249, 255, 0.95) 45%, rgba(255, 251, 235, 0.95) 100%)',
           borderStyle: 'solid',
         }}
       >
-        {terms.map((item, index) => {
-          const ratio =
-            maxValue === minValue ? 1 : (item.value - minValue) / (maxValue - minValue)
-          const weight = Math.round(500 + ratio * 300)
-          const fontSize = 12 + ratio * 30
-          const rotate = index % 5 === 0 ? -5 : index % 7 === 0 ? 5 : 0
-
+        {cloudItems.map(({ item, index, weight, fontSize, rotate, x, y }) => {
           return (
             <span
               key={`${typeLabel}-${item.label}-${index}`}
               style={{
+                position: 'absolute',
+                left: `calc(50% + ${x}px)`,
+                top: `calc(50% + ${y}px)`,
                 fontSize: `${fontSize}px`,
                 fontWeight: weight,
                 color: palette[index % palette.length],
                 lineHeight: 1.3,
-                transform: `rotate(${rotate}deg)`,
+                transform: `translate(-50%, -50%) rotate(${rotate}deg)`,
                 display: 'inline-block',
                 textShadow: '0 1px 0 rgba(255, 255, 255, 0.7)',
+                whiteSpace: 'nowrap',
               }}
               title={`${item.label}: ${item.value}`}
             >
