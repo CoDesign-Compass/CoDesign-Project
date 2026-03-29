@@ -30,6 +30,66 @@ export default function IssueReport() {
   const queryIssueId = params.get('issueId')
   const issueId = routeIssueId || queryIssueId
 
+  const MEANINGLESS_WORDS = new Set([
+    'a', 'an', 'and', 'are', 'as', 'at', 'be', 'because', 'been', 'being', 'but', 'by',
+    'can', 'cannot', 'could', 'did', 'do', 'does', 'doing', 'done', 'for', 'from', 'get',
+    'gets', 'getting', 'got', 'had', 'has', 'have', 'having', 'he', 'her', 'here', 'hers',
+    'herself', 'him', 'himself', 'his', 'how', 'however', 'i', 'if', 'in', 'into', 'is',
+    'it', 'its', 'itself', 'just', 'me', 'might', 'more', 'most', 'my', 'myself', 'no',
+    'nor', 'not', 'now', 'of', 'on', 'once', 'only', 'or', 'other', 'our', 'ours',
+    'ourselves', 'out', 'over', 'own', 'really', 'same', 'she', 'should', 'so', 'some',
+    'such', 'than', 'that', 'the', 'their', 'theirs', 'them', 'themselves', 'then', 'there',
+    'therefore', 'these', 'they', 'this', 'those', 'through', 'to', 'too', 'under', 'until',
+    'up', 'us', 'very', 'was', 'we', 'were', 'what', 'when', 'where', 'which', 'while',
+    'who', 'whom', 'whose', 'why', 'will', 'with', 'within', 'without', 'would', 'yes',
+    'yet', 'you', 'your', 'yours', 'yourself', 'yourselves', 'also', 'maybe', 'perhaps',
+    'etc', 'ok', 'okay', 'like', 'still', 'already', 'much', 'many', 'any', 'every', 'each',
+    'another', 'else', 'even', 'ever', 'always', 'never', 'often', 'sometimes', 'usually',
+    'mostly', 'mainly'
+  ])
+
+  const tokenizeLabel = (label) =>
+    String(label ?? '')
+      .toLowerCase()
+      .split(/[^\p{L}\p{N}]+/u)
+      .filter(Boolean)
+
+  const isMeaningfulLabel = (label) => {
+    const tokens = tokenizeLabel(label)
+    if (!tokens.length) return false
+
+    return tokens.some(
+      (token) => token.length > 1 && !MEANINGLESS_WORDS.has(token) && !/^\d+$/.test(token),
+    )
+  }
+
+  const normalizeWordCloudTerms = (data) => {
+    if (!Array.isArray(data)) return []
+
+    const merged = new Map()
+
+    data.forEach((item) => {
+      const rawLabel = String(item?.label ?? '').trim()
+      const value = Number(item?.value ?? 0)
+
+      if (!rawLabel || !Number.isFinite(value) || value <= 0) return
+      if (!isMeaningfulLabel(rawLabel)) return
+
+      const key = rawLabel.toLowerCase().replace(/\s+/g, ' ').trim()
+      const existing = merged.get(key)
+
+      if (existing) {
+        existing.value += value
+      } else {
+        merged.set(key, { label: rawLabel, value })
+      }
+    })
+
+    return Array.from(merged.values()).sort(
+      (a, b) => b.value - a.value || a.label.localeCompare(b.label),
+    )
+  }
+
   const handleGenerateAiReport = async () => {
     const storedShareId = localStorage.getItem('shareId')
     if (!storedShareId) {
@@ -276,14 +336,7 @@ export default function IssueReport() {
         }
 
         const data = text ? JSON.parse(text) : []
-        const normalized = Array.isArray(data)
-          ? data
-              .map((item) => ({
-                label: String(item?.label ?? '').trim(),
-                value: Number(item?.value ?? 0),
-              }))
-              .filter((item) => item.label && Number.isFinite(item.value) && item.value > 0)
-          : []
+        const normalized = normalizeWordCloudTerms(data)
 
         setTerms(normalized)
         setStatus(normalized.length ? 'success' : 'empty')
