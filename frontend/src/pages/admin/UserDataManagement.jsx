@@ -67,7 +67,7 @@ export default function UserDataManagement() {
   const [showTemplateEditor, setShowTemplateEditor] = useState(false)
   const [notice, setNotice] = useState('')
   const [emailTemplateDraft, setEmailTemplateDraft] = useState(
-    'Dear {{name}},\n\nThank you so much for taking the time to answer our questions. We sincerely appreciate your support and contribution.\n\nAs a small token of our appreciation, we are happy to share your voucher code: {{voucherCode}}.\n\nPlease feel free to contact us if you have any questions.\n\nKind regards,\nCoDesign Team',
+    'Dear {{name}},\n\nThank you so much for taking the time to answer our questions. We sincerely appreciate your support and contribution.\n\nAs a small token of our appreciation, we are happy to share your voucher code: {{voucherCode}}.\n\nPlease feel free to contact us if you have any questions.\n\nKind regards,\nCoDesign Compass Team',
   )
 
   useEffect(() => {
@@ -750,7 +750,9 @@ export default function UserDataManagement() {
                   autoFocus
                 />
                 {voucherModalError && (
-                  <p className="mt-2 text-sm text-red-600">{voucherModalError}</p>
+                  <p className="mt-2 text-sm text-red-600">
+                    {voucherModalError}
+                  </p>
                 )}
               </div>
 
