@@ -59,7 +59,7 @@ Ricky Chen, Jingwen Zhang, Yu Pan, Jiaxin Li, Shuo Li, Aria Fung, Zhimeng Zhu, E
 | Task                                                         | Assignee      | Due Date    |
 | ------------------------------------------------------------ | ------------- | ----------- |
 | Video recording and operation manual preparation             | Ricky Chen    | Next week   |
-| Frontend thank you page & issue page modification, sorting, local debug | Aria Fung     | Next week   |
+| Frontend thank you & issue page modification, sorting, local debug | Aria Fung     | Next week   |
 | Email and voucher functionality implementation               | Jingwen Zhang | Next week   |
 | Deployment: switch to free database                          | Jiaxin Li     | Next week   |
 | Online AI integration research                              | Zhimeng Zhu   | Next week   |
