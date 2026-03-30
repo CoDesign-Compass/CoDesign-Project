@@ -29,7 +29,7 @@ public class UsersController {
   private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 
-  @Value("${ADMIN_EMAIL:hello@purposemedia.cbr.au}")
+  @Value("${ADMIN_EMAIL:hello@purposemediacbr.au}")
   private String adminEmail;
 
   @Value("${ADMIN_PASSWORD:admin123}")
