@@ -1,7 +1,223 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import Chart from 'react-apexcharts'
 import { useParams } from 'react-router-dom'
 import '../../components/AdminIssue/IssueReport.css'
+
+function ResponsiveWordCloudCanvas({ terms, typeLabel }) {
+  const containerRef = useRef(null)
+  const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 })
+
+  useEffect(() => {
+    const element = containerRef.current
+    if (!element) return undefined
+
+    const updateSize = () => {
+      const rect = element.getBoundingClientRect()
+      setCanvasSize({
+        width: Math.max(320, Math.round(rect.width)),
+        height: Math.max(280, Math.round(rect.height)),
+      })
+    }
+
+    updateSize()
+
+    let observer
+    if (typeof ResizeObserver !== 'undefined') {
+      observer = new ResizeObserver(updateSize)
+      observer.observe(element)
+    }
+
+    window.addEventListener('resize', updateSize)
+
+    return () => {
+      if (observer) observer.disconnect()
+      window.removeEventListener('resize', updateSize)
+    }
+  }, [])
+
+  const palette = [
+    '#e11d48',
+    '#f97316',
+    '#eab308',
+    '#22c55e',
+    '#06b6d4',
+    '#3b82f6',
+    '#6366f1',
+    '#a855f7',
+    '#ec4899',
+    '#14b8a6',
+  ]
+
+  const cloudItems = useMemo(() => {
+    const width = canvasSize.width || 860
+    const height = canvasSize.height || 360
+    const minSide = Math.min(width, height)
+    const halfX = width / 2 - 10
+    const halfY = height / 2 - 10
+    const maxWords = Math.max(20, Math.min(68, Math.floor((width * height) / 11000)))
+    const sortedTerms = [...terms]
+      .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label))
+      .slice(0, maxWords)
+
+    if (!sortedTerms.length) return []
+
+    const values = sortedTerms.map((item) => item.value)
+    const minValue = Math.min(...values)
+    const maxValue = Math.max(...values)
+    const minFont = Math.max(13, Math.round(minSide * 0.035))
+    const maxFont = Math.max(minFont + 8, Math.round(minSide * 0.11))
+    const maxRadiusX = halfX * 0.94
+    const maxRadiusY = halfY * 0.88
+    const separationPadding = Math.max(10, Math.round(minSide * 0.026))
+    const ringStepX = Math.max(8, Math.round(width * 0.018))
+    const ringStepY = Math.max(6, Math.round(height * 0.015))
+
+    const intersects = (a, b) =>
+      !(
+        a.right + separationPadding < b.left ||
+        a.left > b.right + separationPadding ||
+        a.bottom + separationPadding < b.top ||
+        a.top > b.bottom + separationPadding
+      )
+
+    const placedWords = []
+
+    return sortedTerms.map((item, index) => {
+      const ratio =
+        maxValue === minValue ? 1 : (item.value - minValue) / (maxValue - minValue)
+      const weight = Math.round(500 + ratio * 300)
+      const desiredFont = minFont + ratio * (maxFont - minFont)
+      const maxFitFont = (width * 0.86) / Math.max(3, item.label.length * 0.66)
+      const fontSize = Math.max(minFont * 0.82, Math.min(desiredFont, maxFitFont))
+      const rotate = index % 4 === 0 ? -5 : index % 6 === 0 ? 5 : 0
+
+      const estimatedWidth = Math.max(26, item.label.length * fontSize * 0.66)
+      const estimatedHeight = Math.max(20, fontSize * 1.46)
+      const progress = sortedTerms.length <= 1 ? 0 : index / (sortedTerms.length - 1)
+      const preferredRadiusX = Math.pow(progress, 0.72) * maxRadiusX
+      const preferredRadiusY = Math.pow(progress, 0.72) * maxRadiusY
+      const baseAngle = index * 137.5 * (Math.PI / 180)
+
+      let chosenX = 0
+      let chosenY = 0
+      let found = false
+
+      for (let attempt = 0; attempt < 520; attempt += 1) {
+        const ringOffset = Math.floor(attempt / 11)
+        const radiusX = preferredRadiusX + ringOffset * ringStepX
+        const radiusY = preferredRadiusY + ringOffset * ringStepY
+        const angle = baseAngle + attempt * 0.4
+        const x = Math.cos(angle) * radiusX
+        const y = Math.sin(angle) * radiusY
+
+        const candidate = {
+          left: x - estimatedWidth / 2,
+          right: x + estimatedWidth / 2,
+          top: y - estimatedHeight / 2,
+          bottom: y + estimatedHeight / 2,
+        }
+
+        const inBounds =
+          candidate.left >= -halfX &&
+          candidate.right <= halfX &&
+          candidate.top >= -halfY &&
+          candidate.bottom <= halfY
+
+        if (inBounds && !placedWords.some((word) => intersects(candidate, word))) {
+          chosenX = x
+          chosenY = y
+          placedWords.push(candidate)
+          found = true
+          break
+        }
+      }
+
+      if (!found) {
+        // Strict fallback: still obey bounds + collision checks. If impossible, skip this term.
+        for (let extra = 0; extra < 280; extra += 1) {
+          const expand = 1 + extra * 0.012
+          const angle = baseAngle + extra * 0.31
+          const x = Math.cos(angle) * maxRadiusX * expand
+          const y = Math.sin(angle) * maxRadiusY * expand
+
+          const candidate = {
+            left: x - estimatedWidth / 2,
+            right: x + estimatedWidth / 2,
+            top: y - estimatedHeight / 2,
+            bottom: y + estimatedHeight / 2,
+          }
+
+          const inBounds =
+            candidate.left >= -halfX &&
+            candidate.right <= halfX &&
+            candidate.top >= -halfY &&
+            candidate.bottom <= halfY
+
+          if (inBounds && !placedWords.some((word) => intersects(candidate, word))) {
+            chosenX = x
+            chosenY = y
+            placedWords.push(candidate)
+            found = true
+            break
+          }
+        }
+      }
+
+      if (!found) {
+        return null
+      }
+
+      return {
+        item,
+        index,
+        weight,
+        fontSize,
+        rotate,
+        x: chosenX,
+        y: chosenY,
+      }
+    }).filter(Boolean)
+  }, [terms, canvasSize.height, canvasSize.width])
+
+  return (
+    <div
+      ref={containerRef}
+      className="report-medium-placeholder"
+      style={{
+        position: 'relative',
+        minHeight: 'clamp(280px, 40vw, 420px)',
+        textAlign: 'center',
+        overflow: 'hidden',
+        background:
+          'linear-gradient(135deg, rgba(250, 245, 255, 0.95) 0%, rgba(240, 249, 255, 0.95) 45%, rgba(255, 251, 235, 0.95) 100%)',
+        borderStyle: 'solid',
+      }}
+    >
+      {cloudItems.map(({ item, index, weight, fontSize, rotate, x, y }) => (
+        <span
+          key={`${typeLabel}-${item.label}-${index}`}
+          style={{
+            position: 'absolute',
+            left: `calc(50% + ${x}px)`,
+            top: `calc(50% + ${y}px)`,
+            fontSize: `${fontSize}px`,
+            fontWeight: weight,
+            color: palette[index % palette.length],
+            lineHeight: 1.28,
+            transform: `translate(-50%, -50%) rotate(${rotate}deg)`,
+            display: 'inline-block',
+            textShadow: '0 1px 0 rgba(255, 255, 255, 0.7)',
+            whiteSpace: 'nowrap',
+            maxWidth: '92%',
+          }}
+          title={`${item.label}: ${item.value}`}
+        >
+          {item.label}
+        </span>
+      ))}
+    </div>
+  )
+}
 
 export default function IssueReport() {
   const [issue, setIssue] = useState(null)
@@ -370,141 +586,7 @@ export default function IssueReport() {
       return <div className="report-medium-placeholder">No {typeLabel} keywords found for this issue.</div>
     }
 
-    const values = terms.map((item) => item.value)
-    const minValue = Math.min(...values)
-    const maxValue = Math.max(...values)
-    const sortedTerms = [...terms].sort((a, b) => b.value - a.value || a.label.localeCompare(b.label))
-    const maxRadiusX = 360
-    const maxRadiusY = 140
-    const palette = [
-      '#e11d48',
-      '#f97316',
-      '#eab308',
-      '#22c55e',
-      '#06b6d4',
-      '#3b82f6',
-      '#6366f1',
-      '#a855f7',
-      '#ec4899',
-      '#14b8a6',
-    ]
-
-    const placedWords = []
-    const separationPadding = 18
-
-    const intersects = (a, b) =>
-      !(
-        a.right + separationPadding < b.left ||
-        a.left > b.right + separationPadding ||
-        a.bottom + separationPadding < b.top ||
-        a.top > b.bottom + separationPadding
-      )
-
-    const cloudItems = sortedTerms.map((item, index) => {
-      const ratio =
-        maxValue === minValue ? 1 : (item.value - minValue) / (maxValue - minValue)
-      const weight = Math.round(500 + ratio * 300)
-      const fontSize = 17 + ratio * 42
-      const rotate = index % 4 === 0 ? -6 : index % 6 === 0 ? 6 : 0
-
-      const estimatedWidth = Math.max(24, item.label.length * fontSize * 0.58)
-      const estimatedHeight = Math.max(18, fontSize * 1.35)
-
-      const progress = sortedTerms.length <= 1 ? 0 : index / (sortedTerms.length - 1)
-      const preferredRadiusX = Math.pow(progress, 0.72) * maxRadiusX
-      const preferredRadiusY = Math.pow(progress, 0.72) * maxRadiusY
-      const baseAngle = index * 137.5 * (Math.PI / 180)
-
-      let chosenX = 0
-      let chosenY = 0
-      let found = false
-
-      for (let attempt = 0; attempt < 260; attempt += 1) {
-        const ringOffset = Math.floor(attempt / 11) * 12
-        const radiusX = preferredRadiusX + ringOffset
-        const radiusY = preferredRadiusY + ringOffset * 0.62
-        const angle = baseAngle + attempt * 0.42
-        const x = Math.cos(angle) * radiusX
-        const y = Math.sin(angle) * radiusY
-
-        const candidate = {
-          left: x - estimatedWidth / 2,
-          right: x + estimatedWidth / 2,
-          top: y - estimatedHeight / 2,
-          bottom: y + estimatedHeight / 2,
-        }
-
-        if (!placedWords.some((w) => intersects(candidate, w))) {
-          chosenX = x
-          chosenY = y
-          placedWords.push(candidate)
-          found = true
-          break
-        }
-      }
-
-      if (!found) {
-        const fallbackRadiusX = preferredRadiusX + maxRadiusX * 0.28
-        const fallbackRadiusY = preferredRadiusY + maxRadiusY * 0.28
-        chosenX = Math.cos(baseAngle) * fallbackRadiusX
-        chosenY = Math.sin(baseAngle) * fallbackRadiusY
-        placedWords.push({
-          left: chosenX - estimatedWidth / 2,
-          right: chosenX + estimatedWidth / 2,
-          top: chosenY - estimatedHeight / 2,
-          bottom: chosenY + estimatedHeight / 2,
-        })
-      }
-
-      return {
-        item,
-        index,
-        weight,
-        fontSize,
-        rotate,
-        x: chosenX,
-        y: chosenY,
-      }
-    })
-
-    return (
-      <div
-        className="report-medium-placeholder"
-        style={{
-          position: 'relative',
-          minHeight: '380px',
-          textAlign: 'center',
-          overflow: 'hidden',
-          background:
-            'linear-gradient(135deg, rgba(250, 245, 255, 0.95) 0%, rgba(240, 249, 255, 0.95) 45%, rgba(255, 251, 235, 0.95) 100%)',
-          borderStyle: 'solid',
-        }}
-      >
-        {cloudItems.map(({ item, index, weight, fontSize, rotate, x, y }) => {
-          return (
-            <span
-              key={`${typeLabel}-${item.label}-${index}`}
-              style={{
-                position: 'absolute',
-                left: `calc(50% + ${x}px)`,
-                top: `calc(50% + ${y}px)`,
-                fontSize: `${fontSize}px`,
-                fontWeight: weight,
-                color: palette[index % palette.length],
-                lineHeight: 1.3,
-                transform: `translate(-50%, -50%) rotate(${rotate}deg)`,
-                display: 'inline-block',
-                textShadow: '0 1px 0 rgba(255, 255, 255, 0.7)',
-                whiteSpace: 'nowrap',
-              }}
-              title={`${item.label}: ${item.value}`}
-            >
-              {item.label}
-            </span>
-          )
-        })}
-      </div>
-    )
+    return <ResponsiveWordCloudCanvas terms={terms} typeLabel={typeLabel} />
   }
 
   const shareId = issue?.shareId || ''
