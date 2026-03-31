@@ -185,6 +185,7 @@ export default function IssueReport() {
         const avgData = avgText ? JSON.parse(avgText) : {}
 
         setIssue(issueData)
+        localStorage.setItem('shareId', issueData.shareId)
         setParticipantCount(Number(countData?.count ?? 0))
         setAvgResponseSeconds(Number(avgData?.avgResponseSeconds ?? 0))
       } catch (err) {

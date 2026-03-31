@@ -1,5 +1,9 @@
 package com.example.demo.ai;
 
+import com.example.demo.ai.claude.ClaudeMessageRequest;
+import com.example.demo.ai.claude.ClaudeMessageResponse;
+import com.example.demo.ai.gemini.GeminiRequest;
+import com.example.demo.ai.gemini.GeminiResponse;
 import com.example.demo.ai.dto.AiReportResponse;
 import com.example.demo.ai.ollama.OllamaChatRequest;
 import com.example.demo.ai.ollama.OllamaChatResponse;
@@ -26,11 +30,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.Set;
+import java.util.ArrayList;
 
 @Service
 public class AiReportService {
 
     private final OllamaClient ollamaClient;
+    private final ClaudeClient claudeClient;
+    private final GeminiClient geminiClient;
     private final ObjectMapper objectMapper;
     private final AiReportRepository aiReportRepository;
     private final SubmissionRepository submissionRepository;
@@ -42,8 +49,19 @@ public class AiReportService {
     @Value("${ollama.model}")
     private String ollamaModel;
 
+    @Value("${anthropic.model}")
+    private String anthropicModel;
+
+    @Value("${google.model:gemini-2.5-flash}")
+    private String geminiModel;
+
+    @Value("${ai.service.provider:gemini}")
+    private String aiProvider;
+
     public AiReportService(
             OllamaClient ollamaClient,
+            ClaudeClient claudeClient,
+            GeminiClient geminiClient,
             ObjectMapper objectMapper,
             AiReportRepository aiReportRepository,
             SubmissionRepository submissionRepository,
@@ -53,6 +71,8 @@ public class AiReportService {
             UserProfileRepository userProfileRepository
     ) {
         this.ollamaClient = ollamaClient;
+        this.claudeClient = claudeClient;
+        this.geminiClient = geminiClient;
         this.objectMapper = objectMapper;
         this.aiReportRepository = aiReportRepository;
         this.submissionRepository = submissionRepository;
@@ -87,7 +107,7 @@ public class AiReportService {
 
         String inputText = buildInputTextForSubmission(submission, issue, profile);
 
-        AiReportResponse report = callOllamaAndParse(inputText);
+        AiReportResponse report = generateStructuredReport(inputText);
 
         saveAiReport(
                 submissionId,
@@ -114,7 +134,7 @@ public class AiReportService {
 
         String inputText = buildInputTextForShare(issue, whyResponses, howResponses);
 
-        AiReportResponse report = callOllamaAndParse(inputText);
+        AiReportResponse report = generateStructuredReport(inputText);
 
         saveAiReport(
                 null, 
@@ -131,8 +151,9 @@ public class AiReportService {
                 .orElseThrow(() -> new RuntimeException("AI report not found"));
     }
 
-    // ===== use Ollama and analyse =====
-    private AiReportResponse callOllamaAndParse(String inputText) {
+    // ===== AI analysis entry point =====
+    private AiReportResponse generateStructuredReport(String inputText) {
+        System.out.println("Using AI Provider: " + aiProvider);
         String schemaInstruction = """
 Return only valid JSON matching this schema:
 {
@@ -182,6 +203,7 @@ Do not use markdown.
 Do not wrap JSON in code fences.
 If information is missing, use empty arrays or empty strings.
 Do not invent facts.
+Return ONLY the JSON object, no preamble or postamble.
 """;
 
         String userPrompt = """
@@ -191,32 +213,85 @@ Input:
 %s
 """.formatted(inputText);
 
-        OllamaChatRequest request = new OllamaChatRequest();
-        request.setModel(ollamaModel);
-        request.setStream(false);
-        request.setFormat("json");
-        request.setMessages(List.of(
-                Map.of("role", "system", "content", schemaInstruction),
-                Map.of("role", "user", "content", userPrompt)
-        ));
+        String rawJson;
+        String modelNameUsed;
 
-        OllamaChatResponse response = ollamaClient.chat(request);
-        String rawJson = response.getMessage() == null ? null : response.getMessage().getContent();
+        if ("claude".equalsIgnoreCase(aiProvider)) {
+            ClaudeMessageRequest request = new ClaudeMessageRequest();
+            request.setModel(anthropicModel);
+            request.setSystem(schemaInstruction);
+            request.setMessages(List.of(
+                    Map.of("role", "user", "content", userPrompt)
+            ));
+
+            ClaudeMessageResponse response = claudeClient.chat(request);
+            rawJson = (response.getContent() != null && !response.getContent().isEmpty()) 
+                    ? response.getContent().get(0).getText() : null;
+            modelNameUsed = anthropicModel;
+        } else if ("gemini".equalsIgnoreCase(aiProvider)) {
+            GeminiRequest request = new GeminiRequest();
+            request.setModel("models/" + geminiModel);
+            
+            GeminiRequest.SystemInstruction si = new GeminiRequest.SystemInstruction();
+            GeminiRequest.Part siPart = new GeminiRequest.Part();
+            siPart.setText(schemaInstruction);
+            si.setParts(List.of(siPart));
+            request.setSystem_instruction(si);
+
+            GeminiRequest.Content content = new GeminiRequest.Content();
+            GeminiRequest.Part p = new GeminiRequest.Part();
+            p.setText(userPrompt);
+            content.setParts(List.of(p));
+            request.setContents(List.of(content));
+            
+            request.setGenerationConfig(new GeminiRequest.GenerationConfig());
+
+            GeminiResponse response = geminiClient.generate(request);
+            rawJson = (response.getCandidates() != null && !response.getCandidates().isEmpty())
+                    ? response.getCandidates().get(0).getContent().getParts().get(0).getText() : null;
+            modelNameUsed = geminiModel;
+        } else {
+            // Default to Ollama
+            OllamaChatRequest request = new OllamaChatRequest();
+            request.setModel(ollamaModel);
+            request.setStream(false);
+            request.setFormat("json");
+            request.setMessages(List.of(
+                    Map.of("role", "system", "content", schemaInstruction),
+                    Map.of("role", "user", "content", userPrompt)
+            ));
+
+            OllamaChatResponse response = ollamaClient.chat(request);
+            rawJson = response.getMessage() == null ? null : response.getMessage().getContent();
+            modelNameUsed = ollamaModel;
+        }
 
         if (rawJson == null || rawJson.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Ollama returned empty content");
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "AI service returned empty content");
         }
 
         try {
-            AiReportResponse report = objectMapper.readValue(rawJson, AiReportResponse.class);
+            // Strip code fences if the model ignored instructions
+            String cleanedJson = rawJson.trim();
+            if (cleanedJson.startsWith("```json")) {
+                cleanedJson = cleanedJson.substring(7);
+            } else if (cleanedJson.startsWith("```")) {
+                cleanedJson = cleanedJson.substring(3);
+            }
+            if (cleanedJson.endsWith("```")) {
+                cleanedJson = cleanedJson.substring(0, cleanedJson.length() - 3);
+            }
+            cleanedJson = cleanedJson.trim();
+
+            AiReportResponse report = objectMapper.readValue(cleanedJson, AiReportResponse.class);
 
             if (report.getMetadata() == null) {
                 AiReportResponse.Metadata metadata = new AiReportResponse.Metadata();
-                metadata.setModel(ollamaModel);
+                metadata.setModel(modelNameUsed);
                 metadata.setGeneratedAt(Instant.now().toString());
                 report.setMetadata(metadata);
             } else {
-                report.getMetadata().setModel(ollamaModel);
+                report.getMetadata().setModel(modelNameUsed);
                 report.getMetadata().setGeneratedAt(Instant.now().toString());
             }
 
@@ -225,7 +300,7 @@ Input:
         } catch (Exception e) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_GATEWAY,
-                    "Failed to parse Ollama structured output: " + e.getMessage()
+                    "Failed to parse AI structured output: " + e.getMessage()
             );
         }
     }
@@ -240,7 +315,7 @@ Input:
             entity.setSubmissionId(submissionId);
             entity.setIssueId(issueId);
             entity.setShareId(shareId);
-            entity.setModel(ollamaModel);
+            entity.setModel(report.getMetadata() != null ? report.getMetadata().getModel() : "unknown");
             entity.setPromptVersion("v1");
             entity.setRawOutput(rawOutput);
             entity.setParsedReportJson(parsedReportJson);
@@ -256,7 +331,24 @@ Input:
         }
     }
 
-    // ===== submission version input =====
+    private String formatTags(Set<Tag> tags) {
+        if (tags == null || tags.isEmpty()) {
+            return "";
+        }
+        return tags.stream()
+                .map(Tag::getLabel)
+                .filter(label -> label != null && !label.isBlank())
+                .collect(Collectors.joining(", "));
+    }
+
+    private String safe(String value) {
+        return value == null ? "" : value;
+    }
+
+    private String stringify(Object value) {
+        return value == null ? "" : value.toString();
+    }
+
     private String buildInputTextForSubmission(Submission submission, Issue issue, UserProfile profile){
         return """
 Submission metadata:
@@ -308,7 +400,6 @@ If evidence is limited, clearly reflect that in the summary, insights, and risks
         );
     }
 
-    // ===== shareId version input =====
     private String buildInputTextForShare(
             Issue issue,
             List<WhyResponse> whyResponses,
@@ -364,23 +455,5 @@ If evidence is limited, clearly reflect that in the summary, insights, and risks
         sb.append("4. Do not invent facts. If data is limited, state this clearly in risks and limitations.\n");
 
         return sb.toString();
-    }
-
-    private String formatTags(Set<Tag> tags) {
-        if (tags == null || tags.isEmpty()) {
-            return "";
-        }
-        return tags.stream()
-                .map(Tag::getLabel)
-                .filter(label -> label != null && !label.isBlank())
-                .collect(Collectors.joining(", "));
-    }
-
-    private String safe(String value) {
-        return value == null ? "" : value;
-    }
-
-    private String stringify(Object value) {
-        return value == null ? "" : value.toString();
     }
 }
