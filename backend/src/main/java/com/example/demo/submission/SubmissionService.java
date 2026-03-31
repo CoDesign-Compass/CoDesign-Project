@@ -397,6 +397,29 @@ public class SubmissionService {
         return buildWordCloudTerms(answers);
     }
 
+    public List<WordCloudTermResponse> getIssueProfileWordCloud(Long issueId) {
+        if (issueId == null) {
+            throw new IllegalArgumentException("ISSUE_ID_REQUIRED");
+        }
+
+        String shareId = issueRepository.findById(issueId)
+                .map(i -> i.getShareId())
+                .orElseThrow(() -> new IllegalArgumentException("ISSUE_NOT_FOUND"));
+
+        List<Object[]> rows = userProfileRepository.findProfileTagCountsByShareId(shareId);
+
+        return rows.stream()
+                .filter(row -> row != null && row.length >= 2)
+                .map(row -> {
+                    String label = safe(row[0] == null ? "" : String.valueOf(row[0])).trim();
+                    int value = row[1] instanceof Number ? ((Number) row[1]).intValue() : 0;
+                    return new WordCloudTermResponse(label, value);
+                })
+                .filter(term -> !term.label().isBlank() && term.value() > 0)
+                .limit(WORD_CLOUD_LIMIT)
+                .toList();
+    }
+
     private RawDataContext buildRawDataContext(Long issueId) {
         String shareId = issueRepository.findById(issueId)
                 .map(i -> i.getShareId())

@@ -66,7 +66,7 @@ export default function HowReport() {
    * Unless report sections become dynamic in the future, backend does NOT need
    * to replace this block.
    *
-   * Backend only needs to return matching detailed content for each `id`
+   * Backend only needs to return matching detailed content for each id
    * inside `sectionContent`.
    */
   const reportCards = [
