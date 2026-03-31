@@ -4,7 +4,7 @@
 **Public Website**: <https://co-design-project.vercel.app/>
 
 ## Demo
-**You can watch demo videoes by the following youtube links:**
+**You can watch demo videos by the following youtube links:**
 <br>
 [User Demo](https://youtu.be/7kRk-Z32Pf8)
 <br>
@@ -12,7 +12,7 @@
 
 <br>
 
-**You can also** [download demo videoes](https://github.com/CoDesign-Compass/CoDesign-Project/tree/main/demo)
+**You can also** [download demo videos](https://github.com/CoDesign-Compass/CoDesign-Project/tree/main/demo)
 
 ## Project Introduction
 ### Background
