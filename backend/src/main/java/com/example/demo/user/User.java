@@ -27,6 +27,9 @@ public class User {
     @Column(nullable = false)
     private boolean wantsUpdates = false;
 
+    @Column(columnDefinition = "boolean default false")
+    private boolean wantsGift = false;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -59,6 +62,9 @@ public class User {
 
     public boolean isWantsUpdates() { return wantsUpdates; }
     public void setWantsUpdates(boolean wantsUpdates) { this.wantsUpdates = wantsUpdates; }
+
+    public boolean isWantsGift() { return wantsGift; }
+    public void setWantsGift(boolean wantsGift) { this.wantsGift = wantsGift; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
