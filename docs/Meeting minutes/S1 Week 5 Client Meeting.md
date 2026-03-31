@@ -1,4 +1,4 @@
-# S1 Week 4 Client Meeting
+# S1 Week 5 Client Meeting
 
 ## Date 
 26/03/2026, 1:00 pm -- 1:40 pm
@@ -7,7 +7,7 @@
 The Hive, Building 108, ANU
 
 ## Participants
-Ricky Chen, Jingwen Zhang, Yu Pan, Jiaxin Li, Aria Fung, Zhimeng Zhu, Shuo Li, Heidi Prowse (client)
+Ricky Chen, Jingwen Zhang, Yu Pan, Jiaxin Li, Aria Fung, Zhimeng Zhu, Shuo Li, Heidi Prowse (client), Buddhi Kothalawala (tutor)
 
 ## Goals
 - Demonstrate progress using stakeholder-provided real data via online presentation.
