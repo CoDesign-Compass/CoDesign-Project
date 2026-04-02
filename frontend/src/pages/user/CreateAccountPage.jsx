@@ -1,11 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom'
 
 export default function CreateAccountPage({
   mode = 'create',
   onSubmit: onSubmitProp,
 }) {
-  // ---- FORM ----
   const [form, setForm] = useState({
     username: '',
     email: '',
@@ -15,22 +13,29 @@ export default function CreateAccountPage({
   })
   const [showPw, setShowPw] = useState(false)
 
-  // ---- submit feedback ----
   const [submitErr, setSubmitErr] = useState('')
   const [submitSuccess, setSubmitSuccess] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
-  // ---- Help bubble ----
+  // ---- AI help bubble ----
   const [open, setOpen] = useState(false)
-  const [helpForm, setHelpForm] = useState({ email: '', message: '' })
-  const [helpSent, setHelpSent] = useState(false)
-  const [helpErr, setHelpErr] = useState('')
-  const [helpSubmitting, setHelpSubmitting] = useState(false)
+  const [chatMessages, setChatMessages] = useState([
+    {
+      role: 'assistant',
+      content:
+        'Hello! I’m your AI assistant. I can help you create an account or explain the feedback flow.',
+    },
+  ])
+  const [chatInput, setChatInput] = useState('')
+  const [chatErr, setChatErr] = useState('')
+  const [chatSubmitting, setChatSubmitting] = useState(false)
 
   const popRef = useRef(null)
-  const helpEmailRef = useRef(null)
+  const chatInputRef = useRef(null)
+  const messagesEndRef = useRef(null)
 
-  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://codesign-project.onrender.com'
+  const API_BASE =
+    process.env.REACT_APP_API_BASE_URL || 'https://codesign-project.onrender.com'
 
   useEffect(() => {
     const onDown = (e) => {
@@ -56,9 +61,13 @@ export default function CreateAccountPage({
 
   useEffect(() => {
     if (open) {
-      helpEmailRef.current?.focus()
+      chatInputRef.current?.focus()
     }
   }, [open])
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [chatMessages, chatSubmitting])
 
   const change = (k) => (e) =>
     setForm((f) => ({
@@ -163,41 +172,34 @@ export default function CreateAccountPage({
     setOpen((prev) => {
       const next = !prev
       if (next) {
-        setHelpErr('')
-        setHelpSent(false)
+        setChatErr('')
       }
       return next
     })
   }
 
-  const handleHelpSubmit = async (e) => {
+  const handleChatSubmit = async (e) => {
     e.preventDefault()
-    setHelpErr('')
+    setChatErr('')
 
-    const validEmail = /^\S+@\S+\.\S+$/.test(helpForm.email)
-    if (!validEmail) {
-      setHelpErr('Please enter a valid email address.')
-      return
-    }
+    const message = chatInput.trim()
+    if (!message) return
 
-    if (helpForm.message.trim().length < 5) {
-      setHelpErr('Please provide a little more detail (at least 5 characters).')
-      return
-    }
-
-    setHelpSubmitting(true)
+    const newUserMessage = { role: 'user', content: message }
+    setChatMessages((prev) => [...prev, newUserMessage])
+    setChatInput('')
+    setChatSubmitting(true)
 
     try {
       const payload = {
-        email: helpForm.email.trim(),
-        message: helpForm.message.trim(),
+        message,
         shareId: localStorage.getItem('shareId') || null,
         issueId: Number(localStorage.getItem('issueId')) || null,
         submissionId: Number(localStorage.getItem('submissionId')) || null,
         pagePath: window.location.pathname,
       }
 
-      const res = await fetch(`${API_BASE}/api/help`, {
+      const res = await fetch(`${API_BASE}/api/ai-support/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -206,13 +208,19 @@ export default function CreateAccountPage({
       const text = await res.text()
       if (!res.ok) throw new Error(text || `HTTP ${res.status}`)
 
-      setHelpSent(true)
-      setHelpForm({ email: '', message: '' })
+      const data = text ? JSON.parse(text) : {}
+      const reply =
+        data.reply || 'Sorry, I could not generate a response just now.'
+
+      setChatMessages((prev) => [
+        ...prev,
+        { role: 'assistant', content: reply },
+      ])
     } catch (err) {
       console.error(err)
-      setHelpErr('We could not send your message. Please try again.')
+      setChatErr('The AI assistant is unavailable right now. Please try again.')
     } finally {
-      setHelpSubmitting(false)
+      setChatSubmitting(false)
     }
   }
 
@@ -306,7 +314,6 @@ export default function CreateAccountPage({
               onClear={() => setForm((f) => ({ ...f, email: '' }))}
             />
 
-            {/* Password */}
             <div style={{ display: 'grid', gap: 6 }}>
               <label className="sr-only" htmlFor="password">
                 Password
@@ -444,7 +451,6 @@ export default function CreateAccountPage({
           </form>
         </main>
 
-        {/* Help bubble */}
         <div
           style={{
             ...container,
@@ -484,7 +490,7 @@ export default function CreateAccountPage({
                   position: 'absolute',
                   bottom: 'calc(100% + 8px)',
                   right: 0,
-                  width: 'min(320px, 86vw)',
+                  width: 'min(360px, 88vw)',
                   background: '#ffe070',
                   color: '#303030',
                   padding: '12px',
@@ -503,173 +509,145 @@ export default function CreateAccountPage({
                     color: '#303030',
                   }}
                 >
-                  Need help?
+                  AI Assistant
                 </h2>
 
-                <p
+                <div
                   style={{
-                    margin: '0 0 10px',
-                    fontSize: 13,
-                    lineHeight: 1.5,
-                    color: '#303030',
-                    fontFamily: 'Poppins, sans-serif',
+                    maxHeight: 240,
+                    overflowY: 'auto',
+                    display: 'grid',
+                    gap: 8,
+                    marginBottom: 10,
+                    paddingRight: 4,
                   }}
                 >
-                  Send us your question and we’ll get back to you.
-                </p>
-
-                {helpSent ? (
-                  <div
-                    style={{
-                      lineHeight: 1.55,
-                      fontFamily: 'Poppins, sans-serif',
-                      color: '#303030',
-                    }}
-                  >
-                    <p style={{ margin: 0, fontWeight: 600 }}>Thanks! 🎉</p>
-                    <p style={{ margin: '6px 0 0' }}>
-                      We’ve received your message and will get back to you soon.
-                    </p>
-                  </div>
-                ) : (
-                  <form
-                    onSubmit={handleHelpSubmit}
-                    style={{ display: 'grid', gap: 8 }}
-                  >
-                    <label
+                  {chatMessages.map((msg, index) => (
+                    <div
+                      key={index}
                       style={{
+                        justifySelf: msg.role === 'user' ? 'end' : 'start',
+                        background: msg.role === 'user' ? '#303030' : '#fff8cc',
+                        color: msg.role === 'user' ? '#ffe070' : '#303030',
+                        padding: '10px 12px',
+                        borderRadius: 10,
                         fontSize: 13,
+                        lineHeight: 1.5,
                         fontFamily: 'Poppins, sans-serif',
-                        color: '#303030',
+                        maxWidth: '90%',
+                        whiteSpace: 'pre-wrap',
                       }}
                     >
-                      Email address
-                      <input
-                        ref={helpEmailRef}
-                        type="email"
-                        value={helpForm.email}
-                        onChange={(e) =>
-                          setHelpForm((f) => ({
-                            ...f,
-                            email: e.target.value,
-                          }))
-                        }
-                        placeholder="you@example.com"
-                        aria-describedby={helpErr ? 'help-error' : undefined}
-                        style={{
-                          width: '100%',
-                          height: 38,
-                          marginTop: 4,
-                          borderRadius: 6,
-                          border: '1px solid #d8c25b',
-                          background: '#fff9c6',
-                          padding: '0 10px',
-                          outline: 'none',
-                          fontFamily: 'Poppins, sans-serif',
-                          color: '#303030',
-                          boxSizing: 'border-box',
-                        }}
-                      />
-                    </label>
+                      {msg.content}
+                    </div>
+                  ))}
 
-                    <label
-                      style={{
-                        fontSize: 13,
-                        fontFamily: 'Poppins, sans-serif',
-                        color: '#303030',
-                      }}
-                    >
-                      Your question
-                      <textarea
-                        rows={3}
-                        value={helpForm.message}
-                        onChange={(e) =>
-                          setHelpForm((f) => ({
-                            ...f,
-                            message: e.target.value,
-                          }))
-                        }
-                        placeholder="Tell us what's going on…"
-                        aria-describedby={helpErr ? 'help-error' : undefined}
-                        style={{
-                          width: '100%',
-                          marginTop: 4,
-                          borderRadius: 6,
-                          border: '1px solid #d8c25b',
-                          background: '#fffef0',
-                          padding: '8px 10px',
-                          resize: 'vertical',
-                          outline: 'none',
-                          fontFamily: 'Poppins, sans-serif',
-                          color: '#303030',
-                          boxSizing: 'border-box',
-                        }}
-                      />
-                    </label>
-
-                    {helpErr && (
-                      <div
-                        id="help-error"
-                        role="alert"
-                        style={{
-                          color: '#9b1c1c',
-                          fontSize: 12,
-                          fontFamily: 'Poppins, sans-serif',
-                          lineHeight: 1.45,
-                        }}
-                      >
-                        {helpErr}
-                      </div>
-                    )}
-
+                  {chatSubmitting && (
                     <div
                       style={{
-                        display: 'flex',
-                        gap: 8,
-                        justifyContent: 'flex-end',
-                        marginTop: 2,
+                        justifySelf: 'start',
+                        background: '#fff8cc',
+                        color: '#303030',
+                        padding: '10px 12px',
+                        borderRadius: 10,
+                        fontSize: 13,
+                        lineHeight: 1.5,
+                        fontFamily: 'Poppins, sans-serif',
                       }}
                     >
-                      <button
-                        type="button"
-                        onClick={() => setOpen(false)}
-                        disabled={helpSubmitting}
-                        style={{
-                          height: 32,
-                          padding: '0 10px',
-                          borderRadius: 6,
-                          border: '1px solid rgba(0,0,0,.15)',
-                          background: '#fff',
-                          color: '#303030',
-                          cursor: helpSubmitting ? 'not-allowed' : 'pointer',
-                          fontFamily: 'Poppins, sans-serif',
-                          opacity: helpSubmitting ? 0.7 : 1,
-                        }}
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        type="submit"
-                        disabled={helpSubmitting}
-                        aria-busy={helpSubmitting}
-                        style={{
-                          height: 32,
-                          padding: '0 12px',
-                          borderRadius: 6,
-                          border: 'none',
-                          background: '#303030',
-                          color: '#ffe070',
-                          cursor: helpSubmitting ? 'not-allowed' : 'pointer',
-                          boxShadow: '0 1px 0 rgba(0,0,0,.2)',
-                          fontFamily: 'Poppins, sans-serif',
-                          opacity: helpSubmitting ? 0.7 : 1,
-                        }}
-                      >
-                        {helpSubmitting ? 'Sending...' : 'Send'}
-                      </button>
+                      Thinking...
                     </div>
-                  </form>
-                )}
+                  )}
+
+                  <div ref={messagesEndRef} />
+                </div>
+
+                <form
+                  onSubmit={handleChatSubmit}
+                  style={{ display: 'grid', gap: 8 }}
+                >
+                  <textarea
+                    ref={chatInputRef}
+                    rows={3}
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    placeholder="Ask the AI assistant..."
+                    style={{
+                      width: '100%',
+                      borderRadius: 6,
+                      border: '1px solid #d8c25b',
+                      background: '#fffef0',
+                      padding: '8px 10px',
+                      resize: 'vertical',
+                      outline: 'none',
+                      fontFamily: 'Poppins, sans-serif',
+                      color: '#303030',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+
+                  {chatErr && (
+                    <div
+                      role="alert"
+                      style={{
+                        color: '#9b1c1c',
+                        fontSize: 12,
+                        fontFamily: 'Poppins, sans-serif',
+                        lineHeight: 1.45,
+                      }}
+                    >
+                      {chatErr}
+                    </div>
+                  )}
+
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: 8,
+                      justifyContent: 'flex-end',
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setOpen(false)}
+                      disabled={chatSubmitting}
+                      style={{
+                        height: 32,
+                        padding: '0 10px',
+                        borderRadius: 6,
+                        border: '1px solid rgba(0,0,0,.15)',
+                        background: '#fff',
+                        color: '#303030',
+                        cursor: chatSubmitting ? 'not-allowed' : 'pointer',
+                        fontFamily: 'Poppins, sans-serif',
+                        opacity: chatSubmitting ? 0.7 : 1,
+                      }}
+                    >
+                      Close
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={chatSubmitting || !chatInput.trim()}
+                      style={{
+                        height: 32,
+                        padding: '0 12px',
+                        borderRadius: 6,
+                        border: 'none',
+                        background: '#303030',
+                        color: '#ffe070',
+                        cursor:
+                          chatSubmitting || !chatInput.trim()
+                            ? 'not-allowed'
+                            : 'pointer',
+                        fontFamily: 'Poppins, sans-serif',
+                        opacity:
+                          chatSubmitting || !chatInput.trim() ? 0.7 : 1,
+                      }}
+                    >
+                      Send
+                    </button>
+                  </div>
+                </form>
               </div>
             )}
           </div>
@@ -679,7 +657,6 @@ export default function CreateAccountPage({
   )
 }
 
-/* small field helper */
 function Field({ id, type = 'text', placeholder, value, onChange, onClear }) {
   return (
     <div style={{ display: 'grid', gap: 6 }}>
@@ -711,7 +688,6 @@ function Field({ id, type = 'text', placeholder, value, onChange, onClear }) {
   )
 }
 
-/* clear all button (×) */
 function suffixBtn(rightPx) {
   return {
     position: 'absolute',
