@@ -1,7 +1,223 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import Chart from 'react-apexcharts'
 import { useParams } from 'react-router-dom'
 import '../../components/AdminIssue/IssueReport.css'
+
+function ResponsiveWordCloudCanvas({ terms, typeLabel }) {
+  const containerRef = useRef(null)
+  const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 })
+
+  useEffect(() => {
+    const element = containerRef.current
+    if (!element) return undefined
+
+    const updateSize = () => {
+      const rect = element.getBoundingClientRect()
+      setCanvasSize({
+        width: Math.max(320, Math.round(rect.width)),
+        height: Math.max(280, Math.round(rect.height)),
+      })
+    }
+
+    updateSize()
+
+    let observer
+    if (typeof ResizeObserver !== 'undefined') {
+      observer = new ResizeObserver(updateSize)
+      observer.observe(element)
+    }
+
+    window.addEventListener('resize', updateSize)
+
+    return () => {
+      if (observer) observer.disconnect()
+      window.removeEventListener('resize', updateSize)
+    }
+  }, [])
+
+  const palette = [
+    '#e11d48',
+    '#f97316',
+    '#eab308',
+    '#22c55e',
+    '#06b6d4',
+    '#3b82f6',
+    '#6366f1',
+    '#a855f7',
+    '#ec4899',
+    '#14b8a6',
+  ]
+
+  const cloudItems = useMemo(() => {
+    const width = canvasSize.width || 860
+    const height = canvasSize.height || 360
+    const minSide = Math.min(width, height)
+    const halfX = width / 2 - 10
+    const halfY = height / 2 - 10
+    const maxWords = Math.max(20, Math.min(68, Math.floor((width * height) / 11000)))
+    const sortedTerms = [...terms]
+      .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label))
+      .slice(0, maxWords)
+
+    if (!sortedTerms.length) return []
+
+    const values = sortedTerms.map((item) => item.value)
+    const minValue = Math.min(...values)
+    const maxValue = Math.max(...values)
+    const minFont = Math.max(13, Math.round(minSide * 0.035))
+    const maxFont = Math.max(minFont + 8, Math.round(minSide * 0.11))
+    const maxRadiusX = halfX * 0.94
+    const maxRadiusY = halfY * 0.88
+    const separationPadding = Math.max(10, Math.round(minSide * 0.026))
+    const ringStepX = Math.max(8, Math.round(width * 0.018))
+    const ringStepY = Math.max(6, Math.round(height * 0.015))
+
+    const intersects = (a, b) =>
+      !(
+        a.right + separationPadding < b.left ||
+        a.left > b.right + separationPadding ||
+        a.bottom + separationPadding < b.top ||
+        a.top > b.bottom + separationPadding
+      )
+
+    const placedWords = []
+
+    return sortedTerms.map((item, index) => {
+      const ratio =
+        maxValue === minValue ? 1 : (item.value - minValue) / (maxValue - minValue)
+      const weight = Math.round(500 + ratio * 300)
+      const desiredFont = minFont + ratio * (maxFont - minFont)
+      const maxFitFont = (width * 0.86) / Math.max(3, item.label.length * 0.66)
+      const fontSize = Math.max(minFont * 0.82, Math.min(desiredFont, maxFitFont))
+      const rotate = index % 4 === 0 ? -5 : index % 6 === 0 ? 5 : 0
+
+      const estimatedWidth = Math.max(26, item.label.length * fontSize * 0.66)
+      const estimatedHeight = Math.max(20, fontSize * 1.46)
+      const progress = sortedTerms.length <= 1 ? 0 : index / (sortedTerms.length - 1)
+      const preferredRadiusX = Math.pow(progress, 0.72) * maxRadiusX
+      const preferredRadiusY = Math.pow(progress, 0.72) * maxRadiusY
+      const baseAngle = index * 137.5 * (Math.PI / 180)
+
+      let chosenX = 0
+      let chosenY = 0
+      let found = false
+
+      for (let attempt = 0; attempt < 520; attempt += 1) {
+        const ringOffset = Math.floor(attempt / 11)
+        const radiusX = preferredRadiusX + ringOffset * ringStepX
+        const radiusY = preferredRadiusY + ringOffset * ringStepY
+        const angle = baseAngle + attempt * 0.4
+        const x = Math.cos(angle) * radiusX
+        const y = Math.sin(angle) * radiusY
+
+        const candidate = {
+          left: x - estimatedWidth / 2,
+          right: x + estimatedWidth / 2,
+          top: y - estimatedHeight / 2,
+          bottom: y + estimatedHeight / 2,
+        }
+
+        const inBounds =
+          candidate.left >= -halfX &&
+          candidate.right <= halfX &&
+          candidate.top >= -halfY &&
+          candidate.bottom <= halfY
+
+        if (inBounds && !placedWords.some((word) => intersects(candidate, word))) {
+          chosenX = x
+          chosenY = y
+          placedWords.push(candidate)
+          found = true
+          break
+        }
+      }
+
+      if (!found) {
+        // Strict fallback: still obey bounds + collision checks. If impossible, skip this term.
+        for (let extra = 0; extra < 280; extra += 1) {
+          const expand = 1 + extra * 0.012
+          const angle = baseAngle + extra * 0.31
+          const x = Math.cos(angle) * maxRadiusX * expand
+          const y = Math.sin(angle) * maxRadiusY * expand
+
+          const candidate = {
+            left: x - estimatedWidth / 2,
+            right: x + estimatedWidth / 2,
+            top: y - estimatedHeight / 2,
+            bottom: y + estimatedHeight / 2,
+          }
+
+          const inBounds =
+            candidate.left >= -halfX &&
+            candidate.right <= halfX &&
+            candidate.top >= -halfY &&
+            candidate.bottom <= halfY
+
+          if (inBounds && !placedWords.some((word) => intersects(candidate, word))) {
+            chosenX = x
+            chosenY = y
+            placedWords.push(candidate)
+            found = true
+            break
+          }
+        }
+      }
+
+      if (!found) {
+        return null
+      }
+
+      return {
+        item,
+        index,
+        weight,
+        fontSize,
+        rotate,
+        x: chosenX,
+        y: chosenY,
+      }
+    }).filter(Boolean)
+  }, [terms, canvasSize.height, canvasSize.width])
+
+  return (
+    <div
+      ref={containerRef}
+      className="report-medium-placeholder"
+      style={{
+        position: 'relative',
+        minHeight: 'clamp(280px, 40vw, 420px)',
+        textAlign: 'center',
+        overflow: 'hidden',
+        background:
+          'linear-gradient(135deg, rgba(250, 245, 255, 0.95) 0%, rgba(240, 249, 255, 0.95) 45%, rgba(255, 251, 235, 0.95) 100%)',
+        borderStyle: 'solid',
+      }}
+    >
+      {cloudItems.map(({ item, index, weight, fontSize, rotate, x, y }) => (
+        <span
+          key={`${typeLabel}-${item.label}-${index}`}
+          style={{
+            position: 'absolute',
+            left: `calc(50% + ${x}px)`,
+            top: `calc(50% + ${y}px)`,
+            fontSize: `${fontSize}px`,
+            fontWeight: weight,
+            color: palette[index % palette.length],
+            lineHeight: 1.28,
+            transform: `translate(-50%, -50%) rotate(${rotate}deg)`,
+            display: 'inline-block',
+            textShadow: '0 1px 0 rgba(255, 255, 255, 0.7)',
+            whiteSpace: 'nowrap',
+            maxWidth: '92%',
+          }}
+          title={`${item.label}: ${item.value}`}
+        >
+          {item.label}
+        </span>
+      ))}
+    </div>
+  )
+}
 
 export default function IssueReport() {
   const [issue, setIssue] = useState(null)
@@ -14,6 +230,8 @@ export default function IssueReport() {
   const [trendError, setTrendError] = useState('')
   const [whyWordCloudTerms, setWhyWordCloudTerms] = useState([])
   const [howWordCloudTerms, setHowWordCloudTerms] = useState([])
+  const [profileWordCloudTerms, setProfileWordCloudTerms] = useState([])
+  const [profileWordCloudStatus, setProfileWordCloudStatus] = useState('idle')
   const [whyWordCloudStatus, setWhyWordCloudStatus] = useState('idle')
   const [howWordCloudStatus, setHowWordCloudStatus] = useState('idle')
   const [loading, setLoading] = useState(true)
@@ -27,6 +245,66 @@ export default function IssueReport() {
   const params = new URLSearchParams(window.location.search)
   const queryIssueId = params.get('issueId')
   const issueId = routeIssueId || queryIssueId
+
+  const MEANINGLESS_WORDS = new Set([
+    'a', 'an', 'and', 'are', 'as', 'at', 'be', 'because', 'been', 'being', 'but', 'by',
+    'can', 'cannot', 'could', 'did', 'do', 'does', 'doing', 'done', 'for', 'from', 'get',
+    'gets', 'getting', 'got', 'had', 'has', 'have', 'having', 'he', 'her', 'here', 'hers',
+    'herself', 'him', 'himself', 'his', 'how', 'however', 'i', 'if', 'in', 'into', 'is',
+    'it', 'its', 'itself', 'just', 'me', 'might', 'more', 'most', 'my', 'myself', 'no',
+    'nor', 'not', 'now', 'of', 'on', 'once', 'only', 'or', 'other', 'our', 'ours',
+    'ourselves', 'out', 'over', 'own', 'really', 'same', 'she', 'should', 'so', 'some',
+    'such', 'than', 'that', 'the', 'their', 'theirs', 'them', 'themselves', 'then', 'there',
+    'therefore', 'these', 'they', 'this', 'those', 'through', 'to', 'too', 'under', 'until',
+    'up', 'us', 'very', 'was', 'we', 'were', 'what', 'when', 'where', 'which', 'while',
+    'who', 'whom', 'whose', 'why', 'will', 'with', 'within', 'without', 'would', 'yes',
+    'yet', 'you', 'your', 'yours', 'yourself', 'yourselves', 'also', 'maybe', 'perhaps',
+    'etc', 'ok', 'okay', 'like', 'still', 'already', 'much', 'many', 'any', 'every', 'each',
+    'another', 'else', 'even', 'ever', 'always', 'never', 'often', 'sometimes', 'usually',
+    'mostly', 'mainly'
+  ])
+
+  const tokenizeLabel = (label) =>
+    String(label ?? '')
+      .toLowerCase()
+      .split(/[^\p{L}\p{N}]+/u)
+      .filter(Boolean)
+
+  const isMeaningfulLabel = (label) => {
+    const tokens = tokenizeLabel(label)
+    if (!tokens.length) return false
+
+    return tokens.some(
+      (token) => token.length > 1 && !MEANINGLESS_WORDS.has(token) && !/^\d+$/.test(token),
+    )
+  }
+
+  const normalizeWordCloudTerms = (data) => {
+    if (!Array.isArray(data)) return []
+
+    const merged = new Map()
+
+    data.forEach((item) => {
+      const rawLabel = String(item?.label ?? '').trim()
+      const value = Number(item?.value ?? 0)
+
+      if (!rawLabel || !Number.isFinite(value) || value <= 0) return
+      if (!isMeaningfulLabel(rawLabel)) return
+
+      const key = rawLabel.toLowerCase().replace(/\s+/g, ' ').trim()
+      const existing = merged.get(key)
+
+      if (existing) {
+        existing.value += value
+      } else {
+        merged.set(key, { label: rawLabel, value })
+      }
+    })
+
+    return Array.from(merged.values()).sort(
+      (a, b) => b.value - a.value || a.label.localeCompare(b.label),
+    )
+  }
 
   const handleGenerateAiReport = async () => {
     const storedShareId = localStorage.getItem('shareId')
@@ -252,8 +530,10 @@ export default function IssueReport() {
 
   useEffect(() => {
     if (!issueId) {
+      setProfileWordCloudStatus('error')
       setWhyWordCloudStatus('error')
       setHowWordCloudStatus('error')
+      setProfileWordCloudTerms([])
       setWhyWordCloudTerms([])
       setHowWordCloudTerms([])
       return
@@ -273,14 +553,7 @@ export default function IssueReport() {
         }
 
         const data = text ? JSON.parse(text) : []
-        const normalized = Array.isArray(data)
-          ? data
-              .map((item) => ({
-                label: String(item?.label ?? '').trim(),
-                value: Number(item?.value ?? 0),
-              }))
-              .filter((item) => item.label && Number.isFinite(item.value) && item.value > 0)
-          : []
+        const normalized = normalizeWordCloudTerms(data)
 
         setTerms(normalized)
         setStatus(normalized.length ? 'success' : 'empty')
@@ -291,6 +564,7 @@ export default function IssueReport() {
       }
     }
 
+    fetchWordCloudByType('profile', setProfileWordCloudStatus, setProfileWordCloudTerms)
     fetchWordCloudByType('why', setWhyWordCloudStatus, setWhyWordCloudTerms)
     fetchWordCloudByType('how', setHowWordCloudStatus, setHowWordCloudTerms)
   }, [API_BASE, issueId])
@@ -312,65 +586,7 @@ export default function IssueReport() {
       return <div className="report-medium-placeholder">No {typeLabel} keywords found for this issue.</div>
     }
 
-    const values = terms.map((item) => item.value)
-    const minValue = Math.min(...values)
-    const maxValue = Math.max(...values)
-    const palette = [
-      '#e11d48',
-      '#f97316',
-      '#eab308',
-      '#22c55e',
-      '#06b6d4',
-      '#3b82f6',
-      '#6366f1',
-      '#a855f7',
-      '#ec4899',
-      '#14b8a6',
-    ]
-
-    return (
-      <div
-        className="report-medium-placeholder"
-        style={{
-          justifyContent: 'flex-start',
-          alignItems: 'flex-start',
-          textAlign: 'left',
-          gap: '12px 16px',
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignContent: 'flex-start',
-          background:
-            'linear-gradient(135deg, rgba(250, 245, 255, 0.95) 0%, rgba(240, 249, 255, 0.95) 45%, rgba(255, 251, 235, 0.95) 100%)',
-          borderStyle: 'solid',
-        }}
-      >
-        {terms.map((item, index) => {
-          const ratio =
-            maxValue === minValue ? 1 : (item.value - minValue) / (maxValue - minValue)
-          const weight = Math.round(500 + ratio * 300)
-          const fontSize = 12 + ratio * 30
-          const rotate = index % 5 === 0 ? -5 : index % 7 === 0 ? 5 : 0
-
-          return (
-            <span
-              key={`${typeLabel}-${item.label}-${index}`}
-              style={{
-                fontSize: `${fontSize}px`,
-                fontWeight: weight,
-                color: palette[index % palette.length],
-                lineHeight: 1.3,
-                transform: `rotate(${rotate}deg)`,
-                display: 'inline-block',
-                textShadow: '0 1px 0 rgba(255, 255, 255, 0.7)',
-              }}
-              title={`${item.label}: ${item.value}`}
-            >
-              {item.label}
-            </span>
-          )
-        })}
-      </div>
-    )
+    return <ResponsiveWordCloudCanvas terms={terms} typeLabel={typeLabel} />
   }
 
   const shareId = issue?.shareId || ''
@@ -557,9 +773,11 @@ export default function IssueReport() {
                           <h4 className="report-card-title">
                             Profile Word Cloud
                           </h4>
-                          <div className="report-medium-placeholder">
-                            Profile word cloud placeholder
-                          </div>
+                          {renderWordCloud(
+                            profileWordCloudStatus,
+                            profileWordCloudTerms,
+                            'profile',
+                          )}
                         </div>
 
                         <div className="wordcloud-block">

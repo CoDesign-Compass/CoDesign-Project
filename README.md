@@ -1,8 +1,35 @@
 # CoDesign-Project
+<img width="1297" height="642" alt="Screenshot 2026-03-31 at 21 47 55" src="https://github.com/user-attachments/assets/2cc05456-8073-4d69-8c0c-4980b518a0ca" />
+
+**Public Website**: <https://co-design-project.vercel.app/>
+
+## Demo
+**You can watch demo videos by the following youtube links:**
+<br>
+    [User Demo](https://youtu.be/7kRk-Z32Pf8)
+<br>
+    [Admin Demo](https://youtu.be/5mU47TunATA)
+
+**You can also** 
+[download demo videos](https://github.com/CoDesign-Compass/CoDesign-Project/tree/main/demo)
+
+## User Guide
+
+### Admin side
+[Admin User Guide.md](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/User%20Guide/Admin%20User%20Guide.md)<br>
+<br> **You can download the PDF and video using following links:** <br>
+[Admin User Guide.pdf](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/User%20Guide/Admin%20User%20Guide.pdf)<br>
+[Admin User GUide.mp4](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/User%20Guide/Admin%20User%20Guide.mp4)
+
+
+### User side
+[User Guide.md](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/User%20Guide/User%20Guide.md)<br>
+<br> **You can download the PDF and video using following links:** <br>
+[User Guide.pdf](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/User%20Guide/User%20Guide.pdf)<br>
+[User GUide.mp4](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/User%20Guide/User%20Guide.mp4)
 
 
 ## Project Introduction
-
 ### Background
 Many policy frameworks and service pathways fail to fully reflect the experiences of those who use them. Individuals with lived experience often lack accessible, secure, and structured ways to provide meaningful feedback that can influence decision-making. This project was initiated to bridge this gap, giving users a safe and interactive platform to share their perspectives.
 
@@ -31,6 +58,3 @@ CoDesignCompass aims to provide a simple, secure, and user-friendly platform to 
 ## Wiki
 For detailed project documentation, including product backlog, user stories, risk log, and sprint retrospectives, please refer to our [wiki.md](https://github.com/AriaFung/CoDesign-Project/blob/main/wiki.md)
 
-## Online Deployment
-Public Website: [codesign-compass.vercel.app](https://co-design-project.vercel.app/)
-<br> Backend and Database deployed to Render: [codesign-project.onrender](https://codesign-project.onrender.com)
