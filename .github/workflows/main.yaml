@@ -2,7 +2,7 @@ name: React CI/CD to GitHub Pages
 
 on:
   push:
-    branches: [ "main" ] # listen to main 和 51-add-cicd branches
+    branches: [ "main" ,"242-set-up-github-actions-for-automated-testing" ] # listen to main 和 51-add-cicd branches
   pull_request:
     branches: [ "main" ]
 
