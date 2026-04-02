@@ -6,13 +6,28 @@
 ## Demo
 **You can watch demo videos by the following youtube links:**
 <br>
-[User Demo](https://youtu.be/7kRk-Z32Pf8)
+    [User Demo](https://youtu.be/7kRk-Z32Pf8)
 <br>
-[Admin Demo](https://youtu.be/5mU47TunATA)
+    [Admin Demo](https://youtu.be/5mU47TunATA)
 
-<br>
+**You can also** 
+[download demo videos](https://github.com/CoDesign-Compass/CoDesign-Project/tree/main/demo)
 
-**You can also** [download demo videos](https://github.com/CoDesign-Compass/CoDesign-Project/tree/main/demo)
+## User Guide
+
+### Admin side
+[Admin User Guide.md](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/User%20Guide/Admin%20User%20Guide.md)<br>
+<br> **You can download the PDF and video using following links:** <br>
+[Admin User Guide.pdf](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/User%20Guide/Admin%20User%20Guide.pdf)<br>
+[Admin User GUide.mp4](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/User%20Guide/Admin%20User%20Guide.mp4)
+
+
+### User side
+[User Guide.md](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/User%20Guide/User%20Guide.md)<br>
+<br> **You can download the PDF and video using following links:** <br>
+[User Guide.pdf](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/User%20Guide/User%20Guide.pdf)<br>
+[User GUide.mp4](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/User%20Guide/User%20Guide.mp4)
+
 
 ## Project Introduction
 ### Background
