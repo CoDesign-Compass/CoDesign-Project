@@ -11,6 +11,8 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
     long countByIssueIdAndStatus(Long issueId, Submission.Status status);
     List<Submission> findByIssueIdOrderByCreatedAtDesc(Long issueId);
 
+    void deleteByIssueId(Long issueId);
+
     @Query(value = """
             SELECT DATE_TRUNC('month', submitted_at) AS month_start, COUNT(*) AS total
             FROM submissions

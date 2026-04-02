@@ -4,6 +4,7 @@ import com.example.demo.dto.CreateIssueRequest;
 import com.example.demo.dto.IssueResponse;
 import com.example.demo.service.IssueService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,5 +38,11 @@ public class IssueController {
   @GetMapping("/share/{shareId}")
   public IssueResponse getIssueByShareId(@PathVariable String shareId) {
       return issueService.getIssueByShareId(shareId);
+  }
+
+  @DeleteMapping("/{issueId}")
+  public ResponseEntity<Void> deleteIssue(@PathVariable Long issueId) {
+      issueService.deleteIssue(issueId);
+      return ResponseEntity.noContent().build();
   }
 }
