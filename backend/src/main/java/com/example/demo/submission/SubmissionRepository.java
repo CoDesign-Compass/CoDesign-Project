@@ -49,4 +49,17 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
               AND created_at IS NOT NULL
             """, nativeQuery = true)
     Double findAverageResponseSecondsByIssueId(@Param("issueId") Long issueId);
+
+    @Query(value = """
+            SELECT i.issue_id,
+                   i.issue_content,
+                   COUNT(s.id) AS total
+            FROM issues i
+            LEFT JOIN submissions s
+              ON s.issue_id = i.issue_id
+             AND s.status = 'SUBMITTED'
+            GROUP BY i.issue_id, i.issue_content
+            ORDER BY i.issue_id
+            """, nativeQuery = true)
+    List<Object[]> findSubmittedCountsForExistingIssues();
 }

@@ -19,7 +19,7 @@ export default function EcommerceMetrics() {
 
       try {
         const [submissionRes, issuesRes] = await Promise.all([
-          fetch(`${API_BASE}/api/submissions/count`),
+          fetch(`${API_BASE}/api/submissions/by-issue`),
           fetch(`${API_BASE}/api/issues`),
         ])
 
@@ -34,9 +34,15 @@ export default function EcommerceMetrics() {
 
         const submissionData = await submissionRes.json()
         const issuesData = await issuesRes.json()
+        const totalSubmittedAcrossExistingIssues = Array.isArray(submissionData)
+          ? submissionData.reduce(
+              (sum, item) => sum + Number(item?.count ?? 0),
+              0,
+            )
+          : 0
 
         if (!cancelled) {
-          setSubmissionCount(Number(submissionData?.count ?? 0))
+          setSubmissionCount(totalSubmittedAcrossExistingIssues)
           setIssueCount(Array.isArray(issuesData) ? issuesData.length : 0)
         }
       } catch (err) {

@@ -1,6 +1,7 @@
 package com.example.demo.submission;
 
 import com.example.demo.submission.dto.CreateSubmissionRequest;
+import com.example.demo.submission.dto.IssueSubmissionCountResponse;
 import com.example.demo.submission.dto.MonthlySubmissionCountResponse;
 import com.example.demo.submission.dto.SubmissionTrendPointResponse;
 import com.example.demo.submission.dto.SubmitSubmissionRequest;
@@ -65,6 +66,11 @@ public class SubmissionController {
             @RequestParam(defaultValue = "12") int months
     ) {
         return ResponseEntity.ok(service.getMonthlySubmittedCounts(months));
+    }
+
+    @GetMapping("/by-issue")
+    public ResponseEntity<List<IssueSubmissionCountResponse>> getSubmittedCountsByExistingIssue() {
+        return ResponseEntity.ok(service.getSubmittedCountsForExistingIssues());
     }
 
     @GetMapping("/trend")

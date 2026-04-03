@@ -9,6 +9,7 @@ import com.example.demo.repository.IssueRepository;
 import com.example.demo.repository.UserProfileRepository;
 import com.example.demo.repository.WhyResponseRepository;
 import com.example.demo.submission.dto.CreateSubmissionRequest;
+import com.example.demo.submission.dto.IssueSubmissionCountResponse;
 import com.example.demo.submission.dto.MonthlySubmissionCountResponse;
 import com.example.demo.submission.dto.SubmissionTrendPointResponse;
 import com.example.demo.submission.dto.SubmitSubmissionRequest;
@@ -172,6 +173,25 @@ public class SubmissionService {
                     entry.getKey().format(formatter),
                     entry.getValue()
             ));
+        }
+
+        return result;
+    }
+
+    public List<IssueSubmissionCountResponse> getSubmittedCountsForExistingIssues() {
+        List<Object[]> rows = repo.findSubmittedCountsForExistingIssues();
+        List<IssueSubmissionCountResponse> result = new ArrayList<>();
+
+        for (Object[] row : rows) {
+            if (row == null || row.length < 3 || row[0] == null || row[2] == null) {
+                continue;
+            }
+
+            Long issueId = ((Number) row[0]).longValue();
+            String issueContent = row[1] == null ? "" : String.valueOf(row[1]);
+            long count = ((Number) row[2]).longValue();
+
+            result.add(new IssueSubmissionCountResponse(issueId, issueContent, count));
         }
 
         return result;
