@@ -11,7 +11,7 @@ import com.example.demo.repository.WhyResponseRepository;
 import com.example.demo.submission.dto.CreateSubmissionRequest;
 import com.example.demo.submission.dto.MonthlySubmissionCountResponse;
 import com.example.demo.submission.dto.SubmissionTrendPointResponse;
-import com.example.demo.submission.dto.SubmitSubmissionRequest;
+import com.example.demo.submission.dto.UpdateThanksRequest;
 import com.example.demo.submission.dto.SubmitSubmissionResponse;
 import com.example.demo.submission.dto.WordCloudTermResponse;
 import org.springframework.stereotype.Service;
@@ -76,35 +76,28 @@ public class SubmissionService {
 
 
     @Transactional
-    public SubmitSubmissionResponse submit(Long id, SubmitSubmissionRequest req) {
+    public SubmitSubmissionResponse submit(Long id) {
         Submission s = repo.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("SUBMISSION_NOT_FOUND"));
 
         if (s.getStatus() == Submission.Status.SUBMITTED) {
-            throw new IllegalStateException("ALREADY_SUBMITTED");
+            return new SubmitSubmissionResponse(
+                    s.getId(),
+                    s.getStatus().name(),
+                    s.getSubmittedAt()
+            );
         }
-
-        
-        String email = req.getEmail();
-        boolean hasEmail = (email != null && !email.trim().isEmpty());
-
-        boolean needsEmail = req.isWantsVoucher() || req.isWantsUpdates();
-
-        if (needsEmail && !hasEmail) {
-                throw new IllegalArgumentException("EMAIL_REQUIRED");
-
-        }
-
-        s.setEmail(hasEmail ? email.trim() : null);
-        s.setWantsVoucher(req.isWantsVoucher());
-        s.setWantsUpdates(req.isWantsUpdates());
 
         s.setStatus(Submission.Status.SUBMITTED);
         s.setSubmittedAt(LocalDateTime.now());
 
         repo.save(s);
 
-        return new SubmitSubmissionResponse(s.getId(), s.getStatus().name(), s.getSubmittedAt());
+        return new SubmitSubmissionResponse(
+                s.getId(),
+                s.getStatus().name(),
+                s.getSubmittedAt()
+        );
     }
 
     @Transactional
@@ -117,6 +110,26 @@ public class SubmissionService {
         }
 
         s.setUserId(userId);
+        return repo.save(s);
+    }
+
+    @Transactional
+    public Submission updateThanksInfo(Long id, UpdateThanksRequest req) {
+        Submission s = repo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("SUBMISSION_NOT_FOUND"));
+
+        String email = req.getEmail();
+        boolean hasEmail = (email != null && !email.trim().isEmpty());
+        boolean needsEmail = req.isWantsVoucher() || req.isWantsUpdates();
+
+        if (needsEmail && !hasEmail) {
+            throw new IllegalArgumentException("EMAIL_REQUIRED");
+        }
+
+        s.setEmail(hasEmail ? email.trim() : null);
+        s.setWantsVoucher(req.isWantsVoucher());
+        s.setWantsUpdates(req.isWantsUpdates());
+
         return repo.save(s);
     }
 
