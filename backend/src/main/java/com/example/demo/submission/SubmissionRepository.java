@@ -11,6 +11,14 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
     long countByIssueIdAndStatus(Long issueId, Submission.Status status);
     List<Submission> findByIssueIdOrderByCreatedAtDesc(Long issueId);
 
+    @Query(value = """
+            SELECT COUNT(s.id)
+            FROM submissions s
+            INNER JOIN issues i ON i.issue_id = s.issue_id
+            WHERE s.status = 'SUBMITTED'
+            """, nativeQuery = true)
+    long countSubmittedForExistingIssues();
+
     void deleteByIssueId(Long issueId);
 
     @Query(value = """
@@ -50,16 +58,4 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
             """, nativeQuery = true)
     Double findAverageResponseSecondsByIssueId(@Param("issueId") Long issueId);
 
-    @Query(value = """
-            SELECT i.issue_id,
-                   i.issue_content,
-                   COUNT(s.id) AS total
-            FROM issues i
-            LEFT JOIN submissions s
-              ON s.issue_id = i.issue_id
-             AND s.status = 'SUBMITTED'
-            GROUP BY i.issue_id, i.issue_content
-            ORDER BY i.issue_id
-            """, nativeQuery = true)
-    List<Object[]> findSubmittedCountsForExistingIssues();
 }
