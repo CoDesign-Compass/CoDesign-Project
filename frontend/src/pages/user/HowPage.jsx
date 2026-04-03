@@ -77,10 +77,13 @@ export default function HowPage() {
   const navigate = useNavigate()
 
   const [step, setStep] = useState(0)
+  const [answers, setAnswers] = useState(Array(5).fill(''))
+  const [submitting, setSubmitting] = useState(false)
+
   const questions = Array(5).fill(
     'Write in your own words. No names or identifiers.',
   )
-  const [answers, setAnswers] = useState(Array(questions.length).fill(''))
+
   const inputRef = useRef(null)
   const endRef = useRef(null)
 
@@ -99,28 +102,57 @@ export default function HowPage() {
   const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://codesign-project.onrender.com'
 
   const submitHow = async () => {
-    const body = {
-      shareId: routeShareId,
-      answer1: answers[0],
-      answer2: answers[1],
-      answer3: answers[2],
-      answer4: answers[3],
-      answer5: answers[4],
+    if (submitting) return
+    setSubmitting(true)
+
+    try {
+      const body = {
+        shareId: routeShareId,
+        answer1: answers[0],
+        answer2: answers[1],
+        answer3: answers[2],
+        answer4: answers[3],
+        answer5: answers[4],
+      }
+
+      const howResponse = await fetch(`${API_BASE}/api/how`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      })
+
+      if (!howResponse.ok) {
+        const errorText = await howResponse.text()
+        throw new Error(`Failed to submit how response: ${errorText}`)
+      }
+
+      const submissionId = localStorage.getItem('submissionId')
+      console.log('API_BASE =', API_BASE)
+      console.log('submissionId =', submissionId)
+
+      if (!submissionId) {
+        throw new Error('No submissionId found')
+      }
+
+      const submitUrl = `${API_BASE}/api/submissions/${submissionId}/submit`
+      console.log('submitUrl =', submitUrl)
+
+      const submitResponse = await fetch(submitUrl, {
+        method: 'POST',
+      })
+
+      if (!submitResponse.ok) {
+        const errorText = await submitResponse.text()
+        console.error('submit error body =', errorText)
+        throw new Error(`Failed to submit feedback session: ${errorText}`)
+      }
+
+      navigate(`/share/${routeShareId}/thankyou`)
+    } finally {
+      setSubmitting(false)
     }
-
-    const response = await fetch(`${API_BASE}/api/how`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    })
-
-    if (!response.ok) {
-      throw new Error('Failed to submit how response')
-    }
-
-    navigate(`/share/${routeShareId}/thankyou`)
   }
 
   useEffect(() => {
@@ -290,6 +322,7 @@ export default function HowPage() {
                 <button
                   type="button"
                   onClick={finish}
+                  disabled={submitting}
                   style={{
                     background: buttonBackground,
                     border: 'none',
@@ -297,10 +330,11 @@ export default function HowPage() {
                     borderRadius: 10,
                     padding: '12px 18px',
                     fontWeight: 600,
-                    cursor: 'pointer',
+                    cursor: submitting ? 'not-allowed' : 'pointer',
+                    opacity: submitting ? 0.7 : 1,
                   }}
                 >
-                  I don’t know
+                  {submitting ? 'Submitting...' : 'I don’t know'}
                 </button>
               </motion.div>
             )}
@@ -308,7 +342,7 @@ export default function HowPage() {
             <button
               type="button"
               onClick={next}
-              disabled={!answers[step].trim()}
+              disabled={submitting || !answers[step].trim()}
               style={{
                 background: buttonBackground,
                 color: buttonTextColor,
@@ -316,12 +350,19 @@ export default function HowPage() {
                 borderRadius: 10,
                 padding: '12px 18px',
                 fontWeight: 600,
-                cursor: answers[step].trim() ? 'pointer' : 'not-allowed',
-                opacity: answers[step].trim() ? 1 : 0.7,
+                cursor:
+                  submitting || !answers[step].trim()
+                    ? 'not-allowed'
+                    : 'pointer',
+                opacity: submitting || !answers[step].trim() ? 0.7 : 1,
                 alignSelf: step > 0 ? 'flex-end' : 'flex-start',
               }}
             >
-              Next
+              {submitting
+                ? 'Submitting...'
+                : step === questions.length - 1
+                  ? 'Finish'
+                  : 'Next'}
             </button>
           </div>
         </motion.div>
