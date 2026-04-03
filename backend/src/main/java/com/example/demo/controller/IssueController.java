@@ -40,7 +40,7 @@ public class IssueController {
       return issueService.getIssueByShareId(shareId);
   }
 
-  @DeleteMapping("/{issueId}")
+  @DeleteMapping("/issues/{issueId}")
   public ResponseEntity<Void> deleteIssue(@PathVariable Long issueId) {
       issueService.deleteIssue(issueId);
       return ResponseEntity.noContent().build();
