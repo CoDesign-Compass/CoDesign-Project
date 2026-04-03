@@ -4,6 +4,7 @@ import com.example.demo.dto.CreateIssueRequest;
 import com.example.demo.dto.IssueResponse;
 import com.example.demo.service.IssueService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,30 +13,42 @@ import java.util.List;
 @RequestMapping("/api")
 public class IssueController {
 
-  private final IssueService issueService;
+    private final IssueService issueService;
 
-  public IssueController(IssueService issueService) {
-      this.issueService = issueService;
-  }
+    public IssueController(IssueService issueService) {
+        this.issueService = issueService;
+    }
 
-  @PostMapping("/issues")
-  @ResponseStatus(HttpStatus.CREATED)
-  public IssueResponse createIssue(@RequestBody CreateIssueRequest request) {
-      return issueService.createIssue(request);
-  }
+    @PostMapping("/issues")
+    @ResponseStatus(HttpStatus.CREATED)
+    public IssueResponse createIssue(@RequestBody CreateIssueRequest request) {
+        return issueService.createIssue(request);
+    }
 
-  @GetMapping("/issues")
-  public List<IssueResponse> getAllIssues() {
-      return issueService.getAllIssues();
-  }
+    @GetMapping("/issues")
+    public List<IssueResponse> getAllIssues() {
+        return issueService.getAllIssues();
+    }
 
-  @GetMapping("/issues/{issueId}")
-  public IssueResponse getIssueById(@PathVariable Long issueId) {
-      return issueService.getIssueById(issueId);
-  }
+    @GetMapping("/issues/{issueId}")
+    public IssueResponse getIssueById(@PathVariable Long issueId) {
+        return issueService.getIssueById(issueId);
+    }
 
-  @GetMapping("/share/{shareId}")
-  public IssueResponse getIssueByShareId(@PathVariable String shareId) {
-      return issueService.getIssueByShareId(shareId);
-  }
+    @GetMapping("/share/{shareId}")
+    public IssueResponse getIssueByShareId(@PathVariable String shareId) {
+        return issueService.getIssueByShareId(shareId);
+    }
+
+    @PostMapping("/issues/{issueId}/edit")
+    public IssueResponse editIssue(@PathVariable Long issueId,
+                                   @RequestBody CreateIssueRequest request) {
+        return issueService.updateIssue(issueId, request);
+    }
+
+    @DeleteMapping("/issues/{issueId}")
+    public ResponseEntity<Void> deleteIssue(@PathVariable Long issueId) {
+        issueService.deleteIssue(issueId);
+        return ResponseEntity.noContent().build();
+    }
 }
