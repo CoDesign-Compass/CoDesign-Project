@@ -69,6 +69,22 @@ public class IssueService {
         return toResponse(issue);
     }
 
+    public IssueResponse updateIssue(Long issueId, CreateIssueRequest request) {
+        Issue issue = issueRepository.findById(issueId)
+                .orElseThrow(() -> new IllegalArgumentException("Issue not found."));
+
+        String content = request.getIssueContent() == null ? "" : request.getIssueContent().trim();
+
+        if (content.isEmpty()) {
+            throw new IllegalArgumentException("Issue content must not be empty.");
+        }
+
+        issue.setIssueContent(content);
+
+        Issue updated = issueRepository.save(issue);
+        return toResponse(updated);
+    }
+
     @Transactional
     public void deleteIssue(Long issueId) {
         Issue issue = issueRepository.findById(issueId)
