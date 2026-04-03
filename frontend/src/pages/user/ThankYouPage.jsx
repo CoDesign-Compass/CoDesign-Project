@@ -38,21 +38,9 @@ export default function ThankPage() {
   const API_BASE =
     process.env.REACT_APP_API_BASE_URL || 'https://codesign-project.onrender.com'
 
-  async function createSubmission(issueId) {
-    const res = await fetch(`${API_BASE}/api/submissions`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ issueId }),
-    })
-
-    const text = await res.text()
-    if (!res.ok) throw new Error(text || `HTTP ${res.status}`)
-    return text ? JSON.parse(text) : {}
-  }
-
-  async function submitSubmission(id, payload) {
-    const res = await fetch(`${API_BASE}/api/submissions/${id}/submit`, {
-      method: 'POST',
+  async function saveThanksInfo(id, payload) {
+    const res = await fetch(`${API_BASE}/api/submissions/${id}/thanks`, {
+      method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     })
@@ -80,40 +68,15 @@ export default function ThankPage() {
       return
     }
 
-    let submissionId = localStorage.getItem('submissionId')
+    const submissionId = localStorage.getItem('submissionId')
+
+    if (!submissionId) {
+      setSubmitError('No submissionId found.')
+      return
+    }
 
     try {
       setIsSubmitting(true)
-
-      if (!submissionId) {
-        const raw = localStorage.getItem('issueId')
-        const issueId = Number(raw)
-
-        if (!Number.isFinite(issueId) || issueId <= 0) {
-          setSubmitError(
-            'No issueId found. Please enter from a share link or welcome page.',
-          )
-          return
-        }
-
-        const created = await createSubmission(issueId)
-        const newId = created?.id ?? created?.submissionId
-
-        if (!newId) {
-          console.log('createSubmission response:', created)
-          setSubmitError(
-            'Created submission but no id returned. Check backend response.',
-          )
-          return
-        }
-
-        submissionId = String(newId)
-        localStorage.setItem('submissionId', submissionId)
-
-        if (created?.issueId) {
-          localStorage.setItem('issueId', String(created.issueId))
-        }
-      }
 
       const payload = {
         email: trimmed,
@@ -121,12 +84,12 @@ export default function ThankPage() {
         wantsUpdates: wantUpdates,
       }
 
-      const resp = await submitSubmission(submissionId, payload)
-      console.log('submit ok:', resp)
-      setSubmitSuccess('Submitted successfully!')
+      const resp = await saveThanksInfo(submissionId, payload)
+      console.log('thanks info saved:', resp)
+      setSubmitSuccess('Your preferences have been saved.')
     } catch (err) {
       console.error(err)
-      setSubmitError('Submit failed: ' + err.message)
+      setSubmitError('Save failed: ' + err.message)
     } finally {
       setIsSubmitting(false)
     }
@@ -245,7 +208,8 @@ export default function ThankPage() {
     theme === 'light' ? '#b9dfb4' : 'rgba(180,255,180,0.24)'
   const successText = theme === 'light' ? '#255b2a' : '#d8ffd4'
   const errorBg = theme === 'light' ? '#fff4f4' : 'rgba(255,180,180,0.10)'
-  const errorBorder = theme === 'light' ? '#efc7c7' : 'rgba(255,180,180,0.24)'
+  const errorBorder =
+    theme === 'light' ? '#efc7c7' : 'rgba(255,180,180,0.24)'
   const errorText = theme === 'light' ? '#9b1c1c' : '#ffd4d4'
 
   return (
@@ -289,7 +253,9 @@ export default function ThankPage() {
             position: 'absolute',
             inset: 0,
             background:
-              theme === 'light' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.14)',
+              theme === 'light'
+                ? 'rgba(255,255,255,0.08)'
+                : 'rgba(0,0,0,0.14)',
           }}
         />
         <div

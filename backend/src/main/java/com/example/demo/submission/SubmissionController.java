@@ -6,6 +6,7 @@ import com.example.demo.submission.dto.SubmissionTrendPointResponse;
 import com.example.demo.submission.dto.SubmitSubmissionRequest;
 import com.example.demo.submission.dto.SubmitSubmissionResponse;
 import com.example.demo.submission.dto.WordCloudTermResponse;
+import com.example.demo.submission.dto.UpdateThanksRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -37,16 +38,21 @@ public class SubmissionController {
     }
 
     @PostMapping("/{id}/submit")
-    public ResponseEntity<SubmitSubmissionResponse> submit(
-            @PathVariable Long id,
-            @Valid @RequestBody SubmitSubmissionRequest req
-    ) {
-        return ResponseEntity.ok(service.submit(id, req));
+    public ResponseEntity<SubmitSubmissionResponse> submit(@PathVariable Long id) {
+    return ResponseEntity.ok(service.submit(id));
     }
 
     @PostMapping("/{id}/link-account")
     public Submission linkAccount(@PathVariable Long id, @RequestBody LinkAccountRequest req) {
         return service.linkAccount(id, req.getUserId());
+    }
+
+    @PatchMapping("/{id}/thanks")
+    public ResponseEntity<Submission> updateThanksInfo(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateThanksRequest req
+    ) {
+        return ResponseEntity.ok(service.updateThanksInfo(id, req));
     }
 
     @GetMapping("/count")
