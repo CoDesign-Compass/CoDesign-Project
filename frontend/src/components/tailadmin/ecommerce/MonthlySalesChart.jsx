@@ -5,7 +5,9 @@ import { MoreDotIcon } from '../icons'
 import { useEffect, useMemo, useState } from 'react'
 
 export default function MonthlySalesChart() {
-  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'
+  const API_BASE =
+    process.env.REACT_APP_API_BASE_URL ||
+    'https://codesign-project.onrender.com'
   const [isOpen, setIsOpen] = useState(false)
   const [monthlyData, setMonthlyData] = useState([])
   const [loading, setLoading] = useState(true)
@@ -179,7 +181,11 @@ export default function MonthlySalesChart() {
         </div>
       </div>
       <div className="pb-4 text-xs text-gray-500 dark:text-gray-400">
-        {error ? error : loading ? 'Loading monthly submissions...' : 'Showing the last 12 months of submitted responses.'}
+        {error
+          ? error
+          : loading
+            ? 'Loading monthly submissions...'
+            : 'Showing the last 12 months of submitted responses.'}
       </div>
     </div>
   )
