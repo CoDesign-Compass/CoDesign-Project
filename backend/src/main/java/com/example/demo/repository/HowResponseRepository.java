@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface HowResponseRepository extends JpaRepository<HowResponse, Long> {
+    void deleteByShareId(String shareId);
+
     List<HowResponse> findByShareId(String shareId);
 
     Optional<HowResponse> findTopByShareIdOrderByCreatedAtDesc(String shareId);
