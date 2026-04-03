@@ -5,7 +5,7 @@ import TagSelection from '../../components/ProfilePage/TagSelection'
 import { useTheme } from '../../context/ThemeContext'
 import '../../components/ProfilePage/ProfilePage.css'
 
-const API_BASE_URL = (process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080') + '/api/profile'
+const API_BASE_URL = (process.env.REACT_APP_API_BASE_URL || 'https://codesign-project.onrender.com') + '/api/profile'
 
 export default function ProfilePage({ setOnNext }) {
   // Retrieve submissionId from localStorage as the temporary userId
