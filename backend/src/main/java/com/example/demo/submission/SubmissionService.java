@@ -426,7 +426,10 @@ public class SubmissionService {
                 .orElseThrow(() -> new IllegalArgumentException("ISSUE_NOT_FOUND"));
         String safeShareId = safe(shareId);
 
-        List<Submission> submissions = repo.findByIssueIdOrderByCreatedAtDesc(issueId);
+        List<Submission> submissions = repo.findByIssueIdOrderByCreatedAtDesc(issueId)
+                .stream()
+                .filter(submission -> submission.getStatus() == Submission.Status.SUBMITTED)
+                .toList();
         List<String> submissionIds = submissions.stream()
                 .map(Submission::getId)
                 .map(String::valueOf)
