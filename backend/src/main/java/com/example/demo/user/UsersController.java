@@ -1,5 +1,7 @@
 package com.example.demo.user;
 
+import com.example.demo.entity.Issue;
+import com.example.demo.repository.IssueRepository;
 import com.example.demo.user.dto.SignupRequest;
 import com.example.demo.user.dto.SignupResponse;
 import com.example.demo.user.dto.LoginRequest;
@@ -7,6 +9,7 @@ import com.example.demo.user.dto.LoginResponse;
 import com.example.demo.user.dto.UserListItemResponse;
 import com.example.demo.user.dto.UpdateUserWantsUpdatesRequest;
 import com.example.demo.user.dto.SendGiftEmailRequest;
+import com.example.demo.user.dto.SendUpdateEmailRequest;
 import com.example.demo.user.dto.UpdateUserWantsGiftRequest;
 
 import jakarta.validation.Valid;
@@ -25,6 +28,7 @@ import java.util.Map;
 public class UsersController {
 
   private final UserRepository userRepository;
+  private final IssueRepository issueRepository;
   private final GiftEmailService giftEmailService;
   private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -35,8 +39,13 @@ public class UsersController {
   @Value("${ADMIN_PASSWORD:admin123}")
   private String adminPassword;
 
-  public UsersController(UserRepository userRepository, GiftEmailService giftEmailService) {
+  public UsersController(
+      UserRepository userRepository,
+      IssueRepository issueRepository,
+      GiftEmailService giftEmailService
+  ) {
     this.userRepository = userRepository;
+    this.issueRepository = issueRepository;
     this.giftEmailService = giftEmailService;
   }
 
@@ -120,6 +129,52 @@ public class UsersController {
     return ResponseEntity.ok(Map.of(
         "id", user.getId(),
         "email", user.getEmail(),
+        "sent", true
+    ));
+  }
+
+  @PostMapping("/{id}/send-update-email")
+  public ResponseEntity<?> sendUpdateEmail(
+      @PathVariable Long id,
+      @Valid @RequestBody SendUpdateEmailRequest req
+  ) {
+    if (!giftEmailService.isConfigured()) {
+      throw new ResponseStatusException(
+          HttpStatus.SERVICE_UNAVAILABLE,
+          "Update email is not configured on the server."
+      );
+    }
+
+    User user = userRepository.findById(id)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found"));
+    Issue issue = issueRepository.findById(req.getIssueId())
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "issue not found"));
+
+    String toEmail = user.getEmail();
+    if (toEmail == null || toEmail.isBlank()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "user email is required");
+    }
+
+    try {
+      giftEmailService.sendUpdateEmail(
+          toEmail.trim(),
+          user.getUsername(),
+          issue,
+          req.getTemplate()
+      );
+    } catch (IllegalArgumentException ex) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+    } catch (IllegalStateException ex) {
+      if ("Update email is not configured on the server.".equals(ex.getMessage())) {
+        throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
+      }
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+    }
+
+    return ResponseEntity.ok(Map.of(
+        "id", user.getId(),
+        "email", user.getEmail(),
+        "issueId", issue.getIssueId(),
         "sent", true
     ));
   }
