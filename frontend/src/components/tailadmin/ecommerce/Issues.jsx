@@ -106,8 +106,8 @@ export default function Issues({ sortBy = 'updated-desc' }) {
     setSaving(true)
 
     try {
-      const res = await fetch(`${API_BASE}/api/issues/${editingIssue.issueId}`, {
-        method: 'PUT',
+      const res = await fetch(`${API_BASE}/api/issues/${editingIssue.issueId}/edit`, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
