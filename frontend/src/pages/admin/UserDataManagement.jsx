@@ -48,6 +48,7 @@ function downloadTextAsFile(text, filename) {
 export default function UserDataManagement() {
   const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://codesign-project.onrender.com'
   const [rows, setRows] = useState([])
+  const [issues, setIssues] = useState([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
   const [q, setQ] = useState('')
@@ -64,10 +65,19 @@ export default function UserDataManagement() {
     userId: '',
     userLabel: '',
   })
-  const [showTemplateEditor, setShowTemplateEditor] = useState(false)
+  const [updateModal, setUpdateModal] = useState({
+    open: false,
+    issueId: '',
+  })
+  const [updateModalError, setUpdateModalError] = useState('')
+  const [showGiftTemplateEditor, setShowGiftTemplateEditor] = useState(false)
+  const [showUpdateTemplateEditor, setShowUpdateTemplateEditor] = useState(false)
   const [notice, setNotice] = useState('')
   const [emailTemplateDraft, setEmailTemplateDraft] = useState(
     'Dear {{name}},\n\nThank you so much for taking the time to answer our questions. We sincerely appreciate your support and contribution.\n\nAs a small token of our appreciation, we are happy to share your voucher code: {{voucherCode}}.\n\nPlease feel free to contact us if you have any questions.\n\nKind regards,\nCoDesign Compass Team',
+  )
+  const [updateEmailTemplateDraft, setUpdateEmailTemplateDraft] = useState(
+    'Dear {{name}},\n\nThank you for staying engaged with CoDesign Compass.\n\nWe would like to share an update with you:\n{{issueContent}}\n\nYou can view and respond using this link:\n{{shareLink}}\n\nThank you again for your continued support.\n\nKind regards,\nCoDesign Compass Team',
   )
 
   useEffect(() => {
@@ -126,6 +136,35 @@ export default function UserDataManagement() {
     }
   }, [API_BASE])
 
+  useEffect(() => {
+    let cancelled = false
+
+    const fetchIssues = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/issues`, {
+          cache: 'no-store',
+        })
+        const text = await res.text()
+        if (!res.ok) {
+          throw new Error(text || `HTTP ${res.status}`)
+        }
+
+        const data = text ? JSON.parse(text) : []
+        if (!cancelled) {
+          setIssues(Array.isArray(data) ? data : [])
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    }
+
+    fetchIssues()
+
+    return () => {
+      cancelled = true
+    }
+  }, [API_BASE])
+
   const filtered = useMemo(() => {
     const k = q.trim().toLowerCase()
     if (!k) return rows
@@ -136,6 +175,10 @@ export default function UserDataManagement() {
         r.id.toLowerCase().includes(k),
     )
   }, [q, rows])
+
+  const availableIssues = useMemo(() => {
+    return [...issues].sort((a, b) => (b.issueId ?? 0) - (a.issueId ?? 0))
+  }, [issues])
 
   const total = filtered.length
   const totalAll = rows.length
@@ -186,6 +229,23 @@ export default function UserDataManagement() {
     }
   }
 
+  async function sendUpdateEmailToUser(userId, issueId, template) {
+    const res = await fetch(`${API_BASE}/api/users/${userId}/send-update-email`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        issueId,
+        template,
+      }),
+    })
+    const text = await res.text()
+    if (!res.ok) {
+      throw new Error(text || `HTTP ${res.status}`)
+    }
+  }
+
   function openSingleVoucherModal(id) {
     if (updatingStatus) return
     const row = rows.find((r) => r.id === id)
@@ -217,6 +277,22 @@ export default function UserDataManagement() {
     if (updatingStatus) return
     setVoucherModal((prev) => ({ ...prev, open: false }))
     setVoucherModalError('')
+  }
+
+  function openUpdateModal() {
+    if (!selected.size || updatingStatus) return
+    setUpdateModal({
+      open: true,
+      issueId:
+        availableIssues.length > 0 ? String(availableIssues[0].issueId) : '',
+    })
+    setUpdateModalError('')
+  }
+
+  function closeUpdateModal() {
+    if (updatingStatus) return
+    setUpdateModal((prev) => ({ ...prev, open: false }))
+    setUpdateModalError('')
   }
 
   async function handleVoucherConfirm() {
@@ -287,6 +363,59 @@ export default function UserDataManagement() {
       console.error(err)
       const message = err instanceof Error ? err.message : ''
       setVoucherModalError(message || 'Failed to send gift email.')
+    } finally {
+      setUpdatingStatus(false)
+    }
+  }
+
+  async function handleUpdateConfirm() {
+    const issueId = Number(updateModal.issueId)
+    const template = updateEmailTemplateDraft.trim()
+
+    if (!Number.isFinite(issueId) || issueId <= 0) {
+      setUpdateModalError('Please choose an issue.')
+      return
+    }
+    if (!template) {
+      setUpdateModalError('Please enter an email template.')
+      return
+    }
+
+    setUpdatingStatus(true)
+    try {
+      const ids = Array.from(selected)
+      const settled = await Promise.allSettled(
+        ids.map((id) => sendUpdateEmailToUser(id, issueId, updateEmailTemplateDraft)),
+      )
+
+      const successIds = []
+      const failedIds = []
+
+      settled.forEach((result, idx) => {
+        const id = ids[idx]
+        if (result.status === 'fulfilled') successIds.push(id)
+        else failedIds.push(id)
+      })
+
+      setSelected(new Set(failedIds))
+      setNotice(
+        `Send Updates completed for issue #${issueId}. Success: ${successIds.length}, Failed: ${failedIds.length}.`,
+      )
+
+      if (failedIds.length > 0) {
+        setLoadError(
+          `Failed users: ${failedIds.join(', ')}. Please retry for the failed users.`,
+        )
+      } else {
+        setLoadError('')
+      }
+
+      setUpdateModal((prev) => ({ ...prev, open: false }))
+      setUpdateModalError('')
+    } catch (err) {
+      console.error(err)
+      const message = err instanceof Error ? err.message : ''
+      setUpdateModalError(message || 'Failed to send update email.')
     } finally {
       setUpdatingStatus(false)
     }
@@ -389,6 +518,19 @@ export default function UserDataManagement() {
               </button>
 
               <button
+                onClick={openUpdateModal}
+                disabled={!selected.size || updatingStatus}
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-sky-200 bg-sky-50 px-3.5 py-2 text-sm font-medium text-sky-700 hover:bg-sky-100 disabled:cursor-not-allowed disabled:opacity-40"
+                title={
+                  selected.size
+                    ? 'Send issue updates to selected users'
+                    : 'No rows selected'
+                }
+              >
+                Send Updates
+              </button>
+
+              <button
                 onClick={() => handleExport('selected')}
                 disabled={!selected.size || updatingStatus}
                 className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
@@ -437,7 +579,7 @@ export default function UserDataManagement() {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <div className="text-sm font-semibold text-amber-900">
-                  Email Template
+                  Gift Email Template
                 </div>
                 <p className="text-xs text-amber-700">
                   Use <code>{'{{name}}'}</code> and{' '}
@@ -445,18 +587,18 @@ export default function UserDataManagement() {
                 </p>
               </div>
               <button
-                onClick={() => setShowTemplateEditor((v) => !v)}
+                onClick={() => setShowGiftTemplateEditor((v) => !v)}
                 disabled={updatingStatus}
                 className="inline-flex items-center justify-center gap-2 rounded-xl border border-amber-300 bg-white px-4 py-2 text-sm font-medium text-amber-800 hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-40"
                 title="Edit email template used for voucher emails"
               >
-                {showTemplateEditor
+                {showGiftTemplateEditor
                   ? 'Hide Email Template'
                   : 'Edit Email Template'}
               </button>
             </div>
 
-            {showTemplateEditor && (
+            {showGiftTemplateEditor && (
               <div className="mt-4">
                 <textarea
                   value={emailTemplateDraft}
@@ -470,7 +612,7 @@ export default function UserDataManagement() {
                 <div className="mt-3 flex gap-2">
                   <button
                     onClick={() => {
-                      setShowTemplateEditor(false)
+                      setShowGiftTemplateEditor(false)
                       setNotice('Email template updated.')
                       setLoadError('')
                     }}
@@ -479,7 +621,63 @@ export default function UserDataManagement() {
                     Save Template
                   </button>
                   <button
-                    onClick={() => setShowTemplateEditor(false)}
+                    onClick={() => setShowGiftTemplateEditor(false)}
+                    className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="rounded-2xl border border-sky-200 bg-sky-50 p-4 md:p-5">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <div className="text-sm font-semibold text-sky-900">
+                  Update Email Template
+                </div>
+                <p className="text-xs text-sky-700">
+                  Use <code>{'{{name}}'}</code>, <code>{'{{shareLink}}'}</code>,
+                  and <code>{'{{issueContent}}'}</code> as placeholders.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowUpdateTemplateEditor((v) => !v)}
+                disabled={updatingStatus}
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-sky-300 bg-white px-4 py-2 text-sm font-medium text-sky-800 hover:bg-sky-100 disabled:cursor-not-allowed disabled:opacity-40"
+                title="Edit email template used for issue updates"
+              >
+                {showUpdateTemplateEditor
+                  ? 'Hide Update Template'
+                  : 'Edit Update Template'}
+              </button>
+            </div>
+
+            {showUpdateTemplateEditor && (
+              <div className="mt-4">
+                <textarea
+                  value={updateEmailTemplateDraft}
+                  onChange={(e) => {
+                    setUpdateEmailTemplateDraft(e.target.value)
+                    if (notice) setNotice('')
+                  }}
+                  rows={10}
+                  className="w-full rounded-xl border border-sky-200 bg-white p-3 text-sm text-gray-800 outline-none focus:ring-2 focus:ring-sky-300"
+                />
+                <div className="mt-3 flex gap-2">
+                  <button
+                    onClick={() => {
+                      setShowUpdateTemplateEditor(false)
+                      setNotice('Update email template updated.')
+                      setLoadError('')
+                    }}
+                    className="inline-flex items-center justify-center rounded-lg border border-sky-300 bg-white px-3 py-1.5 text-sm font-medium text-sky-800 hover:bg-sky-100"
+                  >
+                    Save Template
+                  </button>
+                  <button
+                    onClick={() => setShowUpdateTemplateEditor(false)}
                     className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
                   >
                     Close
@@ -770,6 +968,77 @@ export default function UserDataManagement() {
                   className="inline-flex h-11 items-center justify-center rounded-xl bg-indigo-600 px-5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {updatingStatus ? 'Sending...' : 'Send'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {updateModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 p-4 backdrop-blur-[1px]">
+          <div className="w-full max-w-2xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
+            <div className="border-b border-slate-200 bg-slate-50 px-5 py-4 md:px-6">
+              <div className="text-lg font-semibold text-slate-900">
+                Send Updates to Selected Users
+              </div>
+              <p className="mt-1 text-sm leading-6 text-slate-600">
+                Choose an issue for the {selected.size} selected user
+                {selected.size === 1 ? '' : 's'} and review the update email
+                content before sending.
+              </p>
+            </div>
+
+            <div className="space-y-5 px-5 py-5 md:px-6 md:py-6">
+              <div className="rounded-xl border border-sky-200 bg-sky-50/60 p-4">
+                <label
+                  htmlFor="issue-id-modal"
+                  className="block text-base font-semibold tracking-wide text-sky-900 md:text-lg"
+                >
+                  Issue
+                </label>
+                <p className="mt-1 text-sm text-sky-800/80">
+                  Select the issue to reference in the update email.
+                </p>
+                <select
+                  id="issue-id-modal"
+                  value={updateModal.issueId}
+                  onChange={(e) => {
+                    setUpdateModal((prev) => ({
+                      ...prev,
+                      issueId: e.target.value,
+                    }))
+                    if (updateModalError) setUpdateModalError('')
+                  }}
+                  className="mt-3 h-12 w-full rounded-xl border border-sky-300 bg-white px-4 text-sm text-slate-900 shadow-sm outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
+                >
+                  <option value="">Select an issue</option>
+                  {availableIssues.map((issue) => (
+                    <option key={issue.issueId} value={issue.issueId}>
+                      {`#${issue.issueId} - ${issue.issueContent || 'Untitled issue'}`}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {updateModalError && (
+                <p className="text-sm text-red-600">{updateModalError}</p>
+              )}
+
+              <div className="flex flex-col-reverse gap-2 border-t border-slate-200 pt-4 sm:flex-row sm:justify-end">
+                <button
+                  onClick={closeUpdateModal}
+                  disabled={updatingStatus}
+                  className="inline-flex h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleUpdateConfirm}
+                  disabled={updatingStatus || availableIssues.length === 0}
+                  className="inline-flex h-11 items-center justify-center rounded-xl bg-sky-600 px-5 text-sm font-semibold text-white shadow-sm hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {updatingStatus ? 'Sending...' : 'Send Updates'}
                 </button>
               </div>
             </div>
