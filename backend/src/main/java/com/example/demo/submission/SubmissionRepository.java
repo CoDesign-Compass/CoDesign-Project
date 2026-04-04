@@ -11,12 +11,21 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
     long countByIssueIdAndStatus(Long issueId, Submission.Status status);
     List<Submission> findByIssueIdOrderByCreatedAtDesc(Long issueId);
 
+    @Query(value = """
+            SELECT COUNT(s.id)
+            FROM submissions s
+            INNER JOIN issues i ON i.issue_id = s.issue_id
+            WHERE s.status = 'SUBMITTED'
+            """, nativeQuery = true)
+    long countSubmittedForExistingIssues();
+
     void deleteByIssueId(Long issueId);
 
     @Query(value = """
             SELECT DATE_TRUNC('month', submitted_at) AS month_start, COUNT(*) AS total
-            FROM submissions
-            WHERE status = 'SUBMITTED' AND submitted_at IS NOT NULL
+            FROM submissions s
+            INNER JOIN issues i ON i.issue_id = s.issue_id
+            WHERE s.status = 'SUBMITTED' AND s.submitted_at IS NOT NULL
             GROUP BY month_start
             ORDER BY month_start
             """, nativeQuery = true)
@@ -49,4 +58,5 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
               AND created_at IS NOT NULL
             """, nativeQuery = true)
     Double findAverageResponseSecondsByIssueId(@Param("issueId") Long issueId);
+
 }

@@ -13,31 +13,58 @@ export default function EcommerceMetrics() {
   useEffect(() => {
     let cancelled = false
 
+    const fetchSubmissionCount = async () => {
+      const countRes = await fetch(`${API_BASE}/api/submissions/count`)
+      if (!countRes.ok) {
+        throw new Error(`Failed to load submission count: ${countRes.status}`)
+      }
+      const countData = await countRes.json()
+      return Number(countData?.count ?? 0)
+    }
+
     const fetchMetrics = async () => {
       setLoading(true)
       setError('')
 
       try {
-        const [submissionRes, issuesRes] = await Promise.all([
-          fetch(`${API_BASE}/api/submissions/count`),
-          fetch(`${API_BASE}/api/issues`),
+        const [submissionResult, issuesResult] = await Promise.allSettled([
+          fetchSubmissionCount(),
+          fetch(`${API_BASE}/api/issues`).then(async (res) => {
+            if (!res.ok) {
+              throw new Error(`Failed to load issues: ${res.status}`)
+            }
+            const issuesData = await res.json()
+            return Array.isArray(issuesData) ? issuesData.length : 0
+          }),
         ])
 
-        if (!submissionRes.ok) {
-          throw new Error(
-            `Failed to load submission count: ${submissionRes.status}`,
-          )
-        }
-        if (!issuesRes.ok) {
-          throw new Error(`Failed to load issues: ${issuesRes.status}`)
+        const failed = []
+        let nextSubmissionCount = null
+        let nextIssueCount = null
+
+        if (submissionResult.status === 'fulfilled') {
+          nextSubmissionCount = submissionResult.value
+        } else {
+          failed.push('submission')
         }
 
-        const submissionData = await submissionRes.json()
-        const issuesData = await issuesRes.json()
+        if (issuesResult.status === 'fulfilled') {
+          nextIssueCount = issuesResult.value
+        } else {
+          failed.push('issue')
+        }
+
+        if (submissionResult.status === 'rejected') {
+          console.error(submissionResult.reason)
+        }
+        if (issuesResult.status === 'rejected') {
+          console.error(issuesResult.reason)
+        }
 
         if (!cancelled) {
-          setSubmissionCount(Number(submissionData?.count ?? 0))
-          setIssueCount(Array.isArray(issuesData) ? issuesData.length : 0)
+          setSubmissionCount(nextSubmissionCount)
+          setIssueCount(nextIssueCount)
+          setError(failed.length ? `Failed to load: ${failed.join(', ')}` : '')
         }
       } catch (err) {
         console.error(err)
