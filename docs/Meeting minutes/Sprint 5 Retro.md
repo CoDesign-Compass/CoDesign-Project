@@ -1,4 +1,4 @@
-# Spring Retro - Sprint 5
+# Sprint Retro - Sprint 5
 
 ## Time - Date
 
