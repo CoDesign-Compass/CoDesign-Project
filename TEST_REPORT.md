@@ -92,12 +92,12 @@ The last test run completed successfully with:
 
 From a unit-test perspective, the backend core logic is in a stable state for the covered services. The main remaining risk is that these tests are isolated from the database, HTTP layer, and third-party integrations, so they do not validate full request flow or integration behavior.
 
-## 8. Recommendations
+<!-- ## 8. Recommendations -->
 
-1. Add controller-level `MockMvc` tests for the key HTTP endpoints.
+<!-- 1. Add controller-level `MockMvc` tests for the key HTTP endpoints.
 2. Add repository or integration tests for database-backed flows.
 3. Add tests for AI client adapters and mail-related behavior if those paths are part of the production release scope.
-4. Keep the current `DemoApplicationTests` unchanged as a lightweight application context smoke test.
+4. Keep the current `DemoApplicationTests` unchanged as a lightweight application context smoke test. -->
 
 ## 9. Conclusion
 
