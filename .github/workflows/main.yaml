@@ -25,9 +25,15 @@ jobs:
         run: npm ci # Install project dependencies
         working-directory: frontend
 
-      - name: Run Tests
-        run: npm test
-        working-directory: frontend
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Run Backend Tests
+        run: mvn test
+        working-directory: backend
 
       - name: Run Build
         run: npm run build # Build the React app
