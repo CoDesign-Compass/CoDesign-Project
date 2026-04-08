@@ -7,7 +7,11 @@ import com.example.demo.submission.dto.SubmitSubmissionRequest;
 import com.example.demo.submission.dto.SubmitSubmissionResponse;
 import com.example.demo.submission.dto.WordCloudTermResponse;
 import com.example.demo.submission.dto.UpdateThanksRequest;
+import com.example.demo.user.dto.SendGiftEmailRequest;
+import com.example.demo.user.dto.SendUpdateEmailRequest;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -53,6 +57,41 @@ public class SubmissionController {
             @Valid @RequestBody UpdateThanksRequest req
     ) {
         return ResponseEntity.ok(service.updateThanksInfo(id, req));
+    }
+
+    @GetMapping("/email-subscribers")
+    public ResponseEntity<List<Submission>> getEmailSubscribers() {
+        return ResponseEntity.ok(service.getEmailSubscribers());
+    }
+
+    @PostMapping("/{id}/send-gift-email")
+    public ResponseEntity<?> sendGiftEmailToSubmission(
+            @PathVariable Long id,
+            @Valid @RequestBody SendGiftEmailRequest req
+    ) {
+        try {
+            service.sendGiftEmailToSubmission(id, req.getVoucherCode(), req.getTemplate());
+        } catch (IllegalStateException ex) {
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
+        } catch (IllegalArgumentException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        }
+        return ResponseEntity.ok(Map.of("sent", true));
+    }
+
+    @PostMapping("/{id}/send-update-email")
+    public ResponseEntity<?> sendUpdateEmailToSubmission(
+            @PathVariable Long id,
+            @Valid @RequestBody SendUpdateEmailRequest req
+    ) {
+        try {
+            service.sendUpdateEmailToSubmission(id, req.getIssueId(), req.getTemplate());
+        } catch (IllegalStateException ex) {
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
+        } catch (IllegalArgumentException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        }
+        return ResponseEntity.ok(Map.of("sent", true));
     }
 
     @GetMapping("/count")

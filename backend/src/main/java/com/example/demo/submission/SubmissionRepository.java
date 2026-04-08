@@ -59,4 +59,6 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
             """, nativeQuery = true)
     Double findAverageResponseSecondsByIssueId(@Param("issueId") Long issueId);
 
+    List<Submission> findByEmailIsNotNullOrderByCreatedAtDesc();
+
 }

@@ -14,6 +14,7 @@ import com.example.demo.submission.dto.SubmissionTrendPointResponse;
 import com.example.demo.submission.dto.UpdateThanksRequest;
 import com.example.demo.submission.dto.SubmitSubmissionResponse;
 import com.example.demo.submission.dto.WordCloudTermResponse;
+import com.example.demo.user.GiftEmailService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,19 +52,22 @@ public class SubmissionService {
     private final UserProfileRepository userProfileRepository;
     private final WhyResponseRepository whyResponseRepository;
     private final HowResponseRepository howResponseRepository;
+    private final GiftEmailService giftEmailService;
 
     public SubmissionService(
             SubmissionRepository repo,
             IssueRepository issueRepository,
             UserProfileRepository userProfileRepository,
             WhyResponseRepository whyResponseRepository,
-            HowResponseRepository howResponseRepository
+            HowResponseRepository howResponseRepository,
+            GiftEmailService giftEmailService
     ){
         this.repo = repo;
         this.issueRepository = issueRepository;
         this.userProfileRepository = userProfileRepository;
         this.whyResponseRepository = whyResponseRepository;
         this.howResponseRepository = howResponseRepository;
+        this.giftEmailService = giftEmailService;
     }
 
     @Transactional
@@ -131,6 +135,32 @@ public class SubmissionService {
         s.setWantsUpdates(req.isWantsUpdates());
 
         return repo.save(s);
+    }
+
+    public List<Submission> getEmailSubscribers() {
+        return repo.findByEmailIsNotNullOrderByCreatedAtDesc();
+    }
+
+    public void sendGiftEmailToSubmission(Long id, String voucherCode, String template) {
+        Submission s = repo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("SUBMISSION_NOT_FOUND"));
+        String email = s.getEmail();
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("EMAIL_REQUIRED");
+        }
+        giftEmailService.sendGiftEmail(email.trim(), email.trim(), voucherCode, template);
+    }
+
+    public void sendUpdateEmailToSubmission(Long id, Long issueId, String template) {
+        Submission s = repo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("SUBMISSION_NOT_FOUND"));
+        String email = s.getEmail();
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("EMAIL_REQUIRED");
+        }
+        com.example.demo.entity.Issue issue = issueRepository.findById(issueId)
+                .orElseThrow(() -> new IllegalArgumentException("ISSUE_NOT_FOUND"));
+        giftEmailService.sendUpdateEmail(email.trim(), email.trim(), issue, template);
     }
 
     public long getTotalSubmissions() {
