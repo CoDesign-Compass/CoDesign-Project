@@ -30,6 +30,9 @@ public class WhyResponse {
     @Column(length = 2000)
     private String answer5;
 
+    @Column(nullable = false)
+    private Long submissionId;
+
     private LocalDateTime createdAt = LocalDateTime.now();
 
     public WhyResponse() {}
@@ -56,4 +59,7 @@ public class WhyResponse {
 
     public String getAnswer5() { return answer5; }
     public void setAnswer5(String answer5) { this.answer5 = answer5; }
+
+    public Long getSubmissionId() { return submissionId; }
+    public void setSubmissionId(Long submissionId) { this.submissionId = submissionId; }
 }

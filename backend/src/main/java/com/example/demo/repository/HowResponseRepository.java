@@ -12,4 +12,10 @@ public interface HowResponseRepository extends JpaRepository<HowResponse, Long> 
     List<HowResponse> findByShareId(String shareId);
 
     Optional<HowResponse> findTopByShareIdOrderByCreatedAtDesc(String shareId);
+    
+    List<HowResponse> findBySubmissionId(Long submissionId);
+
+    Optional<HowResponse> findTopBySubmissionIdOrderByCreatedAtDesc(Long submissionId);
+
+    List<HowResponse> findBySubmissionIdIn(List<Long> submissionIds);
 }

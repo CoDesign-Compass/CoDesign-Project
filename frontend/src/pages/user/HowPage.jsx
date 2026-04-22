@@ -99,7 +99,11 @@ export default function HowPage() {
   const buttonBackground = '#ffe071'
   const buttonTextColor = '#000000'
 
-  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://codesign-project.onrender.com'
+  const submissionId = Number(localStorage.getItem('submissionId'))
+
+  const API_BASE =
+    process.env.REACT_APP_API_BASE_URL ||
+    'https://codesign-project.onrender.com'
 
   const submitHow = async () => {
     if (submitting) return
@@ -107,6 +111,7 @@ export default function HowPage() {
 
     try {
       const body = {
+        submissionId,
         shareId: routeShareId,
         answer1: answers[0],
         answer2: answers[1],

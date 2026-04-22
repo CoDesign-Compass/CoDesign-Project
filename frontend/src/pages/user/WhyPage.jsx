@@ -101,10 +101,15 @@ export default function WhyPage() {
   const actionButtonTextColor = '#000000'
   const hintCardBackground = isDark ? '#1f1f1f' : '#f8f9fa'
 
-  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://codesign-project.onrender.com'
+  const submissionId = Number(localStorage.getItem('submissionId'))
+
+  const API_BASE =
+    process.env.REACT_APP_API_BASE_URL ||
+    'https://codesign-project.onrender.com'
 
   const submitWhy = async () => {
     const body = {
+      submissionId,
       shareId: routeShareId,
       stance: selectedButton,
       answer1: answers[0],
@@ -169,7 +174,9 @@ export default function WhyPage() {
       filter: isOtherDimmed ? 'saturate(0.65)' : 'none',
       cursor: 'pointer',
       transition: 'all 0.18s ease',
-      border: isSelected ? '2px solid rgba(0,0,0,0.28)' : '1px solid rgba(0,0,0,0.06)',
+      border: isSelected
+        ? '2px solid rgba(0,0,0,0.28)'
+        : '1px solid rgba(0,0,0,0.06)',
       borderRadius: '8px',
       padding: '0.85rem',
       fontWeight: 700,
@@ -262,9 +269,14 @@ export default function WhyPage() {
             onClick={() => setSelectedButton('agree')}
             style={getTopChoiceStyle('agree', '#d8f5dc', '#c7f7cd', '#69db7c')}
           >
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+            <span
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
+            >
               {selectedButton === 'agree' && (
-                <span aria-hidden="true" style={{ fontSize: 14, fontWeight: 900 }}>
+                <span
+                  aria-hidden="true"
+                  style={{ fontSize: 14, fontWeight: 900 }}
+                >
                   ✓
                 </span>
               )}
@@ -284,9 +296,14 @@ export default function WhyPage() {
               '#ff8787',
             )}
           >
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+            <span
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
+            >
               {selectedButton === 'disagree' && (
-                <span aria-hidden="true" style={{ fontSize: 14, fontWeight: 900 }}>
+                <span
+                  aria-hidden="true"
+                  style={{ fontSize: 14, fontWeight: 900 }}
+                >
                   ✓
                 </span>
               )}
@@ -306,9 +323,14 @@ export default function WhyPage() {
               '#dee2e6',
             )}
           >
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+            <span
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
+            >
               {selectedButton === 'unknown' && (
-                <span aria-hidden="true" style={{ fontSize: 14, fontWeight: 900 }}>
+                <span
+                  aria-hidden="true"
+                  style={{ fontSize: 14, fontWeight: 900 }}
+                >
                   ✓
                 </span>
               )}
