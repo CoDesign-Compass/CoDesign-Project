@@ -173,14 +173,6 @@ export default function UserDataManagement() {
               wantsUpdates: Boolean(u.wantsUpdates),
             }))
           })
-          setSelected((prevSelected) => {
-            const validIds = new Set(users.map((u) => String(u.id)))
-            const next = new Set()
-            prevSelected.forEach((id) => {
-              if (validIds.has(id)) next.add(id)
-            })
-            return next
-          })
           setLoadError('')
         }
       } catch (err) {
@@ -203,6 +195,21 @@ export default function UserDataManagement() {
       clearInterval(timer)
     }
   }, [API_BASE])
+
+  useEffect(() => {
+    const validIds =
+      activeTab === 'registered'
+        ? new Set(rows.map((u) => String(u.id)))
+        : new Set(emailSubs.map((s) => String(s.id)))
+
+    setSelected((prevSelected) => {
+      const next = new Set()
+      prevSelected.forEach((id) => {
+        if (validIds.has(String(id))) next.add(String(id))
+      })
+      return next
+    })
+  }, [activeTab, rows, emailSubs])
 
   useEffect(() => {
     let cancelled = false
@@ -583,6 +590,10 @@ export default function UserDataManagement() {
         if (result.status === 'fulfilled') successIds.push(id)
         else failedIds.push(id)
       })
+
+      if (activeTab === 'emailOnly' && successIds.length > 0) {
+        setEmailSentIds((prev) => new Set([...prev, ...successIds]))
+      }
 
       setSelected(new Set(failedIds))
       setNotice(
