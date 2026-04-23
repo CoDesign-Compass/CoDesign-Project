@@ -16,6 +16,7 @@ import ThankYouPage from './pages/user/ThankYouPage'
 import Layout from './components/Layout'
 import LoginPage from './pages/user/LoginPage'
 import CreateAccountPage from './pages/user/CreateAccountPage'
+import ConsentPage from './pages/user/ConsentPage'
 
 // admin
 import AdminLayout from './components/AdminLayout'
@@ -102,6 +103,16 @@ function App() {
                 </Layout>
               }
             />
+
+              <Route 
+              path="/share/:shareId/consent" 
+              element={
+                <Layout>
+                  <ConsentPage />
+                </Layout>
+              } 
+              />
+
             <Route
               path="/share/:shareId/profile"
               element={
