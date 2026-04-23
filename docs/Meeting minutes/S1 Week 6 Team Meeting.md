@@ -10,7 +10,7 @@ The Hive, Building 108, ANU
 
 ## Participants
 
-Ricky Chen, Jingwen Zhang, Yu Pan, Jiaxin Li, Shuo Li, Aria Fung, Zhimeng Zhu, Eric Pan
+Ricky Chen, Jingwen Zhang, Yu Pan, Jiaxin Li, Shuo Li, Aria Fung, Zhimeng Zhu
 
 ## Goals
 
