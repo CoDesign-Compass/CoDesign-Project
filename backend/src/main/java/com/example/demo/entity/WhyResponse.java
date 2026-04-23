@@ -30,8 +30,7 @@ public class WhyResponse {
     @Column(length = 2000)
     private String answer5;
 
-    //@Column(nullable = false)
-    @Column
+    @Column(nullable = false)
     private Long submissionId;
 
     private LocalDateTime createdAt = LocalDateTime.now();

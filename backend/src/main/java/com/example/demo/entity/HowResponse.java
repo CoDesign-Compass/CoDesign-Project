@@ -28,7 +28,6 @@ public class HowResponse {
     @Column(length = 2000)
     private String answer5;
 
-    @Column(nullable = false)
     private Long submissionId;
 
     private LocalDateTime createdAt = LocalDateTime.now();
