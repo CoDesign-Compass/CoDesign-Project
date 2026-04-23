@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import Chart from 'react-apexcharts'
 import { useParams } from 'react-router-dom'
 import '../../components/AdminIssue/IssueReport.css'
+import AdminInfoTooltip from '../../components/admin/AdminInfoTooltip'
 
 function ResponsiveWordCloudCanvas({ terms, typeLabel }) {
   const containerRef = useRef(null)
@@ -591,6 +592,10 @@ export default function IssueReport() {
 
   const shareId = issue?.shareId || ''
   const shareLink = shareId ? `${window.location.origin}/share/${shareId}` : ''
+  const trendGuidance =
+    trendGranularity === 'month'
+      ? 'Showing month-to-month submission changes.'
+      : 'Showing day-to-day submission changes for the last 30 days.'
 
   return (
     <div className="issue-container">
@@ -730,7 +735,14 @@ export default function IssueReport() {
 
                     <div className="analysis-inner-card">
                       <div className="trend-header-row">
-                        <h3 className="report-card-title">Participation Trend</h3>
+                        <div className="flex items-center gap-2">
+                          <h3 className="report-card-title">
+                            Participation Trend
+                          </h3>
+                          <AdminInfoTooltip label="Show participation trend guidance">
+                            {trendGuidance}
+                          </AdminInfoTooltip>
+                        </div>
                         <div className="trend-toggle-group">
                           <button
                             type="button"
@@ -756,15 +768,11 @@ export default function IssueReport() {
                           height={320}
                         />
                       </div>
-                      <div className="trend-note">
-                        {trendError
-                          ? trendError
-                          : trendLoading
-                            ? 'Loading engagement trend...'
-                            : trendGranularity === 'month'
-                              ? 'Showing month-to-month submission changes.'
-                              : 'Showing day-to-day submission changes (last 30 days).'}
-                      </div>
+                      {(trendError || trendLoading) && (
+                        <div className="trend-note">
+                          {trendError || 'Loading engagement trend...'}
+                        </div>
+                      )}
                     </div>
 
                     <div className="analysis-inner-card">
