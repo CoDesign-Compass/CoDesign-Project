@@ -7,6 +7,7 @@ import {
   AlertCircle,
 } from 'lucide-react'
 import SectionCard from '../../components/admin/SectionCard'
+import AdminInfoTooltip from '../../components/admin/AdminInfoTooltip'
 
 export default function CreateNewIssue() {
   const [issueContent, setIssueContent] = useState('')
@@ -20,7 +21,7 @@ export default function CreateNewIssue() {
 
   const API_BASE =
     process.env.REACT_APP_API_BASE_URL ||
-    'https://codesign-project.onrender.com'
+    'http://localhost:8080'
 
   const handleSubmit = async () => {
     const content = issueContent.trim()
@@ -121,7 +122,7 @@ export default function CreateNewIssue() {
           <div className="mb-3 flex items-center gap-2">
             <label
               htmlFor="issue-content"
-              className="text-sm font-medium text-gray-700 dark:text-gray-300"
+              className="mb-2 block font-medium text-gray-700"
             >
               Issue Content
             </label>
@@ -143,16 +144,14 @@ export default function CreateNewIssue() {
         </div>
 
         <div className="mb-4">
-          <label
-            htmlFor="consent-text"
-            className="mb-2 block font-medium text-gray-700"
-          >
-            Consent Text
-          </label>
-          <p className="mb-3 text-sm leading-6 text-gray-500">
-            Enter the consent text that users must read and agree to before
-            starting.
-          </p>
+          <div className="mb-2 flex items-center gap-2">
+            <label htmlFor="consent-text" className="block font-medium text-gray-700">
+              Consent Text
+            </label>
+            <AdminInfoTooltip label="Show consent text guidance">
+              Enter the consent text that users must read and agree to before starting.
+            </AdminInfoTooltip>
+          </div>
 
           <textarea
             id="consent-text"
