@@ -547,7 +547,7 @@ export default function WhyPage() {
                     alignSelf: step > 0 ? 'flex-end' : 'flex-start',
                   }}
                 >
-                  Next
+                  Next question
                 </button>
               </div>
             </motion.div>

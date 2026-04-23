@@ -144,9 +144,9 @@ export default function WelcomePage() {
 
       const currentShareId = routeShareId || shareId
       if (currentShareId) {
-        navigate(`/share/${currentShareId}/profile`)
+        navigate(`/share/${currentShareId}/consent`)
       } else {
-        navigate('/profile')
+        navigate('/consnet')
       }
     } catch (err) {
       console.error(err)

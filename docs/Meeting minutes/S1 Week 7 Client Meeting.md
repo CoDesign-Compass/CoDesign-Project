@@ -7,7 +7,7 @@
 The Hive, Building 108, ANU
 
 ## Participants
-Client, Team Members
+Client, Team Members, Buddhi Kothalawala (tutor)
 
 ## Goals
 - Present the final system and demonstrate key functionalities

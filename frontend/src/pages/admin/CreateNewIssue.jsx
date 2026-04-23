@@ -10,6 +10,7 @@ import SectionCard from '../../components/admin/SectionCard'
 
 export default function CreateNewIssue() {
   const [issueContent, setIssueContent] = useState('')
+  const [consentText, setConsentText] = useState('')
   const [shareLink, setShareLink] = useState('')
   const [isPublishing, setIsPublishing] = useState(false)
   const [publishError, setPublishError] = useState('')
@@ -23,6 +24,7 @@ export default function CreateNewIssue() {
 
   const handleSubmit = async () => {
     const content = issueContent.trim()
+    const consent = consentText.trim()
 
     setPublishError('')
     setPublishSuccess('')
@@ -30,6 +32,16 @@ export default function CreateNewIssue() {
 
     if (!content) {
       setPublishError('Issue content cannot be empty.')
+      return
+    }
+
+    if (!consent) {
+      setPublishError('Consent text cannot be empty.')
+      return
+    }
+
+    if (consent.length > 5000) {
+      setPublishError('Consent text must not exceed 5000 characters.')
       return
     }
 
@@ -43,14 +55,21 @@ export default function CreateNewIssue() {
         },
         body: JSON.stringify({
           issueContent: content,
+          consentText: consent,
         }),
       })
 
-      if (!response.ok) {
-        throw new Error('Failed to create issue')
+      let data = null
+      try {
+        data = await response.json()
+      } catch {
+        data = null
       }
 
-      const data = await response.json()
+      if (!response.ok) {
+        throw new Error(data?.message || 'Failed to create issue')
+      }
+
       const url = `${window.location.origin}/share/${data.shareId}`
 
       setShareLink(url)
@@ -58,7 +77,9 @@ export default function CreateNewIssue() {
       console.log('Created issue:', data)
     } catch (err) {
       console.error(err)
-      setPublishError('Failed to publish issue. Please try again.')
+      setPublishError(
+        err.message || 'Failed to publish issue. Please try again.',
+      )
     } finally {
       setIsPublishing(false)
     }
@@ -121,6 +142,38 @@ export default function CreateNewIssue() {
           />
         </div>
 
+        <div className="mb-4">
+          <label
+            htmlFor="consent-text"
+            className="mb-2 block font-medium text-gray-700"
+          >
+            Consent Text
+          </label>
+          <p className="mb-3 text-sm leading-6 text-gray-500">
+            Enter the consent text that users must read and agree to before
+            starting.
+          </p>
+
+          <textarea
+            id="consent-text"
+            rows={10}
+            maxLength={5000}
+            className={`w-full rounded-xl p-3 text-gray-800 focus:outline-none focus:ring ${
+              publishError
+                ? 'border border-red-300 focus:ring-red-100'
+                : 'border border-gray-300 focus:ring-blue-200'
+            }`}
+            value={consentText}
+            onChange={(e) => setConsentText(e.target.value)}
+            placeholder="Enter consent text..."
+            aria-invalid={publishError ? 'true' : 'false'}
+          />
+
+          <div className="mt-2 text-right text-xs text-gray-400">
+            {consentText.length}/5000
+          </div>
+        </div>
+
         {(publishError || publishSuccess) && (
           <div
             role={publishError ? 'alert' : 'status'}
@@ -152,7 +205,6 @@ export default function CreateNewIssue() {
         </div>
       </SectionCard>
 
-      {/* Share link result */}
       {shareLink && (
         <SectionCard
           title="Share Link"

@@ -77,7 +77,6 @@ export default function AdminLayoutTail() {
           <MenuIcon />
         </button>
         <div className="text-base font-semibold">Admin</div>
-        <div className="h-8 w-8 rounded-lg bg-gray-100" />
       </header>
 
       {/* 抽屉侧栏：移动端 */}
@@ -115,13 +114,6 @@ export default function AdminLayoutTail() {
           {/* 右侧顶部条（桌面端） */}
           <div className="mb-4 hidden items-center justify-between md:flex">
             <div className="text-lg font-semibold">Admin Dashboard</div>
-            <div className="flex items-center gap-3">
-              <input
-                placeholder="Quick search…"
-                className="h-9 w-64 rounded-xl border border-gray-200 px-3 text-sm outline-none focus:ring-2 focus:ring-indigo-200"
-              />
-              <div className="h-9 w-9 rounded-full bg-gray-100" />
-            </div>
           </div>
 
           {/* 页面内容 */}
