@@ -40,8 +40,11 @@ public class IssueService {
             throw new IllegalArgumentException("Issue content must not be empty.");
         }
 
+        String consentText = normalizeConsentText(request.getConsentText());
+
         Issue issue = new Issue();
         issue.setIssueContent(content);
+        issue.setConsentText(consentText);
         issue.setState(IssueState.ACTIVE);
         issue.setPublishedAt(OffsetDateTime.now());
         issue.setShareId(generateUniqueShareId());
@@ -79,7 +82,10 @@ public class IssueService {
             throw new IllegalArgumentException("Issue content must not be empty.");
         }
 
+        String consentText = normalizeConsentText(request.getConsentText());
+
         issue.setIssueContent(content);
+        issue.setConsentText(consentText);
 
         Issue updated = issueRepository.save(issue);
         return toResponse(updated);
@@ -106,11 +112,30 @@ public class IssueService {
         return shareId;
     }
 
+    private String normalizeConsentText(String consentText) {
+        if (consentText == null) {
+            throw new IllegalArgumentException("Consent text must not be empty.");
+        }
+
+        String trimmed = consentText.trim();
+
+        if (trimmed.isEmpty()) {
+            throw new IllegalArgumentException("Consent text must not be empty.");
+        }
+
+        if (trimmed.length() > 5000) {
+            throw new IllegalArgumentException("Consent text must not exceed 5000 characters.");
+        }
+
+        return trimmed;
+    }
+
     private IssueResponse toResponse(Issue issue) {
         return new IssueResponse(
                 issue.getIssueId(),
                 issue.getShareId(),
                 issue.getIssueContent(),
+                issue.getConsentText(),
                 issue.getState(),
                 issue.getPublishedAt()
         );

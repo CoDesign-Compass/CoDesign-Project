@@ -567,8 +567,6 @@ export default function ThankPage() {
             border: '2px solid #ffe070',
             color: theme === 'light' ? '#303030' : 'white',
             background: '#7F7FBC',
-            textDecoration: 'underline',
-            textUnderlineOffset: '4px',
             textDecorationThickness: '1.5px',
             fontFamily: 'Poppins, sans-serif',
             opacity: 0.85,
