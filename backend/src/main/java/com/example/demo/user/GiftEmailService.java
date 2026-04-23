@@ -106,7 +106,7 @@ public class GiftEmailService {
     String textBody = htmlToPlainText(htmlBody);
 
     MimeMessage mimeMessage = mailSender.createMimeMessage();
-    MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "UTF-8");
+    MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
     helper.setFrom(fromAddress);
     helper.setTo(toEmail);
     helper.setSubject(subject);
