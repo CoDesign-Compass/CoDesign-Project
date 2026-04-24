@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import CategoryTabs from '../../components/ProfilePage/CategoryTabs'
-import SearchAndCreate from '../../components/ProfilePage/SearchAndCreate'
 import TagSelection from '../../components/ProfilePage/TagSelection'
+import SearchAndCreate from '../../components/ProfilePage/SearchAndCreate'
 import { useTheme } from '../../context/ThemeContext'
-import { Input } from '../../components/ui/input'
-import { Button } from '../../components/ui/button'
 
 const API_BASE_URL =
   (process.env.REACT_APP_API_BASE_URL || 'https://codesign-project.onrender.com') + '/api/profile'
@@ -23,12 +21,13 @@ export default function ProfilePage({ setOnNext }) {
   const [modalTitle, setModalTitle] = useState('')
   const [modalMessage, setModalMessage] = useState('')
 
+  const isDark = theme === 'dark'
+
   const openModal = (title, message) => {
     setModalTitle(title)
     setModalMessage(message)
     setShowModal(true)
   }
-
   const closeModal = () => {
     setShowModal(false)
     setModalTitle('')
@@ -40,16 +39,11 @@ export default function ProfilePage({ setOnNext }) {
       openModal('Session Error', 'We could not find your active session. Please go back to the start page.')
       return false
     }
-
     if (selectedTags.length === 0) {
       openModal('Please select your tags', 'Select at least one tag before moving to the next step.')
       return false
     }
-
-    const selectedTagIds = tags
-      .filter((t) => selectedTags.includes(t.label))
-      .map((t) => t.id)
-
+    const selectedTagIds = tags.filter((t) => selectedTags.includes(t.label)).map((t) => t.id)
     try {
       const response = await fetch(`${API_BASE_URL}/${userId}`, {
         method: 'POST',
@@ -83,7 +77,6 @@ export default function ProfilePage({ setOnNext }) {
         const tagsRes = await fetch(`${API_BASE_URL}/tags`)
         const allTags = await tagsRes.json()
         setTags(allTags)
-
         if (userId) {
           const profileRes = await fetch(`${API_BASE_URL}/${userId}`)
           if (profileRes.ok) {
@@ -111,17 +104,11 @@ export default function ProfilePage({ setOnNext }) {
     if (!inputValue.trim() || !userId) return
     const colors = ['yellow', 'blue', 'red', 'purple', 'green', 'orange', 'pink']
     const randomColor = colors[Math.floor(Math.random() * colors.length)]
-
     try {
       const response = await fetch(`${API_BASE_URL}/tags/custom`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          label: inputValue.trim(),
-          category: activeTab,
-          color: randomColor,
-          userId,
-        }),
+        body: JSON.stringify({ label: inputValue.trim(), category: activeTab, color: randomColor, userId }),
       })
       if (response.ok) {
         const newTag = await response.json()
@@ -135,99 +122,220 @@ export default function ProfilePage({ setOnNext }) {
 
   const filteredTags = tags.filter((tag) => tag.category === activeTab)
 
-  if (loading) return <div className="p-6 text-[var(--text-color)]">Loading...</div>
+  // ── design tokens ──────────────────────────────────────────────────
+  const pageBg      = isDark ? '#1e1e1e' : '#f5f5f5'
+  const cardBg      = isDark ? '#272727' : '#ffffff'
+  const cardBorder  = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'
+  const cardShadow  = isDark ? '0 1px 6px rgba(0,0,0,0.35)' : '0 1px 6px rgba(0,0,0,0.07)'
+  const textColor   = isDark ? '#f0f0f0' : '#1a1a1a'
+  const subText     = isDark ? '#888' : '#777'
+  const divider     = isDark ? 'rgba(255,255,255,0.07)' : '#f0f0f0'
+  const inputBg     = isDark ? '#1e1e1e' : '#ffffff'
+  const inputBorder = isDark ? 'rgba(255,255,255,0.12)' : '#ddd'
 
-  const isDark = theme === 'dark'
+  const card = {
+    background: cardBg,
+    borderRadius: 16,
+    padding: 24,
+    boxShadow: cardShadow,
+    border: `1px solid ${cardBorder}`,
+    marginBottom: 20,
+  }
+
+  if (loading) {
+    return (
+      <div style={{ background: pageBg, minHeight: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 48, fontFamily: 'Poppins, sans-serif' }}>
+        <p style={{ color: subText, fontSize: 14 }}>Loading…</p>
+      </div>
+    )
+  }
 
   return (
     <>
-      <div className="p-6">
-        <h1 className="text-2xl font-semibold mb-4 text-[var(--text-color)] font-poppins">
-          Lived Experience Profile Builder
-        </h1>
+      <div style={{ background: pageBg, minHeight: '100%', fontFamily: 'Poppins, sans-serif' }}>
+        <div style={{ maxWidth: 800, margin: '0 auto', padding: '28px 20px 40px' }}>
 
-        <div className="relative inline-flex items-center mb-4">
-          <Input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Enter your name"
-            className="pr-8 w-[min(320px,100%)]"
-          />
-          {name && (
-            <button
-              onClick={() => setName('')}
-              type="button"
-              className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 border-none bg-transparent cursor-pointer text-lg text-gray-400 leading-none"
-            >
-              ×
-            </button>
-          )}
-        </div>
+          {/* Page header */}
+          <div style={{ marginBottom: 28 }}>
+            <h1 style={{ fontSize: 22, fontWeight: 700, color: textColor, margin: '0 0 6px' }}>
+              Lived Experience Profile Builder
+            </h1>
+            <p style={{ fontSize: 14, color: subText, margin: 0 }}>
+              Create a quick profile based on behaviours and lived experiences
+            </p>
+          </div>
 
-        <CategoryTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+          {/* ── Step 1: Basic Info ── */}
+          <div style={card}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: '#c49a00', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6 }}>
+              Step 1
+            </div>
+            <h2 style={{ fontSize: 16, fontWeight: 700, color: textColor, margin: '0 0 4px' }}>Basic Info</h2>
+            <p style={{ fontSize: 13, color: subText, margin: '0 0 20px' }}>Let's start with your name</p>
 
-        <main className="flex gap-4 mt-4 flex-wrap">
-          <div className="flex-1 min-w-[200px]">
+            <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: textColor, marginBottom: 6 }}>
+              Name
+            </label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter your name"
+              style={{
+                width: '100%',
+                padding: '10px 14px',
+                borderRadius: 10,
+                border: `1.5px solid ${inputBorder}`,
+                background: inputBg,
+                color: textColor,
+                fontSize: 14,
+                fontFamily: 'Poppins, sans-serif',
+                outline: 'none',
+                boxSizing: 'border-box',
+                transition: 'border-color 0.15s',
+              }}
+              onFocus={(e) => { e.target.style.borderColor = '#ffe071' }}
+              onBlur={(e) => { e.target.style.borderColor = inputBorder }}
+            />
+          </div>
+
+          {/* ── Step 2: Select Tags ── */}
+          <div style={card}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: '#c49a00', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6 }}>
+              Step 2
+            </div>
+            <h2 style={{ fontSize: 16, fontWeight: 700, color: textColor, margin: '0 0 4px' }}>Select Tags</h2>
+            <p style={{ fontSize: 13, color: subText, margin: '0 0 20px' }}>
+              Choose tags that describe your behaviours and experiences
+            </p>
+
+            <CategoryTabs activeTab={activeTab} setActiveTab={setActiveTab} isDark={isDark} />
+
+            <div style={{ marginTop: 16 }}>
+              <TagSelection tags={filteredTags} selectedTags={selectedTags} onTagClick={handleTagClick} />
+            </div>
+
+            {/* Selected pills */}
+            {selectedTags.length > 0 && (
+              <div style={{ marginTop: 20, paddingTop: 16, borderTop: `1px solid ${divider}` }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: subText, marginBottom: 10 }}>
+                  Selected ({selectedTags.length})
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  {selectedTags.map((tag) => (
+                    <span
+                      key={tag}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 5,
+                        padding: '4px 10px 4px 12px',
+                        borderRadius: 20,
+                        background: '#ffe071',
+                        color: '#1a1a1a',
+                        fontSize: 12,
+                        fontWeight: 600,
+                        fontFamily: 'Poppins, sans-serif',
+                      }}
+                    >
+                      {tag}
+                      <button
+                        onClick={() => handleTagClick(tag)}
+                        aria-label={`Remove ${tag}`}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          padding: 0,
+                          fontSize: 16,
+                          lineHeight: 1,
+                          color: '#666',
+                          display: 'flex',
+                          alignItems: 'center',
+                        }}
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* ── Step 3: Add Your Own ── */}
+          <div style={card}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: '#c49a00', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6 }}>
+              Step 3 — Optional
+            </div>
+            <h2 style={{ fontSize: 16, fontWeight: 700, color: textColor, margin: '0 0 4px' }}>Add Your Own</h2>
+            <p style={{ fontSize: 13, color: subText, margin: '0 0 20px' }}>
+              Can't find a suitable tag? Add your own
+            </p>
             <SearchAndCreate
               inputValue={inputValue}
               onInputChange={setInputValue}
               onCreate={handleCreateTag}
+              isDark={isDark}
             />
           </div>
-          <div className="flex-[2] min-w-[200px]">
-            <TagSelection
-              tags={filteredTags}
-              selectedTags={selectedTags}
-              onTagClick={handleTagClick}
-            />
-          </div>
-        </main>
+        </div>
       </div>
 
+      {/* Validation modal */}
       {showModal && (
         <div
           role="dialog"
           aria-modal="true"
           aria-labelledby="profile-modal-title"
           onClick={closeModal}
-          className="fixed inset-0 flex items-center justify-center p-4 z-[1000]"
-          style={{ background: isDark ? 'rgba(0,0,0,0.55)' : 'rgba(0,0,0,0.35)' }}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.4)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 16,
+            zIndex: 1000,
+          }}
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-[min(420px,100%)] rounded-xl p-5 font-poppins"
             style={{
-              background: isDark ? '#1f1f1f' : '#fff',
-              color: isDark ? '#f5f5f5' : '#303030',
-              boxShadow: isDark
-                ? '0 12px 32px rgba(0,0,0,0.45)'
-                : '0 12px 32px rgba(0,0,0,0.18)',
-              border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.08)',
+              width: 'min(420px, 100%)',
+              background: cardBg,
+              color: textColor,
+              borderRadius: 14,
+              padding: '22px 20px',
+              boxShadow: '0 16px 40px rgba(0,0,0,0.22)',
+              border: `1px solid ${cardBorder}`,
+              fontFamily: 'Poppins, sans-serif',
             }}
           >
-            <h2
-              id="profile-modal-title"
-              className="m-0 mb-2.5 text-xl leading-snug font-poppins"
-              style={{ color: isDark ? '#fff' : '#303030' }}
-            >
+            <h2 id="profile-modal-title" style={{ margin: '0 0 10px', fontSize: 18, fontWeight: 700, color: textColor }}>
               {modalTitle}
             </h2>
-            <p className="m-0 leading-relaxed font-poppins" style={{ color: isDark ? '#e8e8e8' : '#303030' }}>
+            <p style={{ margin: '0 0 20px', fontSize: 14, lineHeight: 1.6, color: subText }}>
               {modalMessage}
             </p>
-            <div className="flex justify-end mt-4">
-              <Button
-                variant="outline"
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <button
                 onClick={closeModal}
                 style={{
-                  border: isDark ? '1px solid rgba(255,255,255,0.22)' : '1px solid rgba(0,0,0,0.15)',
-                  background: isDark ? '#2a2a2a' : 'transparent',
-                  color: isDark ? '#f5f5f5' : '#303030',
+                  padding: '8px 20px',
+                  borderRadius: 8,
+                  border: 'none',
+                  background: '#ffe071',
+                  color: '#1a1a1a',
+                  fontFamily: 'Poppins, sans-serif',
+                  fontWeight: 600,
+                  fontSize: 14,
+                  cursor: 'pointer',
                 }}
               >
                 OK
-              </Button>
+              </button>
             </div>
           </div>
         </div>
