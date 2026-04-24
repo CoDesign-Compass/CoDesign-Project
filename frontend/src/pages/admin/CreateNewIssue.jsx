@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import Button from '../../components/tailadmin/ui/button/Button'
 import {
   ArrowLeft,
   Copy,
@@ -7,6 +6,8 @@ import {
   CheckCircle,
   AlertCircle,
 } from 'lucide-react'
+import SectionCard from '../../components/admin/SectionCard'
+import AdminInfoTooltip from '../../components/admin/AdminInfoTooltip'
 
 export default function CreateNewIssue() {
   const [issueContent, setIssueContent] = useState('')
@@ -19,8 +20,8 @@ export default function CreateNewIssue() {
   const [isCopying, setIsCopying] = useState(false)
 
   const API_BASE =
-    process.env.REACT_APP_API_BASE_URL || 'https://codesign-project.onrender.com'
-
+    process.env.REACT_APP_API_BASE_URL ||
+    'http://localhost:8080'
 
   const handleSubmit = async () => {
     const content = issueContent.trim()
@@ -77,7 +78,9 @@ export default function CreateNewIssue() {
       console.log('Created issue:', data)
     } catch (err) {
       console.error(err)
-      setPublishError(err.message || 'Failed to publish issue. Please try again.')
+      setPublishError(
+        err.message || 'Failed to publish issue. Please try again.',
+      )
     } finally {
       setIsPublishing(false)
     }
@@ -101,46 +104,37 @@ export default function CreateNewIssue() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl p-6">
-      <div className="mb-4">
-        <button
-          onClick={() => window.history.back()}
-          className="inline-flex items-center gap-1 text-gray-600 transition-colors hover:text-gray-900"
-          type="button"
-        >
-          <ArrowLeft className="h-5 w-5" />
-          <span>Back</span>
-        </button>
-      </div>
-
-      <div className="mb-6">
-        <h1 className="mb-2 text-2xl font-bold text-gray-900">
-          Create New Issue
-        </h1>
-        <p className="text-sm leading-6 text-gray-600">
-          Publish an issue and generate a shareable public link for user access.
-        </p>
-      </div>
-
-      <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm md:p-6">
-        <div className="mb-6">
-          <label
-            htmlFor="issue-content"
-            className="mb-2 block font-medium text-gray-700"
+    <div className="space-y-6">
+      <SectionCard
+        title="Create New Issue"
+        headerRight={
+          <button
+            onClick={() => window.history.back()}
+            className="inline-flex w-fit items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-base font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
+            type="button"
           >
-            Issue Content
-          </label>
-          <p className="mb-3 text-sm leading-6 text-gray-500">
-            Enter the issue content clearly so it can be published and shared.
-          </p>
+            <ArrowLeft className="h-4 w-4" />
+            <span>Back</span>
+          </button>
+        }
+      >
+        <div className="mb-5">
+          <div className="mb-3 flex items-center gap-2">
+            <label
+              htmlFor="issue-content"
+              className="mb-2 block font-medium text-gray-700"
+            >
+              Issue Content
+            </label>
+          </div>
 
           <textarea
             id="issue-content"
             rows={6}
-            className={`w-full rounded-xl p-3 text-gray-800 focus:outline-none focus:ring ${
+            className={`w-full rounded-xl bg-white p-3 text-gray-800 outline-none transition focus:ring-2 ${
               publishError
-                ? 'border border-red-300 focus:ring-red-100'
-                : 'border border-gray-300 focus:ring-blue-200'
+                ? 'border border-red-300 focus:border-red-400 focus:ring-red-100'
+                : 'border border-gray-300 focus:border-indigo-500 focus:ring-indigo-100'
             }`}
             value={issueContent}
             onChange={(e) => setIssueContent(e.target.value)}
@@ -150,15 +144,14 @@ export default function CreateNewIssue() {
         </div>
 
         <div className="mb-4">
-          <label
-            htmlFor="consent-text"
-            className="mb-2 block font-medium text-gray-700"
-          >
-            Consent Text
-          </label>
-          <p className="mb-3 text-sm leading-6 text-gray-500">
-            Enter the consent text that users must read and agree to before starting.
-          </p>
+          <div className="mb-2 flex items-center gap-2">
+            <label htmlFor="consent-text" className="block font-medium text-gray-700">
+              Consent Text
+            </label>
+            <AdminInfoTooltip label="Show consent text guidance">
+              Enter the consent text that users must read and agree to before starting.
+            </AdminInfoTooltip>
+          </div>
 
           <textarea
             id="consent-text"
@@ -200,26 +193,26 @@ export default function CreateNewIssue() {
         )}
 
         <div className="flex justify-center md:justify-end">
-          <Button onClick={handleSubmit} disabled={isPublishing}>
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={isPublishing}
+            className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-300 disabled:opacity-70"
+          >
             {isPublishing ? 'Publishing...' : 'Publish Issue'}
-          </Button>
+          </button>
         </div>
-      </section>
+      </SectionCard>
 
       {shareLink && (
-        <section className="mt-6 rounded-2xl border border-gray-200 bg-gray-50 p-5 shadow-sm md:p-6">
-          <div className="mb-2 flex items-center gap-2">
-            <LinkIcon className="h-4 w-4 text-gray-700" />
-            <h2 className="font-semibold text-gray-800">Share Link</h2>
-          </div>
-
-          <p className="mb-4 text-sm leading-6 text-gray-600">
-            Anyone with this link can access the issue page.
-          </p>
-
+        <SectionCard
+          title="Share Link"
+          subtitle="Anyone with this link can access the issue page."
+          headerRight={<LinkIcon className="h-4 w-4 text-gray-700" />}
+        >
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <input
-              className="flex-1 rounded-xl border border-gray-300 bg-white p-2.5 text-gray-800"
+              className="flex-1 rounded-xl border border-gray-300 bg-white p-2.5 text-gray-800 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
               value={shareLink}
               readOnly
               aria-label="Share link"
@@ -231,7 +224,7 @@ export default function CreateNewIssue() {
               className={`inline-flex items-center justify-center rounded-xl border p-2.5 transition-colors ${
                 isCopying
                   ? 'cursor-not-allowed border-gray-200 bg-gray-100 opacity-70'
-                  : 'border-gray-300 hover:bg-gray-100'
+                  : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
               }`}
               title="Copy link"
               aria-label="Copy link"
@@ -253,7 +246,7 @@ export default function CreateNewIssue() {
               {copyStatus}
             </div>
           )}
-        </section>
+        </SectionCard>
       )}
     </div>
   )
