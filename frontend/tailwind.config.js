@@ -6,7 +6,12 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        poppins: ['Poppins', 'sans-serif'],
+      },
       colors: {
+        'compass-purple': '#7F7FBC',
+        'compass-yellow': '#ffe070',
         brand: {
           50:  "#FFFBEB",
           100: "#FEF3C7",
