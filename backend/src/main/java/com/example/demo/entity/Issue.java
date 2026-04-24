@@ -16,6 +16,9 @@ public class Issue {
   @Column(nullable = false, columnDefinition = "TEXT")
   private String issueContent;
 
+  @Column(nullable = false, columnDefinition = "TEXT")
+  private String consentText;
+
   @Enumerated(EnumType.STRING)
   @Column(nullable = false, length = 20)
   private IssueState state;
@@ -24,42 +27,50 @@ public class Issue {
   private OffsetDateTime publishedAt;
 
   public Long getIssueId() {
-      return issueId;
+    return issueId;
   }
 
   public void setIssueId(Long issueId) {
-      this.issueId = issueId;
+    this.issueId = issueId;
   }
 
   public String getShareId() {
-      return shareId;
+    return shareId;
   }
 
   public void setShareId(String shareId) {
-      this.shareId = shareId;
+    this.shareId = shareId;
   }
 
   public String getIssueContent() {
-      return issueContent;
+    return issueContent;
   }
 
   public void setIssueContent(String issueContent) {
-      this.issueContent = issueContent;
+    this.issueContent = issueContent;
+  }
+
+  public String getConsentText() {
+    return consentText;
+  }
+
+  public void setConsentText(String consentText) {
+    this.consentText = consentText;
   }
 
   public IssueState getState() {
-      return state;
+    return state;
   }
 
   public void setState(IssueState state) {
-      this.state = state;
+    this.state = state;
   }
 
   public OffsetDateTime getPublishedAt() {
-      return publishedAt;
+    return publishedAt;
   }
 
   public void setPublishedAt(OffsetDateTime publishedAt) {
-      this.publishedAt = publishedAt;
+    this.publishedAt = publishedAt;
   }
 }

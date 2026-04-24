@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import SectionCard from '../../components/admin/SectionCard'
+import AdminInfoTooltip from '../../components/admin/AdminInfoTooltip'
 
 /* Gift icon */
 const GiftIcon = (props) => (
@@ -10,6 +12,30 @@ const GiftIcon = (props) => (
       d="M20 12v7a2 2 0 0 1-2 2h-3v-9h5ZM9 21H6a2 2 0 0 1-2-2v-7h5v9ZM21 8h-6a2 2 0 0 1 0-4c2 0 3 2 3 2s1-2 3-2a2 2 0 1 1 0 4H3a2 2 0 0 1 0-4c2 0 3 2 3 2s1-2 3-2a2 2 0 0 1 0 4H3M12 8v13"
     />
   </svg>
+)
+
+const MailIcon = (props) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...props}>
+    <path
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M4 6.75A2.75 2.75 0 0 1 6.75 4h10.5A2.75 2.75 0 0 1 20 6.75v10.5A2.75 2.75 0 0 1 17.25 20H6.75A2.75 2.75 0 0 1 4 17.25V6.75Z"
+    />
+    <path
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="m5 7 5.55 4.25a2.4 2.4 0 0 0 2.9 0L19 7"
+    />
+  </svg>
+)
+
+const TemplateTitle = ({ children, guidance, label }) => (
+  <div className="flex items-center gap-2">
+    <h3 className="text-base font-semibold text-gray-900">{children}</h3>
+    <AdminInfoTooltip label={label}>{guidance}</AdminInfoTooltip>
+  </div>
 )
 
 /* export csv */
@@ -35,7 +61,15 @@ function usersToCSV(rows) {
 }
 
 function emailSubsToCSV(rows) {
-  const header = ['submissionId', 'email', 'issueId', 'wantsVoucher', 'wantsUpdates', 'submittedAt', 'status']
+  const header = [
+    'submissionId',
+    'email',
+    'issueId',
+    'wantsVoucher',
+    'wantsUpdates',
+    'submittedAt',
+    'status',
+  ]
   const esc = (v) => {
     const s = v == null ? '' : String(v)
     return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
@@ -70,7 +104,9 @@ function downloadTextAsFile(text, filename) {
 }
 
 export default function UserDataManagement() {
-  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://codesign-project.onrender.com'
+  const API_BASE =
+    process.env.REACT_APP_API_BASE_URL ||
+    'https://codesign-project.onrender.com'
   const [activeTab, setActiveTab] = useState('registered')
   const [rows, setRows] = useState([])
   const [issues, setIssues] = useState([])
@@ -101,7 +137,8 @@ export default function UserDataManagement() {
   })
   const [updateModalError, setUpdateModalError] = useState('')
   const [showGiftTemplateEditor, setShowGiftTemplateEditor] = useState(false)
-  const [showUpdateTemplateEditor, setShowUpdateTemplateEditor] = useState(false)
+  const [showUpdateTemplateEditor, setShowUpdateTemplateEditor] =
+    useState(false)
   const [notice, setNotice] = useState('')
   const [emailTemplateDraft, setEmailTemplateDraft] = useState(
     'Dear {{name}},\n\nThank you so much for taking the time to answer our questions. We sincerely appreciate your support and contribution.\n\nAs a small token of our appreciation, we are happy to share your voucher code: {{voucherCode}}.\n\nPlease feel free to contact us if you have any questions.\n\nKind regards,\nCoDesign Compass Team',
@@ -136,14 +173,6 @@ export default function UserDataManagement() {
               wantsUpdates: Boolean(u.wantsUpdates),
             }))
           })
-          setSelected((prevSelected) => {
-            const validIds = new Set(users.map((u) => String(u.id)))
-            const next = new Set()
-            prevSelected.forEach((id) => {
-              if (validIds.has(id)) next.add(id)
-            })
-            return next
-          })
           setLoadError('')
         }
       } catch (err) {
@@ -166,6 +195,21 @@ export default function UserDataManagement() {
       clearInterval(timer)
     }
   }, [API_BASE])
+
+  useEffect(() => {
+    const validIds =
+      activeTab === 'registered'
+        ? new Set(rows.map((u) => String(u.id)))
+        : new Set(emailSubs.map((s) => String(s.id)))
+
+    setSelected((prevSelected) => {
+      const next = new Set()
+      prevSelected.forEach((id) => {
+        if (validIds.has(String(id))) next.add(String(id))
+      })
+      return next
+    })
+  }, [activeTab, rows, emailSubs])
 
   useEffect(() => {
     let cancelled = false
@@ -201,9 +245,12 @@ export default function UserDataManagement() {
 
     const fetchEmailSubs = async () => {
       try {
-        const res = await fetch(`${API_BASE}/api/submissions/email-subscribers`, {
-          cache: 'no-store',
-        })
+        const res = await fetch(
+          `${API_BASE}/api/submissions/email-subscribers`,
+          {
+            cache: 'no-store',
+          },
+        )
         const text = await res.text()
         if (!res.ok) throw new Error(text || `HTTP ${res.status}`)
         const data = text ? JSON.parse(text) : []
@@ -255,7 +302,8 @@ export default function UserDataManagement() {
   }, [issues])
 
   const totalAll = activeTab === 'registered' ? rows.length : emailSubs.length
-  const total = activeTab === 'registered' ? filtered.length : filteredEmailSubs.length
+  const total =
+    activeTab === 'registered' ? filtered.length : filteredEmailSubs.length
   const selectedCount = selected.size
   const pageCount = Math.max(1, Math.ceil(total / pageSize))
 
@@ -301,31 +349,43 @@ export default function UserDataManagement() {
   }
 
   async function sendUpdateEmailToUser(userId, issueId, template) {
-    const res = await fetch(`${API_BASE}/api/users/${userId}/send-update-email`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ issueId, template }),
-    })
+    const res = await fetch(
+      `${API_BASE}/api/users/${userId}/send-update-email`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ issueId, template }),
+      },
+    )
     const text = await res.text()
     if (!res.ok) throw new Error(text || `HTTP ${res.status}`)
   }
 
   async function sendGiftEmailToSubmission(submissionId, code) {
-    const res = await fetch(`${API_BASE}/api/submissions/${submissionId}/send-gift-email`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ voucherCode: code, template: emailTemplateDraft }),
-    })
+    const res = await fetch(
+      `${API_BASE}/api/submissions/${submissionId}/send-gift-email`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          voucherCode: code,
+          template: emailTemplateDraft,
+        }),
+      },
+    )
     const text = await res.text()
     if (!res.ok) throw new Error(text || `HTTP ${res.status}`)
   }
 
   async function sendUpdateEmailToSubmission(submissionId, issueId, template) {
-    const res = await fetch(`${API_BASE}/api/submissions/${submissionId}/send-update-email`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ issueId, template }),
-    })
+    const res = await fetch(
+      `${API_BASE}/api/submissions/${submissionId}/send-update-email`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ issueId, template }),
+      },
+    )
     const text = await res.text()
     if (!res.ok) throw new Error(text || `HTTP ${res.status}`)
   }
@@ -337,13 +397,25 @@ export default function UserDataManagement() {
       if (!row) return
       setVoucherInput(voucherCode.trim())
       setVoucherModalError('')
-      setVoucherModal({ open: true, mode: 'single', type: 'user', userId: id, userLabel: row.name || row.email || id })
+      setVoucherModal({
+        open: true,
+        mode: 'single',
+        type: 'user',
+        userId: id,
+        userLabel: row.name || row.email || id,
+      })
     } else {
       const sub = emailSubs.find((s) => String(s.id) === String(id))
       if (!sub) return
       setVoucherInput(voucherCode.trim())
       setVoucherModalError('')
-      setVoucherModal({ open: true, mode: 'single', type: 'submission', userId: String(id), userLabel: sub.email || String(id) })
+      setVoucherModal({
+        open: true,
+        mode: 'single',
+        type: 'submission',
+        userId: String(id),
+        userLabel: sub.email || String(id),
+      })
     }
   }
 
@@ -370,7 +442,8 @@ export default function UserDataManagement() {
     if (!selected.size || updatingStatus) return
     setUpdateModal({
       open: true,
-      issueId: availableIssues.length > 0 ? String(availableIssues[0].issueId) : '',
+      issueId:
+        availableIssues.length > 0 ? String(availableIssues[0].issueId) : '',
     })
     setUpdateModalError('')
   }
@@ -394,10 +467,15 @@ export default function UserDataManagement() {
         if (voucherModal.mode === 'single') {
           const id = voucherModal.userId
           const row = rows.find((r) => r.id === id)
-          if (!row) { setVoucherModalError('Selected user not found.'); return }
+          if (!row) {
+            setVoucherModalError('Selected user not found.')
+            return
+          }
           await sendGiftEmailToUser(id, code)
           await persistUserStatus(id, true)
-          setRows((list) => list.map((r) => (r.id === id ? { ...r, Sent: true } : r)))
+          setRows((list) =>
+            list.map((r) => (r.id === id ? { ...r, Sent: true } : r)),
+          )
           setNotice(`Gift email sent to ${row.email}.`)
           setLoadError('')
         } else {
@@ -417,11 +495,17 @@ export default function UserDataManagement() {
             else failedIds.push(id)
           })
           const successSet = new Set(successIds)
-          setRows((prev) => prev.map((u) => (successSet.has(u.id) ? { ...u, Sent: true } : u)))
+          setRows((prev) =>
+            prev.map((u) => (successSet.has(u.id) ? { ...u, Sent: true } : u)),
+          )
           setSelected(new Set(failedIds))
-          setNotice(`Send Selected completed. Success: ${successIds.length}, Failed: ${failedIds.length}.`)
+          setNotice(
+            `Send Gifts completed. Success: ${successIds.length}, Failed: ${failedIds.length}.`,
+          )
           if (failedIds.length > 0) {
-            setLoadError(`Failed users: ${failedIds.join(', ')}. Please retry for the failed users.`)
+            setLoadError(
+              `Failed users: ${failedIds.join(', ')}. Please retry for the failed users.`,
+            )
           } else {
             setLoadError('')
           }
@@ -451,9 +535,13 @@ export default function UserDataManagement() {
           })
           setEmailSentIds((prev) => new Set([...prev, ...successIds]))
           setSelected(new Set(failedIds))
-          setNotice(`Send Selected completed. Success: ${successIds.length}, Failed: ${failedIds.length}.`)
+          setNotice(
+            `Send Selected completed. Success: ${successIds.length}, Failed: ${failedIds.length}.`,
+          )
           if (failedIds.length > 0) {
-            setLoadError(`Failed submissions: ${failedIds.join(', ')}. Please retry.`)
+            setLoadError(
+              `Failed submissions: ${failedIds.join(', ')}. Please retry.`,
+            )
           } else {
             setLoadError('')
           }
@@ -488,9 +576,10 @@ export default function UserDataManagement() {
     setUpdatingStatus(true)
     try {
       const ids = Array.from(selected)
-      const sendFn = activeTab === 'registered'
-        ? (id) => sendUpdateEmailToUser(id, issueId, template)
-        : (id) => sendUpdateEmailToSubmission(id, issueId, template)
+      const sendFn =
+        activeTab === 'registered'
+          ? (id) => sendUpdateEmailToUser(id, issueId, template)
+          : (id) => sendUpdateEmailToSubmission(id, issueId, template)
 
       const settled = await Promise.allSettled(ids.map(sendFn))
 
@@ -502,8 +591,14 @@ export default function UserDataManagement() {
         else failedIds.push(id)
       })
 
+      if (activeTab === 'emailOnly' && successIds.length > 0) {
+        setEmailSentIds((prev) => new Set([...prev, ...successIds]))
+      }
+
       setSelected(new Set(failedIds))
-      setNotice(`Send Updates completed for issue #${issueId}. Success: ${successIds.length}, Failed: ${failedIds.length}.`)
+      setNotice(
+        `Send Updates completed for issue #${issueId}. Success: ${successIds.length}, Failed: ${failedIds.length}.`,
+      )
       if (failedIds.length > 0) {
         setLoadError(`Failed: ${failedIds.join(', ')}. Please retry.`)
       } else {
@@ -530,16 +625,27 @@ export default function UserDataManagement() {
           ? emailSubs
               .filter((s) => selected.has(String(s.id)))
               .map((s) => ({ ...s, _sent: emailSentIds.has(String(s.id)) }))
-          : emailSubs.map((s) => ({ ...s, _sent: emailSentIds.has(String(s.id)) }))
+          : emailSubs.map((s) => ({
+              ...s,
+              _sent: emailSentIds.has(String(s.id)),
+            }))
       if (!data.length) {
-        alert(scope === 'selected' ? 'No selected subscribers.' : 'No data to export.')
+        alert(
+          scope === 'selected'
+            ? 'No selected subscribers.'
+            : 'No data to export.',
+        )
         return
       }
-      downloadTextAsFile(emailSubsToCSV(data), `email-subscribers-${scope}-${ts}.csv`)
+      downloadTextAsFile(
+        emailSubsToCSV(data),
+        `email-subscribers-${scope}-${ts}.csv`,
+      )
       return
     }
 
-    const data = scope === 'selected' ? rows.filter((r) => selected.has(r.id)) : rows
+    const data =
+      scope === 'selected' ? rows.filter((r) => selected.has(r.id)) : rows
     if (!data.length) {
       alert(scope === 'selected' ? 'No selected users.' : 'No data to export.')
       return
@@ -563,10 +669,14 @@ export default function UserDataManagement() {
         ].join(' ')}
       >
         Registered Users
-        <span className={[
-          'ml-1.5 rounded-full px-2 py-0.5 text-xs font-semibold',
-          activeTab === 'registered' ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-200 text-gray-500',
-        ].join(' ')}>
+        <span
+          className={[
+            'ml-1.5 rounded-full px-2 py-0.5 text-xs font-semibold',
+            activeTab === 'registered'
+              ? 'bg-indigo-100 text-indigo-700'
+              : 'bg-gray-200 text-gray-500',
+          ].join(' ')}
+        >
           {rows.length}
         </span>
       </button>
@@ -580,33 +690,70 @@ export default function UserDataManagement() {
         ].join(' ')}
       >
         Email Subscribers
-        <span className={[
-          'ml-1.5 rounded-full px-2 py-0.5 text-xs font-semibold',
-          activeTab === 'emailOnly' ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-200 text-gray-500',
-        ].join(' ')}>
+        <span
+          className={[
+            'ml-1.5 rounded-full px-2 py-0.5 text-xs font-semibold',
+            activeTab === 'emailOnly'
+              ? 'bg-indigo-100 text-indigo-700'
+              : 'bg-gray-200 text-gray-500',
+          ].join(' ')}
+        >
           {emailSubs.length}
         </span>
       </button>
     </div>
   )
 
+  const PaginationControls = () => (
+    <div className="flex flex-col gap-3 border-t border-gray-100 px-4 py-4 md:flex-row md:items-center md:justify-between">
+      <div className="text-sm text-gray-500">
+        Page {page} of {Math.max(1, pageCount)} · {total} filtered result
+        {total === 1 ? '' : 's'}
+      </div>
+
+      <div className="flex flex-wrap items-center gap-3">
+        <select
+          value={pageSize}
+          onChange={(e) => {
+            setPageSize(Number(e.target.value))
+            setPage(1)
+          }}
+          className="h-9 rounded-lg border border-gray-200 bg-white px-2 pr-8 text-sm"
+        >
+          {[5, 8, 10, 20, 50].map((n) => (
+            <option key={n} value={n}>
+              {`${n} / page`}
+            </option>
+          ))}
+        </select>
+
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            className="h-9 rounded-lg border border-gray-200 bg-white px-3 text-sm hover:bg-gray-50"
+          >
+            Previous
+          </button>
+
+          <span className="px-2 text-sm text-gray-600">
+            {page} / {Math.max(1, pageCount)}
+          </span>
+
+          <button
+            onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
+            className="h-9 rounded-lg border border-gray-200 bg-white px-3 text-sm hover:bg-gray-50"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+
   return (
     <div className="space-y-6">
-      {/* Page header */}
-      <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm md:p-6">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-xl font-semibold text-gray-900">
-            User Data Management
-          </h1>
-          <p className="text-sm leading-6 text-gray-500">
-            Review user records, manage sent status, export data, and search
-            users in a clearer and more consistent layout.
-          </p>
-        </div>
-      </section>
-
       {/* Summary + actions */}
-      <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm md:p-6">
+      <SectionCard title="User Data Management">
         <div className="mb-4 grid gap-3 sm:grid-cols-3">
           <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
             <div className="text-xs font-medium uppercase tracking-wide text-gray-500">
@@ -664,17 +811,23 @@ export default function UserDataManagement() {
               <button
                 onClick={openSelectedVoucherModal}
                 disabled={!selected.size || updatingStatus}
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-40"
-                title={selected.size ? 'Send emails to selected' : 'No rows selected'}
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-base font-medium text-emerald-700 hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-40"
+                title={
+                  selected.size ? 'Send emails to selected' : 'No rows selected'
+                }
               >
-                Send Selected
+                Send Gifts
               </button>
 
               <button
                 onClick={openUpdateModal}
                 disabled={!selected.size || updatingStatus}
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-sky-200 bg-sky-50 px-3.5 py-2 text-sm font-medium text-sky-700 hover:bg-sky-100 disabled:cursor-not-allowed disabled:opacity-40"
-                title={selected.size ? 'Send issue updates to selected' : 'No rows selected'}
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-sky-200 bg-sky-50 px-4 py-2 text-base font-medium text-sky-700 hover:bg-sky-100 disabled:cursor-not-allowed disabled:opacity-40"
+                title={
+                  selected.size
+                    ? 'Send issue updates to selected'
+                    : 'No rows selected'
+                }
               >
                 Send Updates
               </button>
@@ -682,7 +835,7 @@ export default function UserDataManagement() {
               <button
                 onClick={() => handleExport('selected')}
                 disabled={!selected.size || updatingStatus}
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
                 title="Export selected rows to CSV"
               >
                 Export Selected
@@ -691,7 +844,7 @@ export default function UserDataManagement() {
               <button
                 onClick={() => handleExport('all')}
                 disabled={updatingStatus}
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-50"
                 title="Export all rows to CSV"
               >
                 Export All
@@ -705,7 +858,11 @@ export default function UserDataManagement() {
                   setQ(e.target.value)
                   setPage(1)
                 }}
-                placeholder={activeTab === 'registered' ? 'Search by name / email / id' : 'Search by email / id / issue'}
+                placeholder={
+                  activeTab === 'registered'
+                    ? 'Search by name / email / id'
+                    : 'Search by email / id / issue'
+                }
                 className="h-10 w-full rounded-xl border border-gray-200 pl-10 pr-3 text-sm outline-none focus:ring-2 focus:ring-indigo-200 sm:w-[300px]"
               />
               <svg
@@ -715,229 +872,288 @@ export default function UserDataManagement() {
                 stroke="currentColor"
               >
                 <circle cx="11" cy="11" r="7" strokeWidth="1.8" />
-                <path d="M20 20L17 17" strokeWidth="1.8" strokeLinecap="round" />
+                <path
+                  d="M20 20L17 17"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                />
               </svg>
             </div>
           </div>
 
-          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 md:p-5">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <div className="text-sm font-semibold text-amber-900">
-                  Gift Email Template
+          <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm md:p-5">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <div className="flex gap-3">
+                <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-indigo-50 text-indigo-600">
+                  <MailIcon className="h-5 w-5" />
                 </div>
-                <p className="text-xs text-amber-700">
-                  Use <code>{'{{name}}'}</code> and{' '}
-                  <code>{'{{voucherCode}}'}</code> as placeholders.
-                </p>
+                <div>
+                  <TemplateTitle
+                    label="Show gift email template guidance"
+                    guidance="Write the message once. When the email is sent, the system will replace the labels below with each recipient's real details, such as their name and voucher code."
+                  >
+                    Gift Email Template
+                  </TemplateTitle>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
+                      Recipient name: <code>{'{{name}}'}</code>
+                    </span>
+                    <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
+                      Voucher code: <code>{'{{voucherCode}}'}</code>
+                    </span>
+                  </div>
+                </div>
               </div>
               <button
                 onClick={() => setShowGiftTemplateEditor((v) => !v)}
                 disabled={updatingStatus}
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-amber-300 bg-white px-4 py-2 text-sm font-medium text-amber-800 hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-40"
+                className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
                 title="Edit email template used for voucher emails"
               >
-                {showGiftTemplateEditor ? 'Hide Email Template' : 'Edit Email Template'}
+                {showGiftTemplateEditor ? 'Hide Editor' : 'Edit Template'}
               </button>
             </div>
 
             {showGiftTemplateEditor && (
-              <div className="mt-4">
+              <div className="mt-5 border-t border-gray-100 pt-5">
+                <label
+                  htmlFor="gift-email-template"
+                  className="mb-2 block text-sm font-medium text-gray-700"
+                >
+                  Email message
+                </label>
                 <textarea
+                  id="gift-email-template"
                   value={emailTemplateDraft}
                   onChange={(e) => {
                     setEmailTemplateDraft(e.target.value)
                     if (notice) setNotice('')
                   }}
                   rows={10}
-                  className="w-full rounded-xl border border-amber-200 bg-white p-3 text-sm text-gray-800 outline-none focus:ring-2 focus:ring-amber-300"
+                  className="w-full rounded-xl border border-gray-300 bg-white p-3 text-sm leading-6 text-gray-800 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
                 />
-                <div className="mt-3 flex gap-2">
+                <p className="mt-2 text-xs leading-5 text-gray-500">
+                  Keep the labels in double curly brackets wherever you want the
+                  personalised details to appear in the email.
+                </p>
+                <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                  <button
+                    onClick={() => setShowGiftTemplateEditor(false)}
+                    className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
                   <button
                     onClick={() => {
                       setShowGiftTemplateEditor(false)
                       setNotice('Email template updated.')
                       setLoadError('')
                     }}
-                    className="inline-flex items-center justify-center rounded-lg border border-amber-300 bg-white px-3 py-1.5 text-sm font-medium text-amber-800 hover:bg-amber-100"
+                    className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700"
                   >
                     Save Template
-                  </button>
-                  <button
-                    onClick={() => setShowGiftTemplateEditor(false)}
-                    className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                  >
-                    Close
                   </button>
                 </div>
               </div>
             )}
           </div>
 
-          <div className="rounded-2xl border border-sky-200 bg-sky-50 p-4 md:p-5">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <div className="text-sm font-semibold text-sky-900">
-                  Update Email Template
+          <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm md:p-5">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <div className="flex gap-3">
+                <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-sky-50 text-sky-600">
+                  <MailIcon className="h-5 w-5" />
                 </div>
-                <p className="text-xs text-sky-700">
-                  Use <code>{'{{name}}'}</code>, <code>{'{{shareLink}}'}</code>,
-                  and <code>{'{{issueContent}}'}</code> as placeholders.
-                </p>
+                <div>
+                  <TemplateTitle
+                    label="Show update email template guidance"
+                    guidance="Write the update once. When the email is sent, the system will automatically add the recipient's name, the issue summary, and the response link in the places you choose."
+                  >
+                    Update Email Template
+                  </TemplateTitle>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
+                      Recipient name: <code>{'{{name}}'}</code>
+                    </span>
+                    <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
+                      Response link: <code>{'{{shareLink}}'}</code>
+                    </span>
+                    <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
+                      Issue summary: <code>{'{{issueContent}}'}</code>
+                    </span>
+                  </div>
+                </div>
               </div>
               <button
                 onClick={() => setShowUpdateTemplateEditor((v) => !v)}
                 disabled={updatingStatus}
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-sky-300 bg-white px-4 py-2 text-sm font-medium text-sky-800 hover:bg-sky-100 disabled:cursor-not-allowed disabled:opacity-40"
+                className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
                 title="Edit email template used for issue updates"
               >
-                {showUpdateTemplateEditor ? 'Hide Update Template' : 'Edit Update Template'}
+                {showUpdateTemplateEditor ? 'Hide Editor' : 'Edit Template'}
               </button>
             </div>
 
             {showUpdateTemplateEditor && (
-              <div className="mt-4">
+              <div className="mt-5 border-t border-gray-100 pt-5">
+                <label
+                  htmlFor="update-email-template"
+                  className="mb-2 block text-sm font-medium text-gray-700"
+                >
+                  Email message
+                </label>
                 <textarea
+                  id="update-email-template"
                   value={updateEmailTemplateDraft}
                   onChange={(e) => {
                     setUpdateEmailTemplateDraft(e.target.value)
                     if (notice) setNotice('')
                   }}
                   rows={10}
-                  className="w-full rounded-xl border border-sky-200 bg-white p-3 text-sm text-gray-800 outline-none focus:ring-2 focus:ring-sky-300"
+                  className="w-full rounded-xl border border-gray-300 bg-white p-3 text-sm leading-6 text-gray-800 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
                 />
-                <div className="mt-3 flex gap-2">
+                <p className="mt-2 text-xs leading-5 text-gray-500">
+                  Keep the labels in double curly brackets wherever you want the
+                  personalised details to appear in the email.
+                </p>
+                <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                  <button
+                    onClick={() => setShowUpdateTemplateEditor(false)}
+                    className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
                   <button
                     onClick={() => {
                       setShowUpdateTemplateEditor(false)
                       setNotice('Update email template updated.')
                       setLoadError('')
                     }}
-                    className="inline-flex items-center justify-center rounded-lg border border-sky-300 bg-white px-3 py-1.5 text-sm font-medium text-sky-800 hover:bg-sky-100"
+                    className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700"
                   >
                     Save Template
-                  </button>
-                  <button
-                    onClick={() => setShowUpdateTemplateEditor(false)}
-                    className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                  >
-                    Close
                   </button>
                 </div>
               </div>
             )}
           </div>
         </div>
-      </section>
+      </SectionCard>
 
       {/* Mobile card view */}
-      <div className="grid gap-3 md:hidden">
-        {paged.map((r) => {
-          const id = String(r.id)
-          const isSent = activeTab === 'registered' ? r.Sent : emailSentIds.has(id)
-          const name = activeTab === 'registered' ? r.name : r.email
-          const subText = activeTab === 'registered' ? `Issue #${id}` : `Issue #${r.issueId}`
+      <SectionCard
+        title="Users Records"
+        className="md:hidden"
+        bodyClassName="p-0"
+        titleClassName="text-base"
+      >
+        <div className="space-y-3 p-5 md:p-6">
+          <TabBar />
 
-          return (
-            <div
-              key={id}
-              className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4 rounded border-gray-300"
-                    checked={selected.has(id)}
-                    onChange={() => toggleRow(id)}
-                    aria-label={`Select ${id}`}
-                  />
-                  <div className="grid h-9 w-9 place-items-center rounded-full bg-indigo-50 font-semibold text-indigo-600">
-                    {name?.[0]?.toUpperCase() ?? 'U'}
+          {paged.map((r) => {
+            const id = String(r.id)
+            const isSent =
+              activeTab === 'registered' ? r.Sent : emailSentIds.has(id)
+            const name = activeTab === 'registered' ? r.name : r.email
+            const subText =
+              activeTab === 'registered'
+                ? `Issue #${id}`
+                : `Issue #${r.issueId}`
+
+            return (
+              <div
+                key={id}
+                className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4 rounded border-gray-300"
+                      checked={selected.has(id)}
+                      onChange={() => toggleRow(id)}
+                      aria-label={`Select ${id}`}
+                    />
+                    <div className="grid h-9 w-9 place-items-center rounded-full bg-indigo-50 font-semibold text-indigo-600">
+                      {name?.[0]?.toUpperCase() ?? 'U'}
+                    </div>
+                    <div>
+                      <div className="font-medium text-gray-900">{name}</div>
+                      <div className="text-xs text-gray-500">{subText}</div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="font-medium text-gray-900">{name}</div>
-                    <div className="text-xs text-gray-500">{subText}</div>
-                  </div>
+
+                  <span
+                    className={[
+                      'rounded-full px-2.5 py-1 text-xs font-medium ring-1',
+                      isSent
+                        ? 'bg-emerald-50 text-emerald-700 ring-emerald-200'
+                        : 'bg-amber-50 text-amber-700 ring-amber-200',
+                    ].join(' ')}
+                  >
+                    {isSent ? 'Sent' : 'Not Sent'}
+                  </span>
                 </div>
 
-                <span
-                  className={[
-                    'rounded-full px-2.5 py-1 text-xs font-medium ring-1',
-                    isSent
-                      ? 'bg-emerald-50 text-emerald-700 ring-emerald-200'
-                      : 'bg-amber-50 text-amber-700 ring-amber-200',
-                  ].join(' ')}
-                >
-                  {isSent ? 'Sent' : 'Not Sent'}
-                </span>
-              </div>
+                {activeTab === 'registered' && (
+                  <div className="mt-2 text-sm text-gray-700">{r.email}</div>
+                )}
+                {activeTab === 'emailOnly' && (
+                  <div className="mt-2 flex gap-2 text-xs">
+                    {r.wantsUpdates && (
+                      <span className="rounded-full bg-sky-50 px-2 py-0.5 text-sky-700 ring-1 ring-sky-200">
+                        Wants Updates
+                      </span>
+                    )}
+                    {r.wantsVoucher && (
+                      <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-emerald-700 ring-1 ring-emerald-200">
+                        Wants Voucher
+                      </span>
+                    )}
+                  </div>
+                )}
 
-              {activeTab === 'registered' && (
-                <div className="mt-2 text-sm text-gray-700">{r.email}</div>
-              )}
-              {activeTab === 'emailOnly' && (
-                <div className="mt-2 flex gap-2 text-xs">
-                  {r.wantsUpdates && (
-                    <span className="rounded-full bg-sky-50 px-2 py-0.5 text-sky-700 ring-1 ring-sky-200">Wants Updates</span>
-                  )}
-                  {r.wantsVoucher && (
-                    <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-emerald-700 ring-1 ring-emerald-200">Wants Voucher</span>
-                  )}
+                <div className="mt-3 flex justify-end gap-2">
+                  <button
+                    onClick={() => openSingleVoucherModal(id)}
+                    disabled={updatingStatus}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-200 bg-white px-3 py-1.5 text-xs font-medium text-indigo-700 hover:bg-indigo-50"
+                  >
+                    <GiftIcon className="h-4 w-4" />
+                    Send Gift
+                  </button>
                 </div>
-              )}
-
-              <div className="mt-3 flex justify-end gap-2">
-                <button
-                  onClick={() => openSingleVoucherModal(id)}
-                  disabled={updatingStatus}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-200 bg-white px-3 py-1.5 text-xs font-medium text-indigo-700 hover:bg-indigo-50"
-                >
-                  <GiftIcon className="h-4 w-4" />
-                  Send Gift
-                </button>
               </div>
-            </div>
-          )
-        })}
+            )
+          })}
 
-        {isEmpty && (
-          <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-            <h3 className="text-base font-semibold text-gray-900">
-              {hasSearch ? 'No matching records found' : 'No records available'}
-            </h3>
-            <p className="mt-2 text-sm leading-6 text-gray-500">
-              {hasSearch
-                ? 'Try a different keyword or clear the search field.'
-                : 'Records will appear here once data becomes available.'}
-            </p>
-          </div>
-        )}
-      </div>
-
-      {/* Desktop table view */}
-      <section className="hidden rounded-2xl border border-gray-200 bg-white p-4 shadow-sm md:block">
-        <div className="mb-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-base font-semibold text-gray-900">
-                User Records
-              </h2>
-              <p className="mt-1 text-sm text-gray-500">
-                Showing {paged.length} item{paged.length === 1 ? '' : 's'} on this
-                page
-                {hasSearch ? `, filtered from ${totalAll} total.` : '.'}
+          {isEmpty && (
+            <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
+              <h3 className="text-base font-semibold text-gray-900">
+                {hasSearch
+                  ? 'No matching records found'
+                  : 'No records available'}
+              </h3>
+              <p className="mt-2 text-sm leading-6 text-gray-500">
+                {hasSearch
+                  ? 'Try a different keyword or clear the search field.'
+                  : 'Records will appear here once data becomes available.'}
               </p>
             </div>
-          </div>
-
-          {/* Tab switcher — below User Records title */}
-          <div className="mt-4">
-            <TabBar />
-          </div>
+          )}
         </div>
+        <PaginationControls />
+      </SectionCard>
 
-        <div className="overflow-x-auto">
+      {/* Desktop table view */}
+      <SectionCard
+        title="User Records"
+        className="hidden md:block"
+        bodyClassName="p-0"
+        titleClassName="text-base"
+        headerRight={<TabBar />}
+      >
+        <div className="overflow-x-auto p-4">
           {activeTab === 'registered' ? (
             <table className="min-w-full text-left">
               <thead>
@@ -970,7 +1186,9 @@ export default function UserDataManagement() {
                           {r.name?.[0] ?? 'U'}
                         </div>
                         <div>
-                          <div className="font-medium text-gray-900">{r.name}</div>
+                          <div className="font-medium text-gray-900">
+                            {r.name}
+                          </div>
                           <div className="text-gray-500">Issue #{r.id}</div>
                         </div>
                       </div>
@@ -1024,7 +1242,9 @@ export default function UserDataManagement() {
                     <td colSpan={6} className="px-3 py-10 text-center">
                       <div className="mx-auto max-w-md">
                         <h3 className="text-base font-semibold text-gray-900">
-                          {hasSearch ? 'No matching users found' : 'No users available'}
+                          {hasSearch
+                            ? 'No matching users found'
+                            : 'No users available'}
                         </h3>
                         <p className="mt-2 text-sm leading-6 text-gray-500">
                           {hasSearch
@@ -1071,12 +1291,15 @@ export default function UserDataManagement() {
                             {s.email?.[0]?.toUpperCase() ?? 'E'}
                           </div>
                           <div>
-                            <div className="font-medium text-gray-900">{s.email}</div>
-                            <div className="text-gray-500">Issue #{s.issueId}</div>
+                            <div className="font-medium text-gray-900">
+                              {s.email}
+                            </div>
+                            <div className="text-gray-500">
+                              Issue #{s.issueId}
+                            </div>
                           </div>
                         </div>
                       </td>
-
 
                       <td className="px-3 py-4">
                         <span
@@ -1125,7 +1348,9 @@ export default function UserDataManagement() {
                     <td colSpan={6} className="px-3 py-10 text-center">
                       <div className="mx-auto max-w-md">
                         <h3 className="text-base font-semibold text-gray-900">
-                          {hasSearch ? 'No matching subscribers found' : 'No email subscribers yet'}
+                          {hasSearch
+                            ? 'No matching subscribers found'
+                            : 'No email subscribers yet'}
                         </h3>
                         <p className="mt-2 text-sm leading-6 text-gray-500">
                           {hasSearch
@@ -1140,52 +1365,8 @@ export default function UserDataManagement() {
             </table>
           )}
         </div>
-      </section>
-
-      {/* Pagination */}
-      <section className="flex flex-col gap-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm md:flex-row md:items-center md:justify-between">
-        <div className="text-sm text-gray-500">
-          Page {page} of {Math.max(1, pageCount)} · {total} filtered result
-          {total === 1 ? '' : 's'}
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3">
-          <select
-            value={pageSize}
-            onChange={(e) => {
-              setPageSize(Number(e.target.value))
-              setPage(1)
-            }}
-            className="h-9 rounded-lg border border-gray-200 bg-white px-2 pr-8 text-sm"
-          >
-            {[5, 8, 10, 20, 50].map((n) => (
-              <option key={n} value={n}>
-                {`${n} / page`}
-              </option>
-            ))}
-          </select>
-
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              className="h-9 rounded-lg border border-gray-200 bg-white px-3 text-sm hover:bg-gray-50"
-            >
-              Previous
-            </button>
-
-            <span className="px-2 text-sm text-gray-600">
-              {page} / {Math.max(1, pageCount)}
-            </span>
-
-            <button
-              onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
-              className="h-9 rounded-lg border border-gray-200 bg-white px-3 text-sm hover:bg-gray-50"
-            >
-              Next
-            </button>
-          </div>
-        </div>
-      </section>
+        <PaginationControls />
+      </SectionCard>
 
       {voucherModal.open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 p-4 backdrop-blur-[1px]">
@@ -1226,7 +1407,9 @@ export default function UserDataManagement() {
                   autoFocus
                 />
                 {voucherModalError && (
-                  <p className="mt-2 text-sm text-red-600">{voucherModalError}</p>
+                  <p className="mt-2 text-sm text-red-600">
+                    {voucherModalError}
+                  </p>
                 )}
               </div>
 
@@ -1280,7 +1463,10 @@ export default function UserDataManagement() {
                   id="issue-id-modal"
                   value={updateModal.issueId}
                   onChange={(e) => {
-                    setUpdateModal((prev) => ({ ...prev, issueId: e.target.value }))
+                    setUpdateModal((prev) => ({
+                      ...prev,
+                      issueId: e.target.value,
+                    }))
                     if (updateModalError) setUpdateModalError('')
                   }}
                   className="mt-3 h-12 w-full rounded-xl border border-sky-300 bg-white px-4 text-sm text-slate-900 shadow-sm outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200"

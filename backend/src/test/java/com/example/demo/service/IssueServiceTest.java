@@ -48,6 +48,7 @@ class IssueServiceTest {
     void createIssueTrimsContentAndBuildsActiveResponse() {
         CreateIssueRequest request = new CreateIssueRequest();
         request.setIssueContent("  Improve bus access  ");
+        request.setConsentText("  Users agree to participate in this feedback activity.  ");
 
         when(issueRepository.existsByShareId(anyString())).thenReturn(false);
         when(issueRepository.save(any(Issue.class))).thenAnswer(invocation -> {
@@ -60,6 +61,7 @@ class IssueServiceTest {
 
         assertThat(response.getIssueId()).isEqualTo(99L);
         assertThat(response.getIssueContent()).isEqualTo("Improve bus access");
+        assertThat(response.getConsentText()).isEqualTo("Users agree to participate in this feedback activity.");
         assertThat(response.getState()).isEqualTo(IssueState.ACTIVE);
         assertThat(response.getShareId()).hasSize(10);
         assertThat(response.getPublishedAt()).isNotNull();
@@ -69,6 +71,7 @@ class IssueServiceTest {
     void createIssueRejectsBlankContent() {
         CreateIssueRequest request = new CreateIssueRequest();
         request.setIssueContent("   ");
+        request.setConsentText("  Users agree to participate in this feedback activity.  ");
 
         assertThatThrownBy(() -> issueService.createIssue(request))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -83,11 +86,13 @@ class IssueServiceTest {
         existing.setIssueId(7L);
         existing.setShareId("share123");
         existing.setIssueContent("Old");
+        existing.setConsentText("Old consent");
         existing.setState(IssueState.ACTIVE);
         existing.setPublishedAt(OffsetDateTime.parse("2026-04-06T10:15:30+00:00"));
 
         CreateIssueRequest request = new CreateIssueRequest();
         request.setIssueContent("  Updated issue text  ");
+        request.setConsentText("  Updated consent text  ");
 
         when(issueRepository.findById(7L)).thenReturn(Optional.of(existing));
         when(issueRepository.save(any(Issue.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -97,8 +102,10 @@ class IssueServiceTest {
         ArgumentCaptor<Issue> captor = ArgumentCaptor.forClass(Issue.class);
         verify(issueRepository).save(captor.capture());
         assertThat(captor.getValue().getIssueContent()).isEqualTo("Updated issue text");
+        assertThat(captor.getValue().getConsentText()).isEqualTo("Updated consent text");
         assertThat(response.getIssueId()).isEqualTo(7L);
         assertThat(response.getIssueContent()).isEqualTo("Updated issue text");
+        assertThat(response.getConsentText()).isEqualTo("Updated consent text");
     }
 
     @Test
@@ -107,6 +114,7 @@ class IssueServiceTest {
         issue.setIssueId(12L);
         issue.setShareId("share123");
         issue.setIssueContent("Content");
+        issue.setConsentText("Consent content");
         issue.setState(IssueState.ACTIVE);
         issue.setPublishedAt(OffsetDateTime.parse("2026-04-06T10:15:30+00:00"));
 
@@ -117,6 +125,7 @@ class IssueServiceTest {
         assertThat(response.getIssueId()).isEqualTo(12L);
         assertThat(response.getShareId()).isEqualTo("share123");
         assertThat(response.getIssueContent()).isEqualTo("Content");
+        assertThat(response.getConsentText()).isEqualTo("Consent content");
     }
 
     @Test
@@ -125,6 +134,7 @@ class IssueServiceTest {
         issue.setIssueId(7L);
         issue.setShareId("share123");
         issue.setIssueContent("Content");
+        issue.setConsentText("Consent content");
         issue.setState(IssueState.ACTIVE);
         issue.setPublishedAt(OffsetDateTime.parse("2026-04-06T10:15:30+00:00"));
 

@@ -16,16 +16,13 @@ import ThankYouPage from './pages/user/ThankYouPage'
 import Layout from './components/Layout'
 import LoginPage from './pages/user/LoginPage'
 import CreateAccountPage from './pages/user/CreateAccountPage'
+import ConsentPage from './pages/user/ConsentPage'
 
 // admin
 import AdminLayout from './components/AdminLayout'
 import DashBoard from './pages/admin/DashBoard'
 import CreateNewIssue from './pages/admin/CreateNewIssue'
 import IssueReport from './pages/admin/IssueReport'
-// import WhyReport from './pages/admin/WhyReport'
-// import HowReport from './pages/admin/HowReport'
-// import ProfileReport from './pages/admin/ProfileReport'
-// import EngagementReport from './pages/admin/EngagementReport'
 import UserDataManagement from './pages/admin/UserDataManagement'
 
 function App() {
@@ -102,6 +99,16 @@ function App() {
                 </Layout>
               }
             />
+
+            <Route
+              path="/share/:shareId/consent"
+              element={
+                <Layout>
+                  <ConsentPage />
+                </Layout>
+              }
+            />
+
             <Route
               path="/share/:shareId/profile"
               element={
@@ -157,10 +164,6 @@ function App() {
               <Route path="new-issue" element={<CreateNewIssue />} />
               <Route path="issue-report" element={<IssueReport />} />
               <Route path="issue-report/:issueId" element={<IssueReport />} />
-              {/* <Route path="why-report" element={<WhyReport />} />
-              <Route path="how-report" element={<HowReport />} />
-              <Route path="profile-report" element={<ProfileReport />} />
-              <Route path="engagement-report" element={<EngagementReport />} /> */}
               <Route path="manage-users" element={<UserDataManagement />} />
             </Route>
 
