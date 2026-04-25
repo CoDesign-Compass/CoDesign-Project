@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react'
+import { useTheme } from '../../context/ThemeContext'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
 import { Label } from '../../components/ui/label'
 import { Checkbox } from '../../components/ui/checkbox'
 import { Alert } from '../../components/ui/alert'
-import AiChatBubble from '../../components/AiChatBubble'
+
 
 export default function CreateAccountPage({ mode = 'create', onSubmit: onSubmitProp }) {
+  const { theme } = useTheme()
   const [form, setForm] = useState({
     username: '',
     email: '',
@@ -107,14 +109,25 @@ export default function CreateAccountPage({ mode = 'create', onSubmit: onSubmitP
   return (
     <div className="flex flex-col min-h-screen bg-[var(--bg-color)] text-[var(--text-color)]">
       <section
-        className="w-screen -ml-[calc(50vw-50%)] h-[120px] grid place-items-center text-center"
+        className="w-screen -ml-[calc(50vw-50%)] grid place-items-center text-center"
         style={{
+          height: 'clamp(120px, 22vh, 200px)',
           backgroundImage: 'url(/Banner.png)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
       >
-        <h1 className="m-0 text-[44px] text-[var(--heading)] tracking-wide drop-shadow-sm">
+        <h1
+          style={{
+            margin: 0,
+            fontFamily: 'Poppins, sans-serif',
+            fontWeight: 400,
+            lineHeight: 1.15,
+            padding: '0 4vw',
+            fontSize: 'clamp(32px, 7vw, 80px)',
+            color: theme === 'light' ? '#303030' : '#ffe070',
+          }}
+        >
           Create Account
         </h1>
       </section>
@@ -227,9 +240,7 @@ export default function CreateAccountPage({ mode = 'create', onSubmit: onSubmitP
         </form>
       </main>
 
-      <div className="w-[min(960px,92vw)] mx-auto flex justify-end pb-4">
-        <AiChatBubble initialMessage="Hello! I'm your AI assistant. I can help you create an account or explain the feedback flow." />
-      </div>
+
     </div>
   )
 }

@@ -166,7 +166,7 @@ export default function WelcomePage() {
         </p>
 
         {/* Divider */}
-        <hr style={{ border: 'none', borderTop: `1px solid ${dividerColor}`, margin: '0 0 14px' }} />
+        <hr style={{ border: 'none', borderTop: `1px solid ${dividerColor}`, margin: '0 0 32px' }} />
 
         {/* Steps */}
         <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
@@ -182,19 +182,21 @@ export default function WelcomePage() {
                 textAlign: 'center',
               }}
             >
-              <div style={{ fontSize: 20, fontWeight: 700, color: '#ffe071', textShadow: '1px 1px #eee', letterSpacing: '0.1em', marginBottom: 3 }}>
-                {num}
+              <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                <div style={{ fontSize: 24, fontWeight: 700, color: '#ffe071', textShadow: '1px 1px #eee', letterSpacing: '0.1em', marginBottom: 3, marginRight: 4 }}>
+                  {num}
+                </div>
+                <div style={{ fontWeight: 600, fontSize: 20, color: stepLabelColor, marginBottom: 2 }}>
+                  {label}
+                </div>
               </div>
-              <div style={{ fontWeight: 600, fontSize: 12, color: stepLabelColor, marginBottom: 2 }}>
-                {label}
-              </div>
-              <div style={{ fontSize: 11, color: stepDescColor }}>{desc}</div>
+              <div style={{ fontSize: 13, color: stepDescColor }}>{desc}</div>
             </div>
           ))}
         </div>
 
         {/* Divider */}
-        <hr style={{ border: 'none', borderTop: `1px solid ${dividerColor}`, margin: '28px 0 60px' }} />
+        <hr style={{ border: 'none', borderTop: `1px solid ${dividerColor}`, margin: '32px 0 60px' }} />
 
         {/* Loading / Error alerts */}
         {loadingIssueContext && (
@@ -207,7 +209,7 @@ export default function WelcomePage() {
         )}
 
         {/* CTAs */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <Button
             variant="yellow"
             size="lg"

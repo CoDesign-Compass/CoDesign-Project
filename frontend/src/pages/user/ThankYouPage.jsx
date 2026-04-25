@@ -7,7 +7,7 @@ import { Input } from '../../components/ui/input'
 import { Label } from '../../components/ui/label'
 import { Checkbox } from '../../components/ui/checkbox'
 import { Alert } from '../../components/ui/alert'
-import AiChatBubble from '../../components/AiChatBubble'
+
 
 export default function ThankPage() {
   const { shareId: routeShareId } = useParams()
@@ -113,7 +113,7 @@ export default function ThankPage() {
       <section className="mt-9 mx-auto text-center w-full max-w-[760px]">
         <p
           className="m-0 text-compass-yellow text-center font-bold font-poppins leading-snug"
-          style={{ fontSize: 'clamp(15px,2.4vw,20px)' }}
+          style={{ fontSize: 'clamp(15px,2.4vw,20px)', textShadow: 'rgba(0, 0, 0, 0.13) 1px 1px 1px' }}
         >
           Give us your email for $10 shopping voucher or more
         </p>
@@ -233,9 +233,7 @@ export default function ThankPage() {
         </Button>
       </section>
 
-      <div className="flex justify-end mx-[clamp(16px,4vw,30px)] my-[clamp(10px,3vw,20px)]">
-        <AiChatBubble initialMessage="Hello! I'm your AI assistant. I can help with the thank-you page, voucher options, account creation, and the feedback flow." />
-      </div>
+
     </div>
   )
 }

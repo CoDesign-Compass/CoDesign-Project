@@ -21,6 +21,8 @@ export default function Layout({ children }) {
     : ["/", "/profile", "/why", "/how", "/thankyou"];
 
   const currentIndex = pages.indexOf(location.pathname);
+  const isWhyPage = location.pathname.endsWith('/why');
+  const isHowPage = location.pathname.endsWith('/how');
   const { theme, toggleTheme } = useTheme();
 
   const goBack = () => {
@@ -80,7 +82,7 @@ export default function Layout({ children }) {
         className="flex justify-between items-center px-4 py-4"
         style={{ backgroundColor: theme === "light" ? "white" : "#303030" }}
       >
-        {currentIndex > 0 ? (
+        {currentIndex > 0 && !isWhyPage && !isHowPage ? (
           <Button
             variant="plain"
             onClick={goBack}
@@ -96,7 +98,7 @@ export default function Layout({ children }) {
           <div />
         )}
 
-        {currentIndex > 0 && currentIndex < pages.length - 1 ? (
+        {currentIndex > 0 && currentIndex < pages.length - 1 && !isWhyPage && !isHowPage ? (
           <Button
             variant="plain"
             onClick={goNext}
