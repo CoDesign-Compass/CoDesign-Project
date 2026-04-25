@@ -79,7 +79,7 @@ export default function ThankPage() {
       className="flex flex-col w-full mx-auto box-border"
       style={{ paddingInline: 'clamp(12px,4vw,24px)', paddingBottom: 'clamp(20px,4vw,36px)' }}
     >
-      <section className="my-[clamp(18px,4vw,40px)] grid place-items-center" />
+      <section className="grid place-items-center" />
 
       <section
         className="m-0 w-full grid place-items-center text-center relative"
