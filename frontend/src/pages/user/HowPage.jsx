@@ -4,70 +4,12 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useIssue } from '../../context/IssueContext'
 import { useTheme } from '../../context/ThemeContext'
 
-function InfoHint({ title, text, isDark }) {
-  const bg = isDark ? '#1f1f1f' : '#f8f9fa'
-  const border = isDark ? 'rgba(255,255,255,0.12)' : '#e9ecef'
-  const titleColor = isDark ? '#f5f5f5' : '#111111'
-  const textColor = isDark ? '#cfcfcf' : '#555555'
-  const iconBg = isDark ? 'rgba(255,255,255,0.08)' : '#e9ecef'
+const TOTAL_QUESTION_STEPS = 5
 
-  return (
-    <div
-      style={{
-        display: 'flex',
-        gap: 12,
-        alignItems: 'flex-start',
-        padding: '14px 16px',
-        borderRadius: 10,
-        background: bg,
-        border: `1px solid ${border}`,
-        marginBottom: 16,
-      }}
-    >
-      <div
-        aria-hidden="true"
-        style={{
-          width: 22,
-          height: 22,
-          minWidth: 22,
-          borderRadius: '50%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: iconBg,
-          color: titleColor,
-          fontSize: 13,
-          fontWeight: 700,
-          lineHeight: 1,
-          marginTop: 1,
-        }}
-      >
-        i
-      </div>
-
-      <div>
-        <div
-          style={{
-            fontWeight: 600,
-            marginBottom: 4,
-            color: titleColor,
-          }}
-        >
-          {title}
-        </div>
-
-        <div
-          style={{
-            fontSize: 14,
-            lineHeight: 1.6,
-            color: textColor,
-          }}
-        >
-          {text}
-        </div>
-      </div>
-    </div>
-  )
+const slideVariants = {
+  enter:  (dir) => ({ x: dir * 48, opacity: 0 }),
+  center: { x: 0, opacity: 1, transition: { duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94] } },
+  exit:   (dir) => ({ x: dir * -48, opacity: 0, transition: { duration: 0.18, ease: 'easeIn' } }),
 }
 
 export default function HowPage() {
@@ -76,304 +18,257 @@ export default function HowPage() {
   const { setShareId } = useIssue()
   const navigate = useNavigate()
 
-  const [step, setStep] = useState(0)
-  const [answers, setAnswers] = useState(Array(5).fill(''))
-  const [submitting, setSubmitting] = useState(false)
-
-  const questions = Array(5).fill(
-    'Write in your own words. No names or identifiers.',
-  )
+  const [currentStep, setCurrentStep] = useState(1)
+  const [direction, setDirection]     = useState(1)
+  const [answers, setAnswers]         = useState(Array(TOTAL_QUESTION_STEPS).fill(''))
+  const [submitting, setSubmitting]   = useState(false)
 
   const inputRef = useRef(null)
-  const endRef = useRef(null)
-
-  const isDark = theme === 'dark'
-
-  const pageTextColor = isDark ? '#f5f5f5' : '#111111'
-  const secondaryTextColor = isDark ? '#cfcfcf' : '#555555'
-  const answeredCardBackground = isDark ? '#1f1f1f' : '#f1f3f5'
-  const borderColor = isDark ? 'rgba(255,255,255,0.12)' : '#e9ecef'
-  const inputBackground = isDark ? '#1a1a1a' : '#ffffff'
-  const inputBorderColor = isDark ? 'rgba(255,255,255,0.18)' : '#ced4da'
-  const inputTextColor = isDark ? '#f5f5f5' : '#111111'
-  const buttonBackground = '#ffe071'
-  const buttonTextColor = '#000000'
+  const topRef   = useRef(null)
+  const isDark   = theme === 'dark'
 
   const submissionId = Number(localStorage.getItem('submissionId'))
+  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://codesign-project.onrender.com'
 
-  const API_BASE =
-    process.env.REACT_APP_API_BASE_URL ||
-    'https://codesign-project.onrender.com'
+  useEffect(() => { if (routeShareId) setShareId(routeShareId) }, [routeShareId, setShareId])
+
+  useEffect(() => {
+    inputRef.current?.focus()
+    topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [currentStep])
 
   const submitHow = async () => {
     if (submitting) return
     setSubmitting(true)
 
     try {
-      const body = {
-        submissionId,
-        shareId: routeShareId,
-        answer1: answers[0],
-        answer2: answers[1],
-        answer3: answers[2],
-        answer4: answers[3],
-        answer5: answers[4],
-      }
-
-      const howResponse = await fetch(`${API_BASE}/api/how`, {
+      const howRes = await fetch(`${API_BASE}/api/how`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          submissionId,
+          shareId: routeShareId,
+          answer1: answers[0], answer2: answers[1], answer3: answers[2],
+          answer4: answers[3], answer5: answers[4],
+        }),
       })
+      if (!howRes.ok) throw new Error('Failed to submit how response')
 
-      if (!howResponse.ok) {
-        const errorText = await howResponse.text()
-        throw new Error(`Failed to submit how response: ${errorText}`)
-      }
+      const sid = localStorage.getItem('submissionId')
+      if (!sid) throw new Error('No submissionId found')
 
-      const submissionId = localStorage.getItem('submissionId')
-      console.log('API_BASE =', API_BASE)
-      console.log('submissionId =', submissionId)
-
-      if (!submissionId) {
-        throw new Error('No submissionId found')
-      }
-
-      const submitUrl = `${API_BASE}/api/submissions/${submissionId}/submit`
-      console.log('submitUrl =', submitUrl)
-
-      const submitResponse = await fetch(submitUrl, {
-        method: 'POST',
-      })
-
-      if (!submitResponse.ok) {
-        const errorText = await submitResponse.text()
-        console.error('submit error body =', errorText)
-        throw new Error(`Failed to submit feedback session: ${errorText}`)
-      }
+      const submitRes = await fetch(`${API_BASE}/api/submissions/${sid}/submit`, { method: 'POST' })
+      if (!submitRes.ok) throw new Error('Failed to submit feedback session')
 
       navigate(`/share/${routeShareId}/thankyou`)
+    } catch (err) {
+      console.error(err)
     } finally {
       setSubmitting(false)
     }
   }
 
-  useEffect(() => {
-    inputRef.current?.focus()
-    endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
-  }, [step])
-
-  useEffect(() => {
-    if (routeShareId) {
-      setShareId(routeShareId)
-    }
-  }, [routeShareId, setShareId])
-
-  const next = async () => {
-    const isLastQuestion = step === questions.length - 1
-
-    if (isLastQuestion) {
+  const goNext = async () => {
+    if (currentStep < TOTAL_QUESTION_STEPS) {
+      if (!answers[currentStep - 1].trim()) return
+      setDirection(1)
+      setCurrentStep((s) => s + 1)
+    } else {
       await submitHow()
-      return
     }
-
-    setStep((s) => s + 1)
   }
 
-  const finish = async () => {
-    await submitHow()
+  const goPrev = () => {
+    if (currentStep === 1) return
+    setDirection(-1)
+    setCurrentStep((s) => s - 1)
   }
+
+  const finishEarly = async () => { await submitHow() }
+
+  // ── design tokens ────────────────────────────────────────────────
+  const textColor   = isDark ? '#f0f0f0' : '#1a1a1a'
+  const subText     = isDark ? '#888' : '#888'
+  const inputBg     = isDark ? '#1a1a1a' : '#ffffff'
+  const inputBorder = isDark ? 'rgba(255,255,255,0.18)' : '#ced4da'
+  const hintBg      = isDark ? '#1f1f1f' : '#f8f9fa'
+  const isLastStep  = currentStep === TOTAL_QUESTION_STEPS
+  const questionIdx = currentStep - 1
 
   return (
     <div
-      style={{
-        maxWidth: 680,
-        margin: '0 auto',
-        padding: '0 16px',
-        color: pageTextColor,
-      }}
+      ref={topRef}
+      className="max-w-[640px] mx-auto px-4 font-poppins"
+      style={{ color: textColor, paddingBottom: 32 }}
     >
-      <p style={{ marginBottom: 6, color: pageTextColor }}>
-        <strong>How could this be improved?</strong>
-      </p>
-
-      <InfoHint
-        isDark={isDark}
-        title={`Follow-up question ${step + 1} of ${questions.length}`}
-        text="Write in your own words. No names or identifiers."
-      />
-
-      {questions.slice(0, step).map((q, i) => (
-        <div
-          key={i}
-          style={{
-            padding: '12px 16px',
-            borderRadius: 10,
-            background: answeredCardBackground,
-            marginBottom: 10,
-            border: `1px solid ${borderColor}`,
-          }}
-        >
-          {i > 0 && (
+      {/* ── Progress bar ── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 28 }}>
+        <span style={{ fontSize: 12, fontWeight: 600, color: subText, whiteSpace: 'nowrap' }}>
+          Question {currentStep} of {TOTAL_QUESTION_STEPS}
+        </span>
+        <div style={{ flex: 1, display: 'flex', gap: 4 }}>
+          {Array.from({ length: TOTAL_QUESTION_STEPS }).map((_, i) => (
             <div
+              key={i}
               style={{
-                fontWeight: 600,
-                marginBottom: 6,
-                color: pageTextColor,
+                flex: 1,
+                height: 4,
+                borderRadius: 2,
+                background: i < currentStep ? '#ffe071' : isDark ? 'rgba(255,255,255,0.1)' : '#e0e0e0',
+                transition: 'background 0.25s',
               }}
-            >
-              How could that be improved?
-            </div>
-          )}
-
-          <div
-            style={{
-              whiteSpace: 'pre-wrap',
-              color: pageTextColor,
-              lineHeight: 1.5,
-            }}
-          >
-            {answers[i]}
-          </div>
+            />
+          ))}
         </div>
-      ))}
+      </div>
 
-      <AnimatePresence mode="popLayout">
-        {step > 0 && (
-          <div
-            style={{
-              fontWeight: 600,
-              marginBottom: 6,
-              color: pageTextColor,
-            }}
-          >
-            How could that be improved?
-          </div>
-        )}
-
+      {/* ── Animated step content ── */}
+      <AnimatePresence mode="wait" custom={direction}>
         <motion.div
-          key={step}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -6 }}
-          transition={{ duration: 0.25, ease: 'easeOut' }}
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 10,
-            marginTop: 8,
-          }}
+          key={currentStep}
+          custom={direction}
+          variants={slideVariants}
+          initial="enter"
+          animate="center"
+          exit="exit"
         >
-          <textarea
-            ref={inputRef}
-            placeholder="Type your answer here..."
-            value={answers[step]}
-            onChange={(e) => {
-              const nextAnswers = [...answers]
-              nextAnswers[step] = e.target.value
-              setAnswers(nextAnswers)
-            }}
-            style={{
-              width: '100%',
-              minHeight: 120,
-              padding: '12px 14px',
-              borderRadius: 10,
-              border: `1px solid ${inputBorderColor}`,
-              outline: 'none',
-              fontSize: 16,
-              resize: 'vertical',
-              boxSizing: 'border-box',
-              fontFamily: 'inherit',
-              lineHeight: 1.5,
-              background: inputBackground,
-              color: inputTextColor,
-            }}
-          />
+          {/* Question label */}
+          <p style={{ fontWeight: 600, fontSize: 20, color: textColor, marginBottom: 60 }}>
+            {currentStep === 1
+              ? 'How could this be improved?'
+              : 'How could that be improved?'}
+          </p>
 
+          {/* Info hint */}
           <div
             style={{
               display: 'flex',
               gap: 10,
-              flexWrap: 'wrap',
               alignItems: 'flex-start',
+              padding: '12px 14px',
+              borderRadius: 10,
+              background: hintBg,
+              marginBottom: 16,
+              fontSize: 13,
+              color: subText,
             }}
           >
-            {step > 0 && (
-              <motion.div
-                key="idk-group"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 6,
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: 13,
-                    lineHeight: 1.5,
-                    color: secondaryTextColor,
-                    maxWidth: 240,
-                  }}
-                >
-                  Select “I don’t know” if you are unsure how to continue. This
-                  will end the follow-up questions.
-                </div>
-
-                <button
-                  type="button"
-                  onClick={finish}
-                  disabled={submitting}
-                  style={{
-                    background: buttonBackground,
-                    border: 'none',
-                    color: buttonTextColor,
-                    borderRadius: 10,
-                    padding: '12px 18px',
-                    fontWeight: 600,
-                    cursor: submitting ? 'not-allowed' : 'pointer',
-                    opacity: submitting ? 0.7 : 1,
-                  }}
-                >
-                  {submitting ? 'Submitting...' : 'I don’t know'}
-                </button>
-              </motion.div>
-            )}
-
-            <button
-              type="button"
-              onClick={next}
-              disabled={submitting || !answers[step].trim()}
+            <span
+              aria-hidden="true"
               style={{
-                background: buttonBackground,
-                color: buttonTextColor,
-                border: 'none',
+                width: 20, height: 20, minWidth: 20, borderRadius: '50%',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: isDark ? 'rgba(255,255,255,0.08)' : '#e9ecef',
+                fontSize: 11, fontWeight: 700, color: textColor, marginTop: 1,
+              }}
+            >i</span>
+            Write in your own words. No names or identifiers.
+          </div>
+
+          {/* Textarea */}
+          <textarea
+            ref={inputRef}
+            placeholder="Type your answer here…"
+            value={answers[questionIdx]}
+            onChange={(e) => {
+              const next = [...answers]
+              next[questionIdx] = e.target.value
+              setAnswers(next)
+            }}
+            style={{
+              width: '100%',
+              minHeight: 130,
+              padding: '12px 14px',
+              borderRadius: 10,
+              border: `1.5px solid ${inputBorder}`,
+              background: inputBg,
+              color: textColor,
+              fontSize: 15,
+              fontFamily: 'Poppins, sans-serif',
+              lineHeight: 1.55,
+              resize: 'vertical',
+              outline: 'none',
+              boxSizing: 'border-box',
+              transition: 'border-color 0.15s',
+            }}
+            onFocus={(e) => { e.target.style.borderColor = '#ffe071' }}
+            onBlur={(e) => { e.target.style.borderColor = inputBorder }}
+          />
+
+          {/* Navigation row */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 14, gap: 10, flexWrap: 'wrap' }}>
+
+            {/* Back */}
+            <button
+              onClick={goPrev}
+              disabled={currentStep === 1}
+              style={{
+                padding: '10px 18px',
                 borderRadius: 10,
-                padding: '12px 18px',
+                border: `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : '#ddd'}`,
+                background: 'transparent',
+                color: currentStep === 1 ? (isDark ? 'rgba(255,255,255,0.2)' : '#ccc') : textColor,
                 fontWeight: 600,
-                cursor:
-                  submitting || !answers[step].trim()
-                    ? 'not-allowed'
-                    : 'pointer',
-                opacity: submitting || !answers[step].trim() ? 0.7 : 1,
-                alignSelf: step > 0 ? 'flex-end' : 'flex-start',
+                fontSize: 14,
+                fontFamily: 'Poppins, sans-serif',
+                cursor: currentStep === 1 ? 'not-allowed' : 'pointer',
+                transition: 'all 0.15s',
               }}
             >
-              {submitting
-                ? 'Submitting...'
-                : step === questions.length - 1
-                  ? 'Finish'
-                  : 'Next'}
+              ← Previous
             </button>
+
+            {/* Right side: I don't know + Next/Finish */}
+            <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+              {currentStep >= 2 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'flex-end' }}>
+                  <span style={{ fontSize: 11, color: subText, maxWidth: 200, textAlign: 'right', lineHeight: 1.4 }}>
+                    Unsure how to continue?
+                  </span>
+                  <button
+                    onClick={finishEarly}
+                    disabled={submitting}
+                    style={{
+                      padding: '10px 18px',
+                      borderRadius: 10,
+                      border: `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : '#ddd'}`,
+                      background: 'transparent',
+                      color: subText,
+                      fontWeight: 600,
+                      fontSize: 14,
+                      fontFamily: 'Poppins, sans-serif',
+                      cursor: submitting ? 'not-allowed' : 'pointer',
+                      opacity: submitting ? 0.6 : 1,
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    I don't know
+                  </button>
+                </div>
+              )}
+
+              <button
+                onClick={goNext}
+                disabled={submitting || !answers[questionIdx].trim()}
+                style={{
+                  padding: '10px 22px',
+                  borderRadius: 10,
+                  border: 'none',
+                  background: answers[questionIdx].trim() && !submitting ? '#ffe071' : isDark ? 'rgba(255,255,255,0.08)' : '#e0e0e0',
+                  color: answers[questionIdx].trim() && !submitting ? '#1a1a1a' : subText,
+                  fontWeight: 700,
+                  fontSize: 14,
+                  fontFamily: 'Poppins, sans-serif',
+                  cursor: answers[questionIdx].trim() && !submitting ? 'pointer' : 'not-allowed',
+                  transition: 'all 0.15s',
+                }}
+              >
+                {submitting ? 'Submitting…' : isLastStep ? 'Finish ✓' : 'Next question →'}
+              </button>
+            </div>
           </div>
         </motion.div>
       </AnimatePresence>
-
-      <div ref={endRef} />
     </div>
   )
 }

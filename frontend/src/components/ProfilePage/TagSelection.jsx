@@ -1,20 +1,23 @@
-import React from "react";
-import Tag from "./Tag";
+import React from 'react'
+import Tag from './Tag'
 
-const TagSelection = ({ tags, selectedTags, onTagClick }) => {
-  return (
-    <div className="tag-grid">
-      {tags.map((tag) => (
+const TagSelection = ({ tags, selectedTags, onTagClick }) => (
+  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, minHeight: 40 }}>
+    {tags.length === 0 ? (
+      <p style={{ fontSize: 13, color: '#999', fontFamily: 'Poppins, sans-serif', margin: 0 }}>
+        No tags in this category yet.
+      </p>
+    ) : (
+      tags.map((tag) => (
         <Tag
           key={tag.id}
           label={tag.label}
-          color={tag.color}
           isSelected={selectedTags.includes(tag.label)}
           onClick={() => onTagClick(tag.label)}
         />
-      ))}
-    </div>
-  );
-};
+      ))
+    )}
+  </div>
+)
 
-export default TagSelection;
+export default TagSelection

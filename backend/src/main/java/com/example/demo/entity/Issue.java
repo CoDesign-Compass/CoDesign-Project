@@ -16,7 +16,7 @@ public class Issue {
   @Column(nullable = false, columnDefinition = "TEXT")
   private String issueContent;
 
-  @Column(nullable = false, columnDefinition = "TEXT")
+  @Column(columnDefinition = "TEXT")
   private String consentText;
 
   @Enumerated(EnumType.STRING)

@@ -1,14 +1,15 @@
-import React, { useState } from 'react'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
-import { useTheme } from '../context/ThemeContext'
+import React, { useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useTheme } from "../context/ThemeContext";
+import { Button } from "./ui/button";
+import AiChatBubble from "./AiChatBubble";
 
 export default function Layout({ children }) {
-  const location = useLocation()
-  const navigate = useNavigate()
-  const { shareId } = useParams()
-  const [onNextHandler, setOnNextHandler] = useState(null)
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { shareId } = useParams();
+  const [onNextHandler, setOnNextHandler] = useState(null);
 
-  // Define page sequence
   const pages = shareId
     ? [
         `/share/${shareId}`,
@@ -17,31 +18,26 @@ export default function Layout({ children }) {
         `/share/${shareId}/how`,
         `/share/${shareId}/thankyou`,
       ]
-    : ['/', '/profile', '/why', '/how', '/thankyou']
+    : ["/", "/profile", "/why", "/how", "/thankyou"];
 
-  const currentIndex = pages.indexOf(location.pathname)
-  const { theme, toggleTheme } = useTheme()
+  const currentIndex = pages.indexOf(location.pathname);
+  const isWhyPage = location.pathname.endsWith('/why');
+  const isHowPage = location.pathname.endsWith('/how');
+  const { theme, toggleTheme } = useTheme();
 
   const goBack = () => {
-    if (currentIndex > 0) {
-      navigate(pages[currentIndex - 1])
-    }
-  }
+    if (currentIndex > 0) navigate(pages[currentIndex - 1]);
+  };
 
   const goNext = async () => {
-    // If the current page has registered an onNext handler (e.g., ProfilePage validation/save)
     if (onNextHandler) {
       const canNavigate = await onNextHandler();
-      if (canNavigate === false) return; // Intercept navigation
+      if (canNavigate === false) return;
     }
+    if (currentIndex < pages.length - 1) navigate(pages[currentIndex + 1]);
+  };
 
-    if (currentIndex < pages.length - 1) {
-      navigate(pages[currentIndex + 1])
-    }
-  }
-
-  // Pass setOnNextHandler to child components
-  const childrenWithProps = React.Children.map(children, child => {
+  const childrenWithProps = React.Children.map(children, (child) => {
     if (React.isValidElement(child)) {
       return React.cloneElement(child, { setOnNext: setOnNextHandler });
     }
@@ -49,90 +45,75 @@ export default function Layout({ children }) {
   });
 
   return (
-    <div className="app-layout" style={{ fontFamily: 'sans-serif' }}>
-      <header
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          position: 'relative',
-          padding: '1rem',
-        }}
-      >
+    <div className="flex flex-col min-h-screen font-poppins">
+      <header className="flex justify-center items-center relative px-4 py-4">
         <img
-          src={theme === 'light' ? '/Logo_light.png' : '/Logo_dark.png'}
+          src={theme === "light" ? "/Logo_light.png" : "/Logo_dark.png"}
           alt="Purpose Media Logo"
-          style={{ height: '60px' }}
+          className="h-[90px]"
         />
-        <button
-          onClick={toggleTheme}
-          style={{
-            position: 'absolute',
-            right: '1rem',
-            padding: '0.5rem 1rem',
-            borderRadius: '8px',
-            border: '1px solid #d8d8d8',
-            background: 'transparent',
-            color: 'var(--text-color)',
-            cursor: 'pointer',
-          }}
-        >
-          <img
-            src={theme === 'light' ? '/light_mode.png' : '/dark_mode.png'}
-            alt="Mode Icon"
-            style={{ height: '30px' }}
+
+        {/* Top-right controls */}
+        <div className="absolute right-4 flex items-center gap-3">
+          {/* Theme toggle */}
+          <button
+            onClick={toggleTheme}
+            className="px-3 py-1.5 rounded-lg bg-transparent text-[var(--text-color)] cursor-pointer"
+            style={{ paddingTop: "0" }}
+          >
+            <img
+              src={theme === "light" ? "/light_mode.png" : "/dark_mode.png"}
+              alt="Mode Icon"
+              className="h-[30px] block"
+            />
+          </button>
+
+          {/* Help / AI chat */}
+          <AiChatBubble
+            direction="down"
+            initialMessage="Hello! I'm your AI assistant. I can help you navigate the app, explain the feedback process, and answer any questions."
           />
-        </button>
+        </div>
       </header>
 
-      <main style={{ minHeight: '70vh' }}>{childrenWithProps}</main>
+      <main className="flex-1 min-h-[70vh]">{childrenWithProps}</main>
 
       <footer
-        style={{
-          backgroundColor: theme === 'light' ? 'white' : '#303030',
-          padding: '1rem',
-          display: 'flex',
-          justifyContent: 'space-between',
-        }}
+        className="flex justify-between items-center px-4 py-4"
+        style={{ backgroundColor: theme === "light" ? "white" : "#303030" }}
       >
-        {/* Back Button (hidden on first page) */}
-        {currentIndex > 0 ? (
-          <button
+        {currentIndex > 0 && !isWhyPage && !isHowPage ? (
+          <Button
+            variant="plain"
             onClick={goBack}
+            className="px-4 py-2 rounded-md"
             style={{
-              background: theme === 'light' ? 'black' : 'white',
-              color: theme === 'light' ? 'white' : 'black',
-              padding: '0.5rem 1rem',
-              borderRadius: '6px',
-              border: 'none',
-              cursor: 'pointer'
+              background: theme === "light" ? "black" : "white",
+              color: theme === "light" ? "white" : "black",
             }}
           >
             ← Back
-          </button>
+          </Button>
         ) : (
-          <div></div>
+          <div />
         )}
 
-        {/* Next Button (hidden on last page) */}
-        {currentIndex >= 0 && currentIndex < pages.length - 1 ? (
-          <button
+        {currentIndex > 0 && currentIndex < pages.length - 1 && !isWhyPage && !isHowPage ? (
+          <Button
+            variant="plain"
             onClick={goNext}
+            className="px-4 py-2 rounded-md"
             style={{
-              background: theme === 'light' ? 'black' : 'white',
-              color: theme === 'light' ? 'white' : 'black',
-              padding: '0.5rem 1rem',
-              borderRadius: '6px',
-              border: 'none',
-              cursor: 'pointer'
+              background: theme === "light" ? "black" : "white",
+              color: theme === "light" ? "white" : "black",
             }}
           >
             Next →
-          </button>
+          </Button>
         ) : (
-          <div></div>
+          <div />
         )}
       </footer>
     </div>
-  )
+  );
 }
