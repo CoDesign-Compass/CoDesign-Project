@@ -1,4 +1,5 @@
-import { useState } from 'react'
+
+import { useEffect, useState } from 'react'
 import { useTheme } from '../../context/ThemeContext'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
@@ -7,7 +8,7 @@ import { Checkbox } from '../../components/ui/checkbox'
 import { Alert } from '../../components/ui/alert'
 import { User, Mail, Lock, Eye, EyeOff } from 'lucide-react'
 
-export default function CreateAccountPage({ mode = 'create' }) {
+export default function CreateAccountPage({ mode = 'create', onSubmit: onSubmitProp }) {
   const { theme } = useTheme()
 
   const [form, setForm] = useState({
@@ -149,7 +150,7 @@ export default function CreateAccountPage({ mode = 'create' }) {
       }}
     >
       <section
-        className="w-full grid place-items-center text-center"
+        className="w-screen -ml-[calc(50vw-50%)] grid place-items-center text-center"
         style={{
           height: 'clamp(120px, 22vh, 200px)',
           backgroundImage: 'url(/Banner.png)',
@@ -160,11 +161,12 @@ export default function CreateAccountPage({ mode = 'create' }) {
         <h1
           style={{
             margin: 0,
+            fontFamily: 'Poppins, sans-serif',
             fontWeight: 400,
             lineHeight: 1.15,
             padding: '0 4vw',
             fontSize: 'clamp(32px, 7vw, 80px)',
-            color: isDark ? '#ffe070' : '#303030',
+            color: theme === 'light' ? '#303030' : '#ffe070',
           }}
         >
           Create Account

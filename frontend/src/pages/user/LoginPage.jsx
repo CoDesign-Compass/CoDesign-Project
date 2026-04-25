@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTheme } from '../../context/ThemeContext'
 import { useIssue } from '../../context/IssueContext'
+import { useTheme } from '../../context/ThemeContext'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
 import { Label } from '../../components/ui/label'
@@ -12,6 +13,7 @@ import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
 export default function LoginPage() {
   const { shareId: routeShareId } = useParams()
   const { shareId, setShareId } = useIssue()
+  const { theme } = useTheme()
   const currentShareId = routeShareId || shareId
   const { theme } = useTheme()
 
@@ -107,11 +109,12 @@ export default function LoginPage() {
         <h1
           style={{
             margin: 0,
+            fontFamily: 'Poppins, sans-serif',
             fontWeight: 400,
             lineHeight: 1.15,
             padding: '0 4vw',
             fontSize: 'clamp(32px, 7vw, 80px)',
-            color: isDark ? '#ffe070' : '#303030',
+            color: theme === 'light' ? '#303030' : '#ffe070',
           }}
         >
           Login
@@ -295,6 +298,10 @@ export default function LoginPage() {
             </div>
 
             {loginErr && <Alert variant="error">{loginErr}</Alert>}
+
+    </div>
+  )
+}
 
             <div
               style={{

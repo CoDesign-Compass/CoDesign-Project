@@ -8,6 +8,7 @@ import { Label } from '../../components/ui/label'
 import { Checkbox } from '../../components/ui/checkbox'
 import { Alert } from '../../components/ui/alert'
 
+
 export default function ThankPage() {
   const { shareId: routeShareId } = useParams()
   const { shareId, setShareId } = useIssue()
@@ -113,6 +114,8 @@ export default function ThankPage() {
         color: textColor,
       }}
     >
+      <section className="grid place-items-center" />
+
       <section
         className="w-full grid place-items-center text-center"
         style={{
@@ -145,14 +148,8 @@ export default function ThankPage() {
         }}
       >
         <p
-          style={{
-            fontSize: 14,
-            color: subText,
-            textAlign: 'center',
-            lineHeight: 1.5,
-            margin: '0 auto 14px',
-            maxWidth: 440,
-          }}
+          className="m-0 text-compass-yellow text-center font-bold font-poppins leading-snug"
+          style={{ fontSize: 'clamp(15px,2.4vw,20px)', textShadow: 'rgba(0, 0, 0, 0.13) 1px 1px 1px' }}
         >
           Thank you for sharing your lived experience. You can leave your email
           below for updates, a voucher, or both.
@@ -344,6 +341,20 @@ export default function ThankPage() {
           </Button>
         </div>
       </main>
+      </section>
+
+      <section className="grid place-items-center my-[clamp(22px,3vw,32px)]">
+        <Button
+          variant="primary"
+          onClick={onLogin}
+          className="border-2 border-compass-yellow"
+          style={{ fontSize: 'clamp(18px,3.2vw,30px)', padding: '8px 22px' }}
+        >
+          Join Us
+        </Button>
+      </section>
+
+
     </div>
   )
 }
