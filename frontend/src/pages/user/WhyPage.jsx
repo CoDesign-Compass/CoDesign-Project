@@ -3,6 +3,75 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useIssue } from '../../context/IssueContext'
 import { useTheme } from '../../context/ThemeContext'
+import { Button } from '../../components/ui/button'
+import { Textarea } from '../../components/ui/textarea'
+
+function InfoHint({ title, text, isDark, yellowIcon = false }) {
+  return (
+    <div
+      style={{
+        background: isDark ? '#272727' : '#ffffff',
+        borderRadius: 16,
+        padding: 16,
+        boxShadow: isDark
+          ? '0 1px 6px rgba(0,0,0,0.35)'
+          : '0 1px 6px rgba(0,0,0,0.07)',
+        border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+        marginBottom: 16,
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: 12,
+      }}
+    >
+      <div
+        aria-hidden="true"
+        style={{
+          marginTop: 2,
+          width: 24,
+          height: 24,
+          minWidth: 24,
+          borderRadius: 999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: 12,
+          fontWeight: 700,
+          background: yellowIcon
+            ? '#ffe071'
+            : isDark
+              ? 'rgba(255,255,255,0.10)'
+              : '#f0f0f0',
+          color: '#1a1a1a',
+        }}
+      >
+        i
+      </div>
+
+      <div>
+        {title && (
+          <div
+            style={{
+              marginBottom: 4,
+              fontSize: 14,
+              fontWeight: 700,
+              color: isDark ? '#f0f0f0' : '#1a1a1a',
+            }}
+          >
+            {title}
+          </div>
+        )}
+        <div
+          style={{
+            fontSize: 14,
+            lineHeight: 1.6,
+            color: isDark ? '#888' : '#777',
+          }}
+        >
+          {text}
+        </div>
+      </div>
+    </div>
+  )
 import { cn } from '../../lib/utils'
 
 // Step 0 = stance, steps 1–5 = follow-up questions
@@ -18,6 +87,47 @@ const slideVariants = {
   enter:  (dir) => ({ x: dir * 48, opacity: 0 }),
   center: { x: 0, opacity: 1, transition: { duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94] } },
   exit:   (dir) => ({ x: dir * -48, opacity: 0, transition: { duration: 0.18, ease: 'easeIn' } }),
+}
+
+function AnswerCard({ title, answer, isDark }) {
+  return (
+    <div
+      style={{
+        background: isDark ? '#272727' : '#ffffff',
+        borderRadius: 16,
+        padding: 16,
+        boxShadow: isDark
+          ? '0 1px 6px rgba(0,0,0,0.35)'
+          : '0 1px 6px rgba(0,0,0,0.07)',
+        border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+        marginBottom: 12,
+      }}
+    >
+      {title && (
+        <p
+          style={{
+            margin: '0 0 8px',
+            fontSize: 14,
+            fontWeight: 700,
+            color: isDark ? '#f0f0f0' : '#1a1a1a',
+          }}
+        >
+          {title}
+        </p>
+      )}
+      <p
+        style={{
+          margin: 0,
+          whiteSpace: 'pre-wrap',
+          fontSize: 14,
+          lineHeight: 1.6,
+          color: isDark ? '#f0f0f0' : '#1a1a1a',
+        }}
+      >
+        {answer}
+      </p>
+    </div>
+  )
 }
 
 export default function WhyPage() {
@@ -96,6 +206,7 @@ export default function WhyPage() {
     const isSelected    = selectedButton === key
     const isHovered     = hoveredButton === key
     const isOtherDimmed = !!selectedButton && !isSelected
+
     return {
       flex: 1,
       backgroundColor: isSelected ? selected : isHovered ? hover : base,
@@ -153,7 +264,6 @@ export default function WhyPage() {
             ))}
           </div>
         </div>
-      )}
 
       {/* ── Animated step content ── */}
       <AnimatePresence mode="wait" custom={direction}>

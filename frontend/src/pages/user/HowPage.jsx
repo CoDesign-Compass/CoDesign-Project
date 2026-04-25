@@ -40,6 +40,8 @@ export default function HowPage() {
   const submitHow = async () => {
     if (submitting) return
     setSubmitting(true)
+    setSubmitError('')
+
     try {
       const howRes = await fetch(`${API_BASE}/api/how`, {
         method: 'POST',
@@ -60,6 +62,9 @@ export default function HowPage() {
       if (!submitRes.ok) throw new Error('Failed to submit feedback session')
 
       navigate(`/share/${routeShareId}/thankyou`)
+    } catch (err) {
+      console.error(err)
+      setSubmitError(err.message || 'Something went wrong while submitting.')
     } finally {
       setSubmitting(false)
     }

@@ -3,8 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useTheme } from '../../context/ThemeContext'
 import { useIssue } from '../../context/IssueContext'
 import { Button } from '../../components/ui/button'
-import { Card, CardContent } from '../../components/ui/card'
 import { Checkbox } from '../../components/ui/checkbox'
+import { Alert } from '../../components/ui/alert'
 
 export default function ConsentPage() {
   const { theme } = useTheme()
@@ -51,7 +51,9 @@ export default function ConsentPage() {
         localStorage.setItem('shareId', String(data?.shareId ?? routeShareId))
       } catch (error) {
         console.error('Failed to load consent page:', error)
-        setPageError('This consent page could not be loaded. Please try the share link again.')
+        setPageError(
+          'This consent page could not be loaded. Please try the share link again.',
+        )
       } finally {
         setLoading(false)
       }
@@ -67,69 +69,217 @@ export default function ConsentPage() {
 
   const isDark = theme === 'dark'
 
-  return (
-    <div className="w-full max-w-[900px] mx-auto px-5 pt-6 pb-10 box-border font-poppins text-[var(--text-color)]">
-      <div className="mb-6">
-        <h1 className="m-0 text-[clamp(28px,4vw,40px)] leading-tight text-[var(--text-color)]">
-          Consent
-        </h1>
-        <p className="mt-2.5 mb-0 text-[15px] leading-7 text-[var(--text-color)] opacity-70">
-          Please read the information below before continuing.
-        </p>
+  const pageBg = isDark ? '#1e1e1e' : '#f5f5f5'
+  const cardBg = isDark ? '#272727' : '#ffffff'
+  const cardBorder = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'
+  const cardShadow = isDark
+    ? '0 1px 6px rgba(0,0,0,0.35)'
+    : '0 1px 6px rgba(0,0,0,0.07)'
+  const textColor = isDark ? '#f0f0f0' : '#1a1a1a'
+  const subText = isDark ? '#888' : '#777'
+  const divider = isDark ? 'rgba(255,255,255,0.07)' : '#f0f0f0'
+  const contentBg = isDark ? '#1e1e1e' : '#ffffff'
+  const contentBorder = isDark ? 'rgba(255,255,255,0.12)' : '#ddd'
+
+  const cardStyle = {
+    background: cardBg,
+    borderRadius: 16,
+    padding: 24,
+    boxShadow: cardShadow,
+    border: `1px solid ${cardBorder}`,
+    marginBottom: 20,
+  }
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          background: pageBg,
+          minHeight: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 48,
+          fontFamily: 'Poppins, sans-serif',
+        }}
+      >
+        <p style={{ color: subText, fontSize: 14 }}>Loading…</p>
       </div>
+    )
+  }
 
-      {loading && (
-        <Card className={isDark ? 'border-white/10 bg-[#1f1f1f]' : ''}>
-          <CardContent>
-            <p className="text-[var(--text-color)] opacity-70 m-0">Loading consent information...</p>
-          </CardContent>
-        </Card>
-      )}
-
-      {!loading && pageError && (
-        <Card className={isDark ? 'border-white/10 bg-[#1f1f1f]' : ''}>
-          <CardContent>
-            <p className="text-red-700 m-0 leading-relaxed">{pageError}</p>
-          </CardContent>
-        </Card>
-      )}
-
-      {!loading && !pageError && (
-        <>
-          <Card
-            className={`shadow-md ${isDark ? 'border-white/10 bg-[#1f1f1f]' : 'border-gray-200 bg-white shadow-md'}`}
+  return (
+    <div
+      style={{
+        background: pageBg,
+        minHeight: '100%',
+        fontFamily: 'Poppins, sans-serif',
+      }}
+    >
+      <div
+        style={{
+          maxWidth: 800,
+          margin: '0 auto',
+          padding: '28px 20px 40px',
+        }}
+      >
+        <div style={{ marginBottom: 28 }}>
+          <h1
+            style={{
+              fontSize: 22,
+              fontWeight: 700,
+              color: textColor,
+              margin: '0 0 6px',
+            }}
           >
-            <CardContent>
-              <p className="m-0 text-[15px] leading-[1.85] whitespace-pre-wrap text-[var(--text-color)]">
-                {consentText}
+            Consent
+          </h1>
+          <p
+            style={{
+              fontSize: 14,
+              color: subText,
+              margin: 0,
+            }}
+          >
+            Please read the information below before continuing.
+          </p>
+        </div>
+
+        {pageError && (
+          <div style={{ marginBottom: 20 }}>
+            <Alert variant="error">{pageError}</Alert>
+          </div>
+        )}
+
+        {!pageError && (
+          <>
+            <div style={cardStyle}>
+              <div
+                style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  color: '#c49a00',
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
+                  marginBottom: 6,
+                }}
+              >
+                Step 0
+              </div>
+
+              <h2
+                style={{
+                  fontSize: 16,
+                  fontWeight: 700,
+                  color: textColor,
+                  margin: '0 0 4px',
+                }}
+              >
+                Consent Information
+              </h2>
+
+              <p
+                style={{
+                  fontSize: 13,
+                  color: subText,
+                  margin: '0 0 20px',
+                }}
+              >
+                Please make sure you are comfortable before continuing.
               </p>
-            </CardContent>
-          </Card>
 
-          <div
-            className={`mt-5 p-5 rounded-[14px] border ${isDark ? 'border-white/10 bg-transparent' : 'border-gray-200 bg-gray-50'}`}
-          >
-            <label className="flex items-start gap-3 cursor-pointer leading-relaxed text-[var(--text-color)]">
-              <Checkbox
-                checked={checked}
-                onChange={(e) => setChecked(e.target.checked)}
-                className="mt-0.5 accent-compass-purple"
-              />
-              <span>I understand and agree to continue.</span>
-            </label>
-          </div>
+              <div
+                style={{
+                  width: '100%',
+                  padding: '16px 18px',
+                  borderRadius: 12,
+                  border: `1.5px solid ${contentBorder}`,
+                  background: contentBg,
+                  color: textColor,
+                  fontSize: 14,
+                  lineHeight: 1.8,
+                  boxSizing: 'border-box',
+                  whiteSpace: 'pre-wrap',
+                }}
+              >
+                {consentText}
+              </div>
+            </div>
 
-          <div className="mt-7 flex justify-end">
-            <Button
-              variant="primary"
-              onClick={handleContinue}
-              disabled={!checked}
+            <div style={cardStyle}>
+              <div
+                role="button"
+                tabIndex={0}
+                onClick={() => setChecked((prev) => !prev)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    setChecked((prev) => !prev)
+                  }
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 12,
+                  cursor: 'pointer',
+                  borderRadius: 12,
+                  outline: 'none',
+                }}
+              >
+                <div
+                  style={{
+                    marginTop: 2,
+                    flexShrink: 0,
+                    pointerEvents: 'none',
+                  }}
+                >
+                  <Checkbox checked={checked} />
+                </div>
+
+                <div>
+                  <div
+                    style={{
+                      fontSize: 14,
+                      fontWeight: 600,
+                      color: textColor,
+                      marginBottom: 4,
+                    }}
+                  >
+                    I understand and agree to continue.
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 13,
+                      color: subText,
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    You need to confirm this before moving to the next step.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              style={{
+                borderTop: `1px solid ${divider}`,
+                marginTop: 8,
+                paddingTop: 20,
+                display: 'flex',
+                justifyContent: 'flex-end',
+              }}
             >
-              Continue
-            </Button>
-          </div>
-        </>
-      )}
+              <Button
+                variant="yellow"
+                onClick={handleContinue}
+                disabled={!checked}
+              >
+                Continue
+              </Button>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   )
 }

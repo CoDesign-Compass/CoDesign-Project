@@ -41,22 +41,41 @@ export default function ThankPage() {
     return text ? JSON.parse(text) : {}
   }
 
+  const isValidEmail = (value) => {
+    const trimmed = value.trim()
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)
+  }
+
   const onSubmit = async (e) => {
     e.preventDefault()
     setSubmitError('')
     setSubmitSuccess('')
 
     const trimmed = email.trim()
-    if (!trimmed.length) { setSubmitError('Please enter your email address.'); return }
-    if (!/^\S+@\S+\.\S+$/.test(trimmed)) { setSubmitError('Please enter a valid email address.'); return }
+
+    if (!trimmed.length) {
+      setSubmitError('Please enter your email address.')
+      return
+    }
+
+    if (!isValidEmail(trimmed)) {
+      setSubmitError('Please enter a valid email address.')
+      return
+    }
 
     const submissionId = localStorage.getItem('submissionId')
-    if (!submissionId) { setSubmitError('No submissionId found.'); return }
+    if (!submissionId) {
+      setSubmitError('No submissionId found.')
+      return
+    }
 
     try {
       setIsSubmitting(true)
-      const resp = await saveThanksInfo(submissionId, { email: trimmed, wantsVoucher: wantVoucher, wantsUpdates: wantUpdates })
-      console.log('thanks info saved:', resp)
+      await saveThanksInfo(submissionId, {
+        email: trimmed,
+        wantsVoucher: wantVoucher,
+        wantsUpdates: wantUpdates,
+      })
       setSubmitSuccess('Your preferences have been saved.')
     } catch (err) {
       console.error(err)
@@ -74,84 +93,137 @@ export default function ThankPage() {
 
   const isDark = theme === 'dark'
 
+  const pageBg = isDark ? '#1e1e1e' : '#f5f5f5'
+  const cardBg = isDark ? '#272727' : '#ffffff'
+  const cardBorder = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'
+  const cardShadow = isDark ? '0 1px 6px rgba(0,0,0,0.35)' : '0 1px 6px rgba(0,0,0,0.07)'
+  const textColor = isDark ? '#f0f0f0' : '#1a1a1a'
+  const subText = isDark ? '#b5b5b5' : '#666'
+  const dividerColor = isDark ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.07)'
+  const inputBg = isDark ? '#1f1f1f' : '#ffffff'
+  const inputBorder = isDark ? 'rgba(255,255,255,0.18)' : '#d9d9d9'
+  const optionBg = isDark ? '#1f1f1f' : '#fcfcfc'
+  const optionBorder = isDark ? 'rgba(255,255,255,0.14)' : 'rgba(0,0,0,0.06)'
+
   return (
     <div
-      className="flex flex-col w-full mx-auto box-border"
-      style={{ paddingInline: 'clamp(12px,4vw,24px)', paddingBottom: 'clamp(20px,4vw,36px)' }}
+      className="flex flex-col font-poppins"
+      style={{
+        minHeight: '100vh',
+        background: pageBg,
+        color: textColor,
+      }}
     >
       <section className="grid place-items-center" />
 
       <section
-        className="m-0 w-full grid place-items-center text-center relative"
+        className="w-full grid place-items-center text-center"
         style={{
-          height: 'clamp(140px,30vh,260px)',
+          height: 'clamp(120px, 22vh, 200px)',
           backgroundImage: 'url(/Banner.png)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
       >
-        <div
-          className="absolute inset-0"
-          style={{ background: isDark ? 'rgba(0,0,0,0.14)' : 'rgba(255,255,255,0.08)' }}
-        />
-        <div className="relative z-10 px-[4vw]">
-          <h1
-            className="m-0 font-poppins leading-tight"
-            style={{ fontSize: 'clamp(30px,8vw,96px)', color: isDark ? '#ffe070' : '#303030' }}
-          >
-            Thanks
-          </h1>
-          <h2
-            className="mt-1 mb-0 font-poppins leading-snug"
-            style={{ fontSize: 'clamp(24px,3.2vw,40px)', color: isDark ? '#ffe070' : '#303030' }}
-          >
-            for sharing your experience
-          </h2>
-        </div>
+        <h1
+          style={{
+            margin: 0,
+            fontWeight: 400,
+            lineHeight: 1.15,
+            padding: '0 4vw',
+            fontSize: 'clamp(32px, 7vw, 80px)',
+            color: isDark ? '#ffe070' : '#303030',
+          }}
+        >
+          Thank You
+        </h1>
       </section>
 
-      <section className="mt-9 mx-auto text-center w-full max-w-[760px]">
+      <main
+        style={{
+          width: '100%',
+          maxWidth: 560,
+          margin: '0 auto',
+          padding: '24px 16px 40px',
+        }}
+      >
         <p
           className="m-0 text-compass-yellow text-center font-bold font-poppins leading-snug"
           style={{ fontSize: 'clamp(15px,2.4vw,20px)', textShadow: 'rgba(0, 0, 0, 0.13) 1px 1px 1px' }}
         >
-          Give us your email for $10 shopping voucher or more
-        </p>
-        <p
-          className="mt-2.5 mb-0 text-center font-poppins leading-relaxed text-[var(--text-color)] opacity-80"
-          style={{ fontSize: 'clamp(12px,1.9vw,15px)' }}
-        >
-          Choose whether you would like a voucher, updates, or both.
+          Thank you for sharing your lived experience. You can leave your email
+          below for updates, a voucher, or both.
         </p>
 
-        <div className="flex justify-center mt-[clamp(16px,4vw,24px)]">
-          <form
-            onSubmit={onSubmit}
-            className="flex items-end gap-3 flex-wrap w-full justify-center"
+        <hr
+          style={{
+            border: 'none',
+            borderTop: `1px solid ${dividerColor}`,
+            margin: '0 0 18px',
+          }}
+        />
+
+        <section
+          style={{
+            border: `1px solid ${cardBorder}`,
+            background: cardBg,
+            borderRadius: 20,
+            padding: 20,
+            boxShadow: cardShadow,
+          }}
+        >
+          <p
+            style={{
+              margin: '0 0 6px',
+              fontSize: 18,
+              fontWeight: 700,
+              color: textColor,
+              textAlign: 'center',
+            }}
           >
-            <div className="relative flex-1 min-w-0 text-left" style={{ flex: '1 1 clamp(220px,70vw,420px)' }}>
+            Stay in the loop
+          </p>
+
+          <p
+            style={{
+              margin: '0 0 18px',
+              fontSize: 13,
+              lineHeight: 1.6,
+              color: subText,
+              textAlign: 'center',
+            }}
+          >
+            Choose whether you would like a shopping voucher, future updates, or both.
+          </p>
+
+          <form onSubmit={onSubmit} className="grid gap-4">
+            <div>
               <Label
                 htmlFor="thank-email"
-                className="block mb-1.5 font-semibold text-[var(--text-color)]"
-                style={{ fontSize: 'clamp(12px,1.8vw,14px)' }}
+                className="mb-1.5 block text-sm font-medium"
+                style={{ color: textColor }}
               >
                 Email address
               </Label>
+
               <div className="relative">
                 <Input
                   id="thank-email"
                   type="email"
+                  inputMode="email"
+                  autoComplete="email"
                   placeholder="you@example.com"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value)
+                    if (submitError) setSubmitError('')
+                  }}
                   required
                   className={`pr-10 ${submitError ? 'border-red-300' : ''}`}
                   style={{
-                    height: 'clamp(40px,3.4vw,46px)',
-                    fontSize: 'clamp(12px,2vw,18px)',
-                    background: isDark ? 'rgba(255,255,255,0.08)' : '#fff',
-                    color: isDark ? '#fff' : '#303030',
-                    borderColor: isDark ? 'rgba(255,255,255,0.22)' : undefined,
+                    background: inputBg,
+                    color: textColor,
+                    borderColor: submitError ? '#fca5a5' : inputBorder,
                   }}
                 />
                 {email && (
@@ -159,7 +231,8 @@ export default function ThankPage() {
                     type="button"
                     onClick={() => setEmail('')}
                     aria-label="Clear"
-                    className="absolute right-2 bottom-[11px] w-6 h-6 border-none bg-transparent cursor-pointer text-lg text-gray-400 leading-none z-10"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 border-none bg-transparent cursor-pointer text-lg leading-none"
+                    style={{ color: isDark ? '#c7c7c7' : '#888' }}
                   >
                     ×
                   </button>
@@ -167,59 +240,107 @@ export default function ThankPage() {
               </div>
             </div>
 
+            <div className="grid gap-3">
+              <div
+                role="button"
+                tabIndex={0}
+                onClick={() => setWantVoucher((prev) => !prev)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    setWantVoucher((prev) => !prev)
+                  }
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 12,
+                  borderRadius: 16,
+                  border: `1px solid ${optionBorder}`,
+                  background: optionBg,
+                  padding: 16,
+                  cursor: 'pointer',
+                }}
+              >
+                <Checkbox
+                  checked={wantVoucher}
+                  onChange={(e) => setWantVoucher(e.target.checked)}
+                  className="mt-0.5"
+                />
+                <span
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 500,
+                    lineHeight: 1.6,
+                    color: textColor,
+                  }}
+                >
+                  Send me a $10 shopping voucher
+                </span>
+              </div>
+
+              <div
+                role="button"
+                tabIndex={0}
+                onClick={() => setWantUpdates((prev) => !prev)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    setWantUpdates((prev) => !prev)
+                  }
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 12,
+                  borderRadius: 16,
+                  border: `1px solid ${optionBorder}`,
+                  background: optionBg,
+                  padding: 16,
+                  cursor: 'pointer',
+                }}
+              >
+                <Checkbox
+                  checked={wantUpdates}
+                  onChange={(e) => setWantUpdates(e.target.checked)}
+                  className="mt-0.5"
+                />
+                <span
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 500,
+                    lineHeight: 1.6,
+                    color: textColor,
+                  }}
+                >
+                  Keep me updated with the latest information
+                </span>
+              </div>
+            </div>
+
+            {(submitError || submitSuccess) && (
+              <Alert variant={submitError ? 'error' : 'success'}>
+                {submitError || submitSuccess}
+              </Alert>
+            )}
+
             <Button
-              variant="primary"
+              variant="yellow"
               type="submit"
               disabled={isSubmitting}
-              className="flex-shrink-0 border border-compass-yellow"
-              style={{
-                height: 'clamp(40px,3.4vw,46px)',
-                fontSize: 'clamp(12px,1.5vw,16px)',
-                padding: '0 clamp(14px,2vw,18px)',
-              }}
+              className="w-full"
             >
-              {isSubmitting ? 'Submitting...' : 'Submit'}
+              {isSubmitting ? 'Submitting...' : 'Save preferences'}
             </Button>
           </form>
+        </section>
+
+        <div style={{ marginTop: 20 }}>
+          <Button variant="outline" onClick={onLogin} className="w-full">
+            Join Us
+          </Button>
         </div>
-
-        {(submitError || submitSuccess) && (
-          <div className="mt-3.5">
-            <Alert variant={submitError ? 'error' : 'success'}>
-              {submitError || submitSuccess}
-            </Alert>
-          </div>
-        )}
-
-        <div className="mt-[clamp(18px,3vw,28px)] grid gap-3 text-left">
-          <label className="flex items-start justify-start gap-3 cursor-pointer">
-            <Checkbox
-              checked={wantVoucher}
-              onChange={(e) => setWantVoucher(e.target.checked)}
-              className="mt-0.5 w-[18px] h-[18px]"
-            />
-            <span
-              className="font-semibold text-[var(--text-color)] font-poppins leading-snug"
-              style={{ fontSize: 'clamp(12px,2vw,16px)' }}
-            >
-              Send me a $10 shopping voucher
-            </span>
-          </label>
-
-          <label className="flex items-start justify-start gap-3 cursor-pointer">
-            <Checkbox
-              checked={wantUpdates}
-              onChange={(e) => setWantUpdates(e.target.checked)}
-              className="mt-0.5 w-[18px] h-[18px]"
-            />
-            <span
-              className="font-semibold text-[var(--text-color)] font-poppins leading-snug flex-1"
-              style={{ fontSize: 'clamp(12px,2vw,16px)' }}
-            >
-              Keep me updated with the latest information
-            </span>
-          </label>
-        </div>
+      </main>
       </section>
 
       <section className="grid place-items-center my-[clamp(22px,3vw,32px)]">
