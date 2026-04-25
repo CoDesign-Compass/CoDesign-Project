@@ -341,18 +341,6 @@ export default function ThankPage() {
           </Button>
         </div>
       </main>
-      </section>
-
-      <section className="grid place-items-center my-[clamp(22px,3vw,32px)]">
-        <Button
-          variant="primary"
-          onClick={onLogin}
-          className="border-2 border-compass-yellow"
-          style={{ fontSize: 'clamp(18px,3.2vw,30px)', padding: '8px 22px' }}
-        >
-          Join Us
-        </Button>
-      </section>
 
 
     </div>

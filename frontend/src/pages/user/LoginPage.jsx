@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTheme } from '../../context/ThemeContext'
 import { useIssue } from '../../context/IssueContext'
-import { useTheme } from '../../context/ThemeContext'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
 import { Label } from '../../components/ui/label'
@@ -15,7 +14,6 @@ export default function LoginPage() {
   const { shareId, setShareId } = useIssue()
   const { theme } = useTheme()
   const currentShareId = routeShareId || shareId
-  const { theme } = useTheme()
 
   const API_BASE =
     process.env.REACT_APP_API_BASE_URL || 'https://codesign-project.onrender.com'
@@ -298,10 +296,6 @@ export default function LoginPage() {
             </div>
 
             {loginErr && <Alert variant="error">{loginErr}</Alert>}
-
-    </div>
-  )
-}
 
             <div
               style={{

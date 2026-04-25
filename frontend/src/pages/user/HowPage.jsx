@@ -40,7 +40,6 @@ export default function HowPage() {
   const submitHow = async () => {
     if (submitting) return
     setSubmitting(true)
-    setSubmitError('')
 
     try {
       const howRes = await fetch(`${API_BASE}/api/how`, {
@@ -64,7 +63,6 @@ export default function HowPage() {
       navigate(`/share/${routeShareId}/thankyou`)
     } catch (err) {
       console.error(err)
-      setSubmitError(err.message || 'Something went wrong while submitting.')
     } finally {
       setSubmitting(false)
     }
