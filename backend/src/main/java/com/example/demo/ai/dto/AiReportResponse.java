@@ -1,9 +1,28 @@
 package com.example.demo.ai.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.List;
 
 public class AiReportResponse {
+
+    public enum Sentiment {
+        Positive, Anxious, Expectant, Negative, Neutral;
+
+        @JsonCreator
+        public static Sentiment fromString(String value) {
+            if (value == null) return Neutral;
+            for (Sentiment s : values()) {
+                if (s.name().equalsIgnoreCase(value.trim())) return s;
+            }
+            return Neutral;
+        }
+
+        @JsonValue
+        public String toValue() { return name(); }
+    }
+
     private String title;
     private String summary;
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
@@ -25,13 +44,13 @@ public class AiReportResponse {
 
         public static class ParticipantSentiment {
             private String participantId;
-            private String sentiment; // e.g. "Positive", "Anxious", "Expectant", "Negative", "Neutral"
+            private Sentiment sentiment;
             private String rationale;
 
             public String getParticipantId() { return participantId; }
             public void setParticipantId(String participantId) { this.participantId = participantId; }
-            public String getSentiment() { return sentiment; }
-            public void setSentiment(String sentiment) { this.sentiment = sentiment; }
+            public Sentiment getSentiment() { return sentiment; }
+            public void setSentiment(Sentiment sentiment) { this.sentiment = sentiment; }
             public String getRationale() { return rationale; }
             public void setRationale(String rationale) { this.rationale = rationale; }
         }

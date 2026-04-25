@@ -7,6 +7,8 @@ import com.example.demo.ai.gemini.GeminiResponse;
 import com.example.demo.ai.dto.AiReportResponse;
 import com.example.demo.ai.ollama.OllamaChatRequest;
 import com.example.demo.ai.ollama.OllamaChatResponse;
+import com.example.demo.ai.openai.OpenAiChatRequest;
+import com.example.demo.ai.openai.OpenAiChatResponse;
 import com.example.demo.entity.HowResponse;
 import com.example.demo.entity.Issue;
 import com.example.demo.model.Tag;
@@ -38,6 +40,7 @@ public class AiReportService {
     private final OllamaClient ollamaClient;
     private final ClaudeClient claudeClient;
     private final GeminiClient geminiClient;
+    private final OpenAiClient openAiClient;
     private final ObjectMapper objectMapper;
     private final AiReportRepository aiReportRepository;
     private final SubmissionRepository submissionRepository;
@@ -55,6 +58,9 @@ public class AiReportService {
     @Value("${google.model:gemini-2.5-flash}")
     private String geminiModel;
 
+    @Value("${openai.model:gpt-4o}")
+    private String openAiModel;
+
     @Value("${ai.service.provider:gemini}")
     private String aiProvider;
 
@@ -62,6 +68,7 @@ public class AiReportService {
             OllamaClient ollamaClient,
             ClaudeClient claudeClient,
             GeminiClient geminiClient,
+            OpenAiClient openAiClient,
             ObjectMapper objectMapper,
             AiReportRepository aiReportRepository,
             SubmissionRepository submissionRepository,
@@ -73,6 +80,7 @@ public class AiReportService {
         this.ollamaClient = ollamaClient;
         this.claudeClient = claudeClient;
         this.geminiClient = geminiClient;
+        this.openAiClient = openAiClient;
         this.objectMapper = objectMapper;
         this.aiReportRepository = aiReportRepository;
         this.submissionRepository = submissionRepository;
@@ -188,7 +196,7 @@ Return only valid JSON matching this schema:
     "participantSentiments": [
       {
         "participantId": "string",
-        "sentiment": "string",
+        "sentiment": "Positive|Anxious|Expectant|Negative|Neutral",
         "rationale": "string"
       }
     ],
@@ -250,6 +258,18 @@ Input:
             rawJson = (response.getCandidates() != null && !response.getCandidates().isEmpty())
                     ? response.getCandidates().get(0).getContent().getParts().get(0).getText() : null;
             modelNameUsed = geminiModel;
+        } else if ("openai".equalsIgnoreCase(aiProvider)) {
+            OpenAiChatRequest request = new OpenAiChatRequest();
+            request.setModel(openAiModel);
+            request.setMessages(List.of(
+                    Map.of("role", "system", "content", schemaInstruction),
+                    Map.of("role", "user", "content", userPrompt)
+            ));
+
+            OpenAiChatResponse response = openAiClient.chat(request);
+            rawJson = (response.getChoices() != null && !response.getChoices().isEmpty())
+                    ? response.getChoices().get(0).getMessage().getContent() : null;
+            modelNameUsed = openAiModel;
         } else {
             // Default to Ollama
             OllamaChatRequest request = new OllamaChatRequest();
@@ -449,7 +469,7 @@ If evidence is limited, clearly reflect that in the summary, insights, and risks
         sb.append("Generate a structured AI report based on the issue context and all why/how user responses above.\n");
         sb.append("1. Summarise common themes, disagreements, pain points, and actionable opportunities.\n");
         sb.append("2. Perform Sentiment Analysis for each participant. Match Why response #N with How response #N (if both exist) as the same participant.\n");
-        sb.append("   - For each participant, identify their primary sentiment (e.g., Positive, Anxious, Expectant, Frustrated, Neutral).\n");
+        sb.append("   - For each participant, identify their primary sentiment. You MUST use exactly one of: Positive, Anxious, Expectant, Negative, Neutral.\n");
         sb.append("   - Provide a brief rationale for that sentiment.\n");
         sb.append("3. Prioritise actual user responses over generic assumptions.\n");
         sb.append("4. Do not invent facts. If data is limited, state this clearly in risks and limitations.\n");
