@@ -3,11 +3,14 @@ package com.example.demo.dashboard.service;
 import com.example.demo.dashboard.dto.FunnelStepDTO;
 import com.example.demo.dashboard.dto.QuestionDistributionDTO;
 import com.example.demo.dashboard.dto.QuestionnaireMetricsDTO;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.PageRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Tag("unit")
+@Tag("regression")
 class DashboardServiceTest {
 
     private final DashboardService dashboardService = new DashboardService();

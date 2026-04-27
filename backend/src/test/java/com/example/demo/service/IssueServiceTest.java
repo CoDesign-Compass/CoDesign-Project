@@ -8,6 +8,7 @@ import com.example.demo.repository.HowResponseRepository;
 import com.example.demo.repository.IssueRepository;
 import com.example.demo.repository.WhyResponseRepository;
 import com.example.demo.submission.SubmissionRepository;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -28,6 +29,8 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
+@Tag("unit")
+@Tag("regression")
 class IssueServiceTest {
 
     @Mock
