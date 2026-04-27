@@ -31,6 +31,12 @@ jobs:
           java-version: '17'
           cache: 'maven'
 
+      # ------------------------------------
+      # Backend Test Strategy (3-layer testing)
+      # ------------------------------------
+      # Unit tests       
+      # API tests     
+      # Regression tests 
       - name: Run Backend Unit Tests
         run: mvn -q -Dgroups=unit test
         working-directory: backend
