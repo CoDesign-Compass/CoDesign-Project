@@ -25,6 +25,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 class IssueServiceTest {
@@ -81,6 +82,26 @@ class IssueServiceTest {
     }
 
     @Test
+    void createIssueRetriesWhenGeneratedShareIdAlreadyExists() {
+        CreateIssueRequest request = new CreateIssueRequest();
+        request.setIssueContent("Retry share id");
+        request.setConsentText("User consent text");
+
+        when(issueRepository.existsByShareId(anyString())).thenReturn(true, false);
+        when(issueRepository.save(any(Issue.class))).thenAnswer(invocation -> {
+            Issue issue = invocation.getArgument(0);
+            issue.setIssueId(66L);
+            return issue;
+        });
+
+        IssueResponse response = issueService.createIssue(request);
+
+        assertThat(response.getIssueId()).isEqualTo(66L);
+        assertThat(response.getShareId()).hasSize(10);
+        verify(issueRepository, times(2)).existsByShareId(anyString());
+    }
+
+    @Test
     void updateIssuePersistsTrimmedContent() {
         Issue existing = new Issue();
         existing.setIssueId(7L);
@@ -106,6 +127,48 @@ class IssueServiceTest {
         assertThat(response.getIssueId()).isEqualTo(7L);
         assertThat(response.getIssueContent()).isEqualTo("Updated issue text");
         assertThat(response.getConsentText()).isEqualTo("Updated consent text");
+    }
+
+    @Test
+    void updateIssueRejectsBlankContent() {
+        Issue existing = new Issue();
+        existing.setIssueId(7L);
+
+        CreateIssueRequest request = new CreateIssueRequest();
+        request.setIssueContent("   ");
+
+        when(issueRepository.findById(7L)).thenReturn(Optional.of(existing));
+
+        assertThatThrownBy(() -> issueService.updateIssue(7L, request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Issue content must not be empty.");
+    }
+
+    @Test
+    void getIssueByIdThrowsWhenMissing() {
+        when(issueRepository.findById(100L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> issueService.getIssueById(100L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Issue not found.");
+    }
+
+    @Test
+    void getIssueByShareIdThrowsWhenMissing() {
+        when(issueRepository.findByShareId("missing")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> issueService.getIssueByShareId("missing"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Issue not found.");
+    }
+
+    @Test
+    void deleteIssueThrowsWhenMissing() {
+        when(issueRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> issueService.deleteIssue(99L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Issue not found.");
     }
 
     @Test
