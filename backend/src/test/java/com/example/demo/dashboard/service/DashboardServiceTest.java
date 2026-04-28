@@ -3,11 +3,14 @@ package com.example.demo.dashboard.service;
 import com.example.demo.dashboard.dto.FunnelStepDTO;
 import com.example.demo.dashboard.dto.QuestionDistributionDTO;
 import com.example.demo.dashboard.dto.QuestionnaireMetricsDTO;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.PageRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Tag("unit")
+@Tag("regression")
 class DashboardServiceTest {
 
     private final DashboardService dashboardService = new DashboardService();
@@ -35,12 +38,45 @@ class DashboardServiceTest {
     }
 
     @Test
+    void getQuestionDistributionSupportsQuestion2Branch() {
+        QuestionDistributionDTO result = dashboardService.getQuestionDistribution("question2");
+
+        assertThat(result.getOptions()).hasSize(2);
+        assertThat(result.getTotalCount()).isEqualTo(1089L);
+    }
+
+    @Test
+    void getQuestionDistributionSupportsQuestion3Branch() {
+        QuestionDistributionDTO result = dashboardService.getQuestionDistribution("question3");
+
+        assertThat(result.getOptions()).hasSize(4);
+        assertThat(result.getTotalCount()).isEqualTo(967L);
+    }
+
+    @Test
+    void getQuestionDistributionReturnsFallbackForUnknownQuestion() {
+        QuestionDistributionDTO result = dashboardService.getQuestionDistribution("unknown");
+
+        assertThat(result.getOptions()).hasSize(1);
+        assertThat(result.getOptions().get(0).getOption()).isEqualTo("No data");
+        assertThat(result.getTotalCount()).isZero();
+    }
+
+    @Test
     void getQuestionsFiltersByThemeAndPagesResults() {
         var page = dashboardService.getQuestions("Transportation", PageRequest.of(0, 10));
 
         assertThat(page.getTotalElements()).isEqualTo(1);
         assertThat(page.getContent()).hasSize(1);
         assertThat(page.getContent().get(0).getTheme()).isEqualTo("Transportation");
+    }
+
+    @Test
+    void getQuestionsReturnsAllWhenThemeIsAll() {
+        var page = dashboardService.getQuestions("All", PageRequest.of(0, 10));
+
+        assertThat(page.getTotalElements()).isEqualTo(5);
+        assertThat(page.getContent()).hasSize(5);
     }
 
     @Test

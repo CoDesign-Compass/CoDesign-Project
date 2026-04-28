@@ -29,9 +29,24 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+          cache: 'maven'
 
-      - name: Run Backend Tests
-        run: mvn test
+      # ------------------------------------
+      # Backend Test Strategy (3-layer testing)
+      # ------------------------------------
+      # Unit tests       
+      # API tests     
+      # Regression tests 
+      - name: Run Backend Unit Tests
+        run: mvn -q -Dgroups=unit test
+        working-directory: backend
+
+      - name: Run Backend API Tests
+        run: mvn -q -Dgroups=api test
+        working-directory: backend
+
+      - name: Run Backend Regression Tests
+        run: mvn -q -Dgroups=regression test
         working-directory: backend
 
       - name: Run Build

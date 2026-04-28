@@ -85,4 +85,38 @@ class AIDataProcessingServiceTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Issue not found for shareId: missing");
     }
+
+    @Test
+    void prepareSubmissionForAiHandlesNullAndNonMeaningfulInputs() {
+        Issue issue = new Issue();
+        issue.setShareId("share-null");
+        issue.setIssueContent(null);
+
+        WhyResponse whyResponse = new WhyResponse();
+        whyResponse.setShareId("share-null");
+        whyResponse.setStance("   ");
+        whyResponse.setAnswer1("i don't know");
+        whyResponse.setAnswer2("??");
+        whyResponse.setAnswer3("12");
+        whyResponse.setAnswer4("ok");
+        whyResponse.setAnswer5(null);
+
+        HowResponse howResponse = new HowResponse();
+        howResponse.setShareId("share-null");
+        howResponse.setAnswer1("none");
+        howResponse.setAnswer2("use better signs");
+
+        when(issueRepository.findByShareId("share-null")).thenReturn(Optional.of(issue));
+        when(whyResponseRepository.findTopByShareIdOrderByCreatedAtDesc("share-null")).thenReturn(Optional.of(whyResponse));
+        when(howResponseRepository.findTopByShareIdOrderByCreatedAtDesc("share-null")).thenReturn(Optional.of(howResponse));
+
+        AIProcessedDataDto result = aiDataProcessingService.prepareSubmissionForAI("share-null");
+
+        assertThat(result.getIssueContent()).isNull();
+        assertThat(result.getStance()).isNull();
+        assertThat(result.getWhy()).isEmpty();
+        assertThat(result.getHow()).extracting("questionIndex").containsExactly(2);
+        assertThat(result.getMergedWhyText()).isEmpty();
+        assertThat(result.getMergedHowText()).isEqualTo("use better signs");
+    }
 }
