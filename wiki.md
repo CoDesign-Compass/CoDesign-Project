@@ -84,9 +84,9 @@ Frontend: CSS, HTML, React
 |week 3|[S1 Week3 Tutor Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%203%20Tutor%20Meeting.md)<br>[S1 Week3 Team Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%203%20Team%20Meeting.md)<br>[S1 Week3 Client Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%203%20Client%20Meeting.md)|
 |week 4|[S1 Week4 Tutor Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%204%20Tutor%20Meeting.md) <br>[S1 Week4 Team Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%204%20Team%20Meeting)|
 |week 5|[S1 Week5 Tutor Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%205%20Tutor%20Meeting.md)<br>[S1 Week5 Team Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%205%20Team%20Meeting.md)<br>[S1 Week5 Client Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%205%20Client%20Meeting.md)|
-|week 6||
-|week 7||
-|week 8||
+|week 6|[S1 Week6 Tutor Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%206%20Tutor%20Meeting.md)<br>[S1 Week6 Team Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%206%20Team%20Meeting.md)|
+|week 7|[S1 Week7 Tutor Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%207%20Tutor%20Meeting.md)<br>[S1 Week7 Team Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%207%20Team%20Meeting.md)<br>[S1 Week7 Client Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%207%20Client%20Meeting.md)|
+|week 8|[S1 Week8 Tutor Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%208%20Tutor%20Meeting.md)<br>[S1 Week8 Team Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%208%20Team%20Meeting.md)<br>[S1 Week8 Client Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%208%20Client%20Meeting.md)|
 |week 9||
 ## Team velocity
 ### Sprint 1
