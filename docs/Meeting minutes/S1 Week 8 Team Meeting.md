@@ -47,9 +47,10 @@ Ricky Chen, Jingwen Zhang, Yu Pan, Jiaxin Li, Shuo Li, Aria Fung, Zhimeng Zhu
 | Action Items                                                        | Assignee               | Due Date                        |
 | ------------------------------------------------------------------- | ---------------------- | ------------------------------- |
 | Update the user manual and user guide video.                        | Ricky Chen             | Next week                       |
+| Write deployment documentation.              | Ricky Chen             | Next week                       |
 | Continue deployment work.                                           | Jiaxin Li              | Next week                       |
 | Connect the domain name to the deployed website after receiving it. | Eric                   | After receiving the domain name |
-| Start the deployment documentation.                                 | Team                   | Next week                       |
+| Start the delivery documentation.                                 | Team                   | Next week                       |
 | Fix the online automatic email sending issue.                       | Jingwen Zhang          | Next week                       |
 | Improve the UI based on the client’s requirements.                  | Zhimeng Zhu, Aria Fung | Next week                       |
 |Add end-to-end tests.|Shuo Li|Next week|
@@ -60,6 +61,7 @@ Ricky Chen, Jingwen Zhang, Yu Pan, Jiaxin Li, Shuo Li, Aria Fung, Zhimeng Zhu
 | Task                                | Assignee               | Due Date                        |
 | ----------------------------------- | ---------------------- | ------------------------------- |
 | User manual and video update        | Ricky Chen             | Next week                       |
+| Write deployment documentation.              | Ricky Chen             | Next week                       |
 | Deployment                          | Jiaxin Li              | Next week                       |
 | Domain name connection              | Eric                   | After receiving the domain name |
 | Online automatic email issue fixing | Jingwen Zhang          | Next week                       |
