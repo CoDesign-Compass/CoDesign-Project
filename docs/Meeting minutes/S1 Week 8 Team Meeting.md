@@ -1,4 +1,4 @@
-# S1 Week 7 Team Meeting
+# S1 Week 8 Team Meeting
 
 ## Date
 
@@ -52,6 +52,7 @@ Ricky Chen, Jingwen Zhang, Yu Pan, Jiaxin Li, Shuo Li, Aria Fung, Zhimeng Zhu
 | Start the deployment documentation.                                 | Team                   | Next week                       |
 | Fix the online automatic email sending issue.                       | Jingwen Zhang          | Next week                       |
 | Improve the UI based on the client’s requirements.                  | Zhimeng Zhu, Aria Fung | Next week                       |
+|Add end-to-end tests.|Shuo Li|Next week|
 | Prepare and refine the poster.                                      | Team                   | Before poster submission        |
 
 ## Task Allocations
@@ -63,4 +64,5 @@ Ricky Chen, Jingwen Zhang, Yu Pan, Jiaxin Li, Shuo Li, Aria Fung, Zhimeng Zhu
 | Domain name connection              | Eric                   | After receiving the domain name |
 | Online automatic email issue fixing | Jingwen Zhang          | Next week                       |
 | UI improvements                     | Zhimeng Zhu, Aria Fung | Next week                       |
+|Add end-to-end tests.|Shuo Li|Next week|
 | Poster preparation                  | Team                   | Next week                       |
