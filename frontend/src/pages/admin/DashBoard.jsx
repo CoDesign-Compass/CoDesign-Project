@@ -8,7 +8,7 @@ const DashBoard = () => {
   const [issueSortBy, setIssueSortBy] = useState('updated-desc')
   const [downloadingLogs, setDownloadingLogs] = useState(false)
 
-  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://codesign-project.onrender.co'
+  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://codesign-project.onrender.com'
 
   const handleDownloadAiLogs = async () => {
     try {
