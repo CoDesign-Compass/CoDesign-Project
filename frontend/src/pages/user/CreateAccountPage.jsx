@@ -19,6 +19,7 @@ export default function CreateAccountPage({ mode = 'create', onSubmit: onSubmitP
     subscribe: false,
   })
   const [showPw, setShowPw] = useState(false)
+  const [showConfirmPw, setShowConfirmPw] = useState(false)
   const [submitErr, setSubmitErr] = useState('')
   const [submitSuccess, setSubmitSuccess] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -316,17 +317,29 @@ export default function CreateAccountPage({ mode = 'create', onSubmit: onSubmitP
                 <Label htmlFor="confirm" className="mb-1.5 block text-sm font-medium" style={{ color: textColor }}>
                   Confirm password
                 </Label>
-                <Input
-                  id="confirm"
-                  type="password"
-                  placeholder="Confirm your password"
-                  value={form.confirm}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, confirm: e.target.value }))
-                  }
-                  autoComplete="new-password"
-                  style={{ background: inputBg, color: textColor, borderColor: inputBorder }}
-                />
+                <div className="relative">
+                  <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <Input
+                    id="confirm"
+                    type={showConfirmPw ? 'text' : 'password'}
+                    placeholder="Confirm your password"
+                    value={form.confirm}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, confirm: e.target.value }))
+                    }
+                    autoComplete="new-password"
+                    className="pl-9 pr-11"
+                    style={{ background: inputBg, color: textColor, borderColor: inputBorder }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPw((s) => !s)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2"
+                    style={{ color: isDark ? '#c7c7c7' : '#888' }}
+                  >
+                    {showConfirmPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
               </div>
             )}
 

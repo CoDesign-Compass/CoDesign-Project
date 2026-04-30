@@ -32,6 +32,7 @@ export default function WhyPage() {
   const [hoveredButton, setHoveredButton]   = useState(null)
   const [answers, setAnswers] = useState(Array(TOTAL_QUESTION_STEPS).fill(''))
   const [submitting, setSubmitting] = useState(false)
+  const [hoveredNav, setHoveredNav] = useState(null)
 
   const inputRef = useRef(null)
   const topRef   = useRef(null)
@@ -221,16 +222,20 @@ export default function WhyPage() {
                 <button
                   onClick={goNext}
                   disabled={!selectedButton}
+                  onMouseEnter={() => setHoveredNav('continue')}
+                  onMouseLeave={() => setHoveredNav(null)}
                   style={{
                     padding: '10px 24px',
                     borderRadius: 10,
                     border: 'none',
-                    background: selectedButton ? '#ffe071' : isDark ? 'rgba(255,255,255,0.08)' : '#e0e0e0',
+                    background: selectedButton ? (hoveredNav === 'continue' ? '#ffd43b' : '#ffe071') : isDark ? 'rgba(255,255,255,0.08)' : '#e0e0e0',
                     color: selectedButton ? '#1a1a1a' : subText,
                     fontWeight: 700,
                     fontSize: 14,
                     fontFamily: 'Poppins, sans-serif',
                     cursor: selectedButton ? 'pointer' : 'not-allowed',
+                    transform: selectedButton && hoveredNav === 'continue' ? 'translateY(-1px)' : 'none',
+                    boxShadow: selectedButton && hoveredNav === 'continue' ? '0 4px 12px rgba(0,0,0,0.12)' : 'none',
                     transition: 'all 0.15s',
                   }}
                 >
@@ -336,11 +341,13 @@ export default function WhyPage() {
                 {/* Back */}
                 <button
                   onClick={goPrev}
+                  onMouseEnter={() => setHoveredNav('back')}
+                  onMouseLeave={() => setHoveredNav(null)}
                   style={{
                     padding: '10px 18px',
                     borderRadius: 10,
                     border: `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : '#ddd'}`,
-                    background: 'transparent',
+                    background: hoveredNav === 'back' ? (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)') : 'transparent',
                     color: textColor,
                     fontWeight: 600,
                     fontSize: 14,
@@ -362,12 +369,14 @@ export default function WhyPage() {
                       <button
                         onClick={finishEarly}
                         disabled={submitting}
+                        onMouseEnter={() => !submitting && setHoveredNav('idontknow')}
+                        onMouseLeave={() => setHoveredNav(null)}
                         style={{
                           padding: '10px 18px',
                           borderRadius: 10,
-                          border: `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : '#ddd'}`,
-                          background: 'transparent',
-                          color: subText,
+                          border: `1px solid ${isDark ? 'rgba(255,255,255,0.18)' : '#bbb'}`,
+                          background: hoveredNav === 'idontknow' ? (isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)') : 'transparent',
+                          color: textColor,
                           fontWeight: 600,
                           fontSize: 14,
                           fontFamily: 'Poppins, sans-serif',
@@ -384,16 +393,22 @@ export default function WhyPage() {
                   <button
                     onClick={goNext}
                     disabled={submitting || !answers[questionIdx].trim()}
+                    onMouseEnter={() => answers[questionIdx].trim() && !submitting && setHoveredNav('next')}
+                    onMouseLeave={() => setHoveredNav(null)}
                     style={{
                       padding: '10px 22px',
                       borderRadius: 10,
                       border: 'none',
-                      background: answers[questionIdx].trim() && !submitting ? '#ffe071' : isDark ? 'rgba(255,255,255,0.08)' : '#e0e0e0',
+                      background: answers[questionIdx].trim() && !submitting
+                        ? (hoveredNav === 'next' ? '#ffd43b' : '#ffe071')
+                        : isDark ? 'rgba(255,255,255,0.08)' : '#e0e0e0',
                       color: answers[questionIdx].trim() && !submitting ? '#1a1a1a' : subText,
                       fontWeight: 700,
                       fontSize: 14,
                       fontFamily: 'Poppins, sans-serif',
                       cursor: answers[questionIdx].trim() && !submitting ? 'pointer' : 'not-allowed',
+                      transform: answers[questionIdx].trim() && !submitting && hoveredNav === 'next' ? 'translateY(-1px)' : 'none',
+                      boxShadow: answers[questionIdx].trim() && !submitting && hoveredNav === 'next' ? '0 4px 12px rgba(0,0,0,0.12)' : 'none',
                       transition: 'all 0.15s',
                     }}
                   >

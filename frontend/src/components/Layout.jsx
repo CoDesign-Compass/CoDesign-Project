@@ -82,7 +82,7 @@ export default function Layout({ children }) {
         className="flex justify-between items-center px-4 py-4"
         style={{ backgroundColor: theme === "light" ? "white" : "#303030" }}
       >
-        {currentIndex > 0 && !isWhyPage && !isHowPage ? (
+        {currentIndex > 0 ? (
           <Button
             variant="plain"
             onClick={goBack}
@@ -98,7 +98,7 @@ export default function Layout({ children }) {
           <div />
         )}
 
-        {currentIndex > 0 && currentIndex < pages.length - 1 && !isWhyPage && !isHowPage ? (
+        {currentIndex > 0 && currentIndex < pages.length - 1 ? (
           <Button
             variant="plain"
             onClick={goNext}
