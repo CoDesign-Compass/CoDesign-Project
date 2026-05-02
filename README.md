@@ -1,7 +1,7 @@
 # CoDesign-Project
 <img width="1297" height="642" alt="Screenshot 2026-03-31 at 21 47 55" src="https://github.com/user-attachments/assets/2cc05456-8073-4d69-8c0c-4980b518a0ca" />
 
-**Public Website**: <https://co-design-project.vercel.app/>
+**Public Website**: <https://codesign-frontend.onrender.com>
 
 ## Demo
 **You can watch demo videos by the following youtube links:**
