@@ -15,6 +15,8 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -23,6 +25,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/submissions")
 public class SubmissionController {
+    private static final Logger log = LoggerFactory.getLogger(SubmissionController.class);
 
     private final SubmissionService service;
 
@@ -69,6 +72,7 @@ public class SubmissionController {
             @PathVariable Long id,
             @Valid @RequestBody SendGiftEmailRequest req
     ) {
+        log.info("send-gift-email called. submissionId={}", id);
         try {
             service.sendGiftEmailToSubmission(id, req.getVoucherCode(), req.getTemplate());
         } catch (IllegalStateException ex) {
