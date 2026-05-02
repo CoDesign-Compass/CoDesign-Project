@@ -113,6 +113,7 @@ export default function ProfilePage({ setOnNext }) {
       if (response.ok) {
         const newTag = await response.json()
         setTags((prev) => [...prev, newTag])
+        setSelectedTags((prev) => [...prev, newTag.label])
         setInputValue('')
       }
     } catch (error) {
