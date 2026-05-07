@@ -1,20 +1,21 @@
 package com.example.demo.user;
 
 import com.example.demo.entity.Issue;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
+import com.resend.Resend;
+import com.resend.core.exception.ResendException;
+import com.resend.services.emails.model.CreateEmailOptions;
+import com.resend.services.emails.model.CreateEmailResponse;
 import java.util.Map;
-import org.springframework.beans.factory.ObjectProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.MailException;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.HtmlUtils;
 
 @Service
 public class GiftEmailService {
-  private final JavaMailSender mailSender;
+  private static final Logger log = LoggerFactory.getLogger(GiftEmailService.class);
+  private final Resend resend;
   private final boolean mailConfigured;
   private final String fromAddress;
   private final String giftSubject;
@@ -22,15 +23,15 @@ public class GiftEmailService {
   private final String publicBaseUrl;
 
   public GiftEmailService(
-      ObjectProvider<JavaMailSender> mailSenderProvider,
-      @Value("${spring.mail.host:}") String smtpHost,
+      @Value("${resend.api-key:${RESEND_API_KEY:}}") String resendApiKey,
       @Value("${app.mail.from:no-reply@codesign.local}") String fromAddress,
       @Value("${app.mail.subject:Thank you for your response - Your voucher code}") String giftSubject,
       @Value("${app.mail.update-subject:CoDesign Compass issue update}") String updateSubject,
       @Value("${app.public.base-url:https://co-design-project.vercel.app}") String publicBaseUrl
   ) {
-    this.mailSender = mailSenderProvider.getIfAvailable();
-    this.mailConfigured = this.mailSender != null && smtpHost != null && !smtpHost.isBlank();
+    String safeApiKey = resendApiKey == null ? "" : resendApiKey.trim();
+    this.resend = safeApiKey.isBlank() ? null : new Resend(safeApiKey);
+    this.mailConfigured = this.resend != null;
     this.fromAddress = fromAddress;
     this.giftSubject = giftSubject;
     this.updateSubject = updateSubject;
@@ -46,7 +47,7 @@ public class GiftEmailService {
       throw new IllegalStateException("Gift email is not configured on the server.");
     }
 
-    String safeName = (userName == null || userName.isBlank()) ? "there" : userName.trim();
+    String safeName = (userName == null || userName.isBlank()) ? "client" : userName.trim();
     String safeVoucherCode = voucherCode == null ? "" : voucherCode.trim();
     String safeTemplate = template == null ? "" : template.trim();
 
@@ -60,7 +61,8 @@ public class GiftEmailService {
               "{{voucherCode}}", HtmlUtils.htmlEscape(safeVoucherCode)
           )
       );
-    } catch (MessagingException | MailException ex) {
+    } catch (RuntimeException ex) {
+      log.error("Gift email failed", ex);
       throw new IllegalStateException("Failed to send gift email.", ex);
     }
   }
@@ -73,7 +75,7 @@ public class GiftEmailService {
       throw new IllegalArgumentException("Issue is required.");
     }
 
-    String safeName = (userName == null || userName.isBlank()) ? "there" : userName.trim();
+    String safeName = (userName == null || userName.isBlank()) ? "client" : userName.trim();
     String safeTemplate = template == null ? "" : template.trim();
     String safeIssueContent = issue.getIssueContent() == null ? "" : issue.getIssueContent().trim();
     String shareId = issue.getShareId() == null ? "" : issue.getShareId().trim();
@@ -90,7 +92,7 @@ public class GiftEmailService {
               "{{issueContent}}", HtmlUtils.htmlEscape(safeIssueContent)
           )
       );
-    } catch (MessagingException | MailException ex) {
+    } catch (RuntimeException ex) {
       throw new IllegalStateException("Failed to send update email.", ex);
     }
   }
@@ -100,19 +102,22 @@ public class GiftEmailService {
       String subject,
       String template,
       Map<String, String> placeholders
-  ) throws MessagingException {
+  ) {
     String rendered = applyPlaceholders(template, placeholders);
     String htmlBody = looksLikeHtml(rendered) ? rendered : wrapAsHtml(rendered);
-    String textBody = htmlToPlainText(htmlBody);
 
-    MimeMessage mimeMessage = mailSender.createMimeMessage();
-    MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-    helper.setFrom(fromAddress);
-    helper.setTo(toEmail);
-    helper.setSubject(subject);
-    helper.setText(textBody, htmlBody);
-
-    mailSender.send(mimeMessage);
+    CreateEmailOptions sendEmailRequest = CreateEmailOptions.builder()
+        .from(fromAddress)
+        .to(toEmail)
+        .subject(subject)
+        .html(htmlBody)
+        .build();
+    log.info("About to call Resend API. to={}, from={}", toEmail, fromAddress);
+    try {
+      CreateEmailResponse ignored = resend.emails().send(sendEmailRequest);
+    } catch (ResendException ex) {
+      throw new IllegalStateException("Resend API request failed.", ex);
+    }
   }
 
   private String applyPlaceholders(String template, Map<String, String> placeholders) {
@@ -143,24 +148,4 @@ public class GiftEmailService {
         + "</td></tr></table></td></tr></table></body></html>";
   }
 
-  private String htmlToPlainText(String html) {
-    if (html == null || html.isBlank()) {
-      return "";
-    }
-    return html
-        .replaceAll("(?is)<style[^>]*>.*?</style>", "")
-        .replaceAll("(?is)<script[^>]*>.*?</script>", "")
-        .replaceAll("(?i)<br\\s*/?>", "\n")
-        .replaceAll("(?i)</p>", "\n\n")
-        .replaceAll("(?i)</tr>", "\n")
-        .replaceAll("(?s)<[^>]+>", "")
-        .replace("&nbsp;", " ")
-        .replace("&amp;", "&")
-        .replace("&lt;", "<")
-        .replace("&gt;", ">")
-        .replace("&quot;", "\"")
-        .replace("&#39;", "'")
-        .replaceAll("\\n{3,}", "\n\n")
-        .trim();
-  }
 }

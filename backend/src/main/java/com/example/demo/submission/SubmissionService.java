@@ -148,7 +148,7 @@ public class SubmissionService {
         if (email == null || email.isBlank()) {
             throw new IllegalArgumentException("EMAIL_REQUIRED");
         }
-        giftEmailService.sendGiftEmail(email.trim(), email.trim(), voucherCode, template);
+        giftEmailService.sendGiftEmail(email.trim(), null, voucherCode, template);
     }
 
     public void sendUpdateEmailToSubmission(Long id, Long issueId, String template) {
@@ -160,7 +160,7 @@ public class SubmissionService {
         }
         com.example.demo.entity.Issue issue = issueRepository.findById(issueId)
                 .orElseThrow(() -> new IllegalArgumentException("ISSUE_NOT_FOUND"));
-        giftEmailService.sendUpdateEmail(email.trim(), email.trim(), issue, template);
+        giftEmailService.sendUpdateEmail(email.trim(), null, issue, template);
     }
 
     public long getTotalSubmissions() {

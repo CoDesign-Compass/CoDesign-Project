@@ -2,6 +2,10 @@ import React, { useEffect, useMemo, useState } from 'react'
 import SectionCard from '../../components/admin/SectionCard'
 import AdminInfoTooltip from '../../components/admin/AdminInfoTooltip'
 
+const GIFT_TEMPLATE_STORAGE_KEY = 'udm_gift_template'
+const UPDATE_TEMPLATE_STORAGE_KEY = 'udm_update_template'
+const EMAIL_SENT_IDS_STORAGE_KEY = 'udm_email_sent_ids'
+
 /* Gift icon */
 const GiftIcon = (props) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...props}>
@@ -146,6 +150,54 @@ export default function UserDataManagement() {
   const [updateEmailTemplateDraft, setUpdateEmailTemplateDraft] = useState(
     'Dear {{name}},\n\nThank you for staying engaged with CoDesign Compass.\n\nWe would like to share an update with you:\n{{issueContent}}\n\nYou can view and respond using this link:\n{{shareLink}}\n\nThank you again for your continued support.\n\nKind regards,\nCoDesign Compass Team',
   )
+
+  useEffect(() => {
+    try {
+      const savedGiftTemplate = localStorage.getItem(GIFT_TEMPLATE_STORAGE_KEY)
+      const savedUpdateTemplate = localStorage.getItem(
+        UPDATE_TEMPLATE_STORAGE_KEY,
+      )
+      const savedSentIds = localStorage.getItem(EMAIL_SENT_IDS_STORAGE_KEY)
+
+      if (savedGiftTemplate) setEmailTemplateDraft(savedGiftTemplate)
+      if (savedUpdateTemplate) setUpdateEmailTemplateDraft(savedUpdateTemplate)
+      if (savedSentIds) {
+        const ids = JSON.parse(savedSentIds)
+        if (Array.isArray(ids)) {
+          setEmailSentIds(new Set(ids.map((v) => String(v))))
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load saved template/status from localStorage', err)
+    }
+  }, [])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(GIFT_TEMPLATE_STORAGE_KEY, emailTemplateDraft)
+    } catch (err) {
+      console.error('Failed to persist gift template', err)
+    }
+  }, [emailTemplateDraft])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(UPDATE_TEMPLATE_STORAGE_KEY, updateEmailTemplateDraft)
+    } catch (err) {
+      console.error('Failed to persist update template', err)
+    }
+  }, [updateEmailTemplateDraft])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        EMAIL_SENT_IDS_STORAGE_KEY,
+        JSON.stringify(Array.from(emailSentIds)),
+      )
+    } catch (err) {
+      console.error('Failed to persist email sent ids', err)
+    }
+  }, [emailSentIds])
 
   useEffect(() => {
     let cancelled = false
@@ -936,6 +988,10 @@ export default function UserDataManagement() {
                   Keep the labels in double curly brackets wherever you want the
                   personalised details to appear in the email.
                 </p>
+                <p className="mt-1 text-xs leading-5 text-gray-500">
+                  If <code>{'{{name}}'}</code> is unavailable, the system will use
+                  <strong> client </strong> automatically.
+                </p>
                 <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                   <button
                     onClick={() => setShowGiftTemplateEditor(false)}
@@ -1015,6 +1071,10 @@ export default function UserDataManagement() {
                 <p className="mt-2 text-xs leading-5 text-gray-500">
                   Keep the labels in double curly brackets wherever you want the
                   personalised details to appear in the email.
+                </p>
+                <p className="mt-1 text-xs leading-5 text-gray-500">
+                  If <code>{'{{name}}'}</code> is unavailable, the system will use
+                  <strong> client </strong> automatically.
                 </p>
                 <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                   <button

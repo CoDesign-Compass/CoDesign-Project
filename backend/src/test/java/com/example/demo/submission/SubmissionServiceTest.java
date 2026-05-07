@@ -259,7 +259,7 @@ class SubmissionServiceTest {
 
         service.sendGiftEmailToSubmission(3L, "VC-3", "tpl");
 
-        verify(giftEmailService).sendGiftEmail("a@test.com", "a@test.com", "VC-3", "tpl");
+        verify(giftEmailService).sendGiftEmail("a@test.com", null, "VC-3", "tpl");
         }
 
         @Test
@@ -295,7 +295,7 @@ class SubmissionServiceTest {
 
         service.sendUpdateEmailToSubmission(6L, 10L, "tpl");
 
-        verify(giftEmailService).sendUpdateEmail("u@test.com", "u@test.com", issue, "tpl");
+        verify(giftEmailService).sendUpdateEmail("u@test.com", null, issue, "tpl");
         }
 
         @Test
