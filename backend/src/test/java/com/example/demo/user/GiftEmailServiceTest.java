@@ -2,22 +2,26 @@ package com.example.demo.user;
 
 import com.example.demo.entity.Issue;
 import org.junit.jupiter.api.Test;
+import org.springframework.mail.javamail.JavaMailSender;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
 
 class GiftEmailServiceTest {
 
     @Test
-    void isConfiguredDependsOnResendApiKey() {
+    void isConfiguredDependsOnSmtpHostAndMailSender() {
         GiftEmailService configured = new GiftEmailService(
-                "re_test_key",
+                mock(JavaMailSender.class),
+                "smtp.test.com",
                 "from@test.com",
                 "gift",
                 "update",
                 "https://a.com/"
         );
         GiftEmailService notConfigured = new GiftEmailService(
+                mock(JavaMailSender.class),
                 "",
                 "from@test.com",
                 "gift",
@@ -32,6 +36,7 @@ class GiftEmailServiceTest {
     @Test
     void sendGiftEmailThrowsWhenMailNotConfigured() {
         GiftEmailService service = new GiftEmailService(
+                (JavaMailSender) null,
                 "",
                 "from@test.com",
                 "gift",
@@ -47,7 +52,8 @@ class GiftEmailServiceTest {
     @Test
     void sendUpdateEmailValidatesIssueAndNotConfigured() {
         GiftEmailService configured = new GiftEmailService(
-                "re_test_key",
+                mock(JavaMailSender.class),
+                "smtp.test.com",
                 "from@test.com",
                 "gift",
                 "update",
@@ -59,6 +65,7 @@ class GiftEmailServiceTest {
                 .hasMessageContaining("Issue is required");
 
         GiftEmailService notConfigured = new GiftEmailService(
+                mock(JavaMailSender.class),
                 "",
                 "from@test.com",
                 "gift",

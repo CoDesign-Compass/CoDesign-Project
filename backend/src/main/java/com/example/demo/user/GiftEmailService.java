@@ -1,37 +1,59 @@
 package com.example.demo.user;
 
 import com.example.demo.entity.Issue;
-import com.resend.Resend;
-import com.resend.core.exception.ResendException;
-import com.resend.services.emails.model.CreateEmailOptions;
-import com.resend.services.emails.model.CreateEmailResponse;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailException;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.HtmlUtils;
 
 @Service
 public class GiftEmailService {
   private static final Logger log = LoggerFactory.getLogger(GiftEmailService.class);
-  private final Resend resend;
+  private final JavaMailSender mailSender;
   private final boolean mailConfigured;
   private final String fromAddress;
   private final String giftSubject;
   private final String updateSubject;
   private final String publicBaseUrl;
 
+  @Autowired
   public GiftEmailService(
-      @Value("${resend.api-key:${RESEND_API_KEY:}}") String resendApiKey,
+      ObjectProvider<JavaMailSender> mailSenderProvider,
+      @Value("${spring.mail.host:${SMTP_HOST:${SPRING_MAIL_HOST:}}}") String smtpHost,
       @Value("${app.mail.from:no-reply@codesign.local}") String fromAddress,
       @Value("${app.mail.subject:Thank you for your response - Your voucher code}") String giftSubject,
       @Value("${app.mail.update-subject:CoDesign Compass issue update}") String updateSubject,
       @Value("${app.public.base-url:https://co-design-project.vercel.app}") String publicBaseUrl
   ) {
-    String safeApiKey = resendApiKey == null ? "" : resendApiKey.trim();
-    this.resend = safeApiKey.isBlank() ? null : new Resend(safeApiKey);
-    this.mailConfigured = this.resend != null;
+    this.mailSender = mailSenderProvider.getIfAvailable();
+    String safeSmtpHost = smtpHost == null ? "" : smtpHost.trim();
+    this.mailConfigured = this.mailSender != null && !safeSmtpHost.isBlank();
+    this.fromAddress = fromAddress;
+    this.giftSubject = giftSubject;
+    this.updateSubject = updateSubject;
+    this.publicBaseUrl = publicBaseUrl == null ? "" : publicBaseUrl.replaceAll("/+$", "");
+  }
+
+  GiftEmailService(
+      JavaMailSender mailSender,
+      String smtpHost,
+      String fromAddress,
+      String giftSubject,
+      String updateSubject,
+      String publicBaseUrl
+  ) {
+    this.mailSender = mailSender;
+    String safeSmtpHost = smtpHost == null ? "" : smtpHost.trim();
+    this.mailConfigured = this.mailSender != null && !safeSmtpHost.isBlank();
     this.fromAddress = fromAddress;
     this.giftSubject = giftSubject;
     this.updateSubject = updateSubject;
@@ -106,17 +128,18 @@ public class GiftEmailService {
     String rendered = applyPlaceholders(template, placeholders);
     String htmlBody = looksLikeHtml(rendered) ? rendered : wrapAsHtml(rendered);
 
-    CreateEmailOptions sendEmailRequest = CreateEmailOptions.builder()
-        .from(fromAddress)
-        .to(toEmail)
-        .subject(subject)
-        .html(htmlBody)
-        .build();
-    log.info("About to call Resend API. to={}, from={}", toEmail, fromAddress);
     try {
-      CreateEmailResponse ignored = resend.emails().send(sendEmailRequest);
-    } catch (ResendException ex) {
-      throw new IllegalStateException("Resend API request failed.", ex);
+      MimeMessage message = mailSender.createMimeMessage();
+      MimeMessageHelper helper = new MimeMessageHelper(message, "UTF-8");
+      helper.setFrom(fromAddress);
+      helper.setTo(toEmail);
+      helper.setSubject(subject);
+      helper.setText(htmlBody, true);
+
+      log.info("About to send SMTP email. to={}, from={}", toEmail, fromAddress);
+      mailSender.send(message);
+    } catch (MessagingException | MailException ex) {
+      throw new IllegalStateException("SMTP email request failed.", ex);
     }
   }
 
