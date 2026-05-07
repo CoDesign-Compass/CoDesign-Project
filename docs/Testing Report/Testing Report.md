@@ -50,7 +50,8 @@ The purpose of testing is to:
 -  **Unit Testing** – Service and controller level testing 
 -  **Integration Testing** – API interaction testing 
 -  **Mock Testing** – AI responses simulated 
--  **Manual Testing** – Frontend interaction 
+-  **Functional Testing** – System behavior testing
+
 
 ------
 
@@ -105,6 +106,31 @@ The purpose of testing is to:
 | TC16    | API    | Get issue by ID  | Correct data returned | Success       | ✅ Pass |
 | TC17    | API    | Delete issue     | Removed successfully  | Success       | ✅ Pass |
 | TC18    | API    | Invalid request  | Error returned        | Success       | ✅ Pass |
+
+### Administrator Functional Test Cases
+
+| Test ID | Feature        | Test Scenario                        | Expected Result                                 | Status |
+| ------- | -------------- | ------------------------------------ | ----------------------------------------------- | ------ |
+| FT01    | Login          | Admin logs in with valid credentials | Redirect to dashboard                           | ✅ Pass |
+| FT02    | Create Issue   | Admin creates a new issue            | Issue published successfully with share link    | ✅ Pass |
+| FT03    | View Responses | Admin clicks an issue card           | Response data, trends, and AI summary displayed | ✅ Pass |
+| FT04    | AI Summary     | AI generates summary from responses  | Summary is generated and displayed correctly    | ✅ Pass |
+| FT05    | Export Data    | Admin exports report                 | File downloaded successfully                    | ✅ Pass |
+| FT06    | Send Email     | Send coupon to a user                | Email sent successfully                         | ✅ Pass |
+| FT07    | Batch Email    | Send coupons in batch                | Emails sent to multiple users                   | ✅ Pass |
+
+### User Functional Test Cases
+
+| Test ID | Feature          | Test Scenario                 | Expected Result                | Status |
+| ------- | ---------------- | ----------------------------- | ------------------------------ | ------ |
+| FT08    | View Issue       | User opens issue page         | Issue displayed correctly      | ✅ Pass |
+| FT09    | Select Attitude  | User selects stance           | Selection recorded correctly   | ✅ Pass |
+| FT10    | Answer Questions | User answers guided questions | Answers saved step-by-step     | ✅ Pass |
+| FT11    | Skip Questions   | User selects "I don’t know"   | Flow ends correctly            | ✅ Pass |
+| FT12    | Submit Answers   | User submits responses        | Submission stored successfully | ✅ Pass |
+| FT13    | Receive Coupon   | User enters valid email       | Coupon email received          | ✅ Pass |
+| FT14    | Signup           | User registers account        | Account created successfully   | ✅ Pass |
+| FT15    | Profile Save     | User saves tags               | Tags stored and reused         | ✅ Pass |
 
 ------
 
