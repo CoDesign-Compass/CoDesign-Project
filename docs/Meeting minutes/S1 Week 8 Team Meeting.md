@@ -54,6 +54,7 @@ Ricky Chen, Jingwen Zhang, Yu Pan, Jiaxin Li, Shuo Li, Aria Fung, Zhimeng Zhu
 | Fix the online automatic email sending issue.                       | Jingwen Zhang          | Next week                       |
 | Improve the UI based on the client’s requirements.                  | Zhimeng Zhu, Aria Fung | Next week                       |
 |Add end-to-end tests.|Shuo Li|Next week|
+| Poster Preparetion.                  |  Aria Fung | Next week                       |
 | Prepare and refine the poster.                                      | Team                   | Before poster submission        |
 
 ## Task Allocations
@@ -68,3 +69,4 @@ Ricky Chen, Jingwen Zhang, Yu Pan, Jiaxin Li, Shuo Li, Aria Fung, Zhimeng Zhu
 | UI improvements                     | Zhimeng Zhu, Aria Fung | Next week                       |
 |Add end-to-end tests.|Shuo Li|Next week|
 | Poster preparation                  | Team                   | Next week                       |
+| Poster Preparetion.                  |  Aria Fung | Next week                       |
