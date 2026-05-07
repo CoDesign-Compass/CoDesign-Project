@@ -22,6 +22,7 @@ export default function HowPage() {
   const [direction, setDirection]     = useState(1)
   const [answers, setAnswers]         = useState(Array(TOTAL_QUESTION_STEPS).fill(''))
   const [submitting, setSubmitting]   = useState(false)
+  const [hoveredNav, setHoveredNav]   = useState(null)
 
   const inputRef = useRef(null)
   const topRef   = useRef(null)
@@ -202,11 +203,13 @@ export default function HowPage() {
             <button
               onClick={goPrev}
               disabled={currentStep === 1}
+              onMouseEnter={() => currentStep !== 1 && setHoveredNav('back')}
+              onMouseLeave={() => setHoveredNav(null)}
               style={{
                 padding: '10px 18px',
                 borderRadius: 10,
                 border: `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : '#ddd'}`,
-                background: 'transparent',
+                background: hoveredNav === 'back' ? (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)') : 'transparent',
                 color: currentStep === 1 ? (isDark ? 'rgba(255,255,255,0.2)' : '#ccc') : textColor,
                 fontWeight: 600,
                 fontSize: 14,
@@ -223,17 +226,19 @@ export default function HowPage() {
               {currentStep >= 2 && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'flex-end' }}>
                   <span style={{ fontSize: 11, color: subText, maxWidth: 200, textAlign: 'right', lineHeight: 1.4 }}>
-                    Unsure how to continue?
+                    Unsure how to continue? This would end follow-ups.
                   </span>
                   <button
                     onClick={finishEarly}
                     disabled={submitting}
+                    onMouseEnter={() => !submitting && setHoveredNav('idontknow')}
+                    onMouseLeave={() => setHoveredNav(null)}
                     style={{
                       padding: '10px 18px',
                       borderRadius: 10,
-                      border: `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : '#ddd'}`,
-                      background: 'transparent',
-                      color: subText,
+                      border: `1px solid ${isDark ? 'rgba(255,255,255,0.18)' : '#bbb'}`,
+                      background: hoveredNav === 'idontknow' ? (isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)') : 'transparent',
+                      color: textColor,
                       fontWeight: 600,
                       fontSize: 14,
                       fontFamily: 'Poppins, sans-serif',
@@ -250,16 +255,22 @@ export default function HowPage() {
               <button
                 onClick={goNext}
                 disabled={submitting || !answers[questionIdx].trim()}
+                onMouseEnter={() => answers[questionIdx].trim() && !submitting && setHoveredNav('next')}
+                onMouseLeave={() => setHoveredNav(null)}
                 style={{
                   padding: '10px 22px',
                   borderRadius: 10,
                   border: 'none',
-                  background: answers[questionIdx].trim() && !submitting ? '#ffe071' : isDark ? 'rgba(255,255,255,0.08)' : '#e0e0e0',
+                  background: answers[questionIdx].trim() && !submitting
+                    ? (hoveredNav === 'next' ? '#ffd43b' : '#ffe071')
+                    : isDark ? 'rgba(255,255,255,0.08)' : '#e0e0e0',
                   color: answers[questionIdx].trim() && !submitting ? '#1a1a1a' : subText,
                   fontWeight: 700,
                   fontSize: 14,
                   fontFamily: 'Poppins, sans-serif',
                   cursor: answers[questionIdx].trim() && !submitting ? 'pointer' : 'not-allowed',
+                  transform: answers[questionIdx].trim() && !submitting && hoveredNav === 'next' ? 'translateY(-1px)' : 'none',
+                  boxShadow: answers[questionIdx].trim() && !submitting && hoveredNav === 'next' ? '0 4px 12px rgba(0,0,0,0.12)' : 'none',
                   transition: 'all 0.15s',
                 }}
               >
