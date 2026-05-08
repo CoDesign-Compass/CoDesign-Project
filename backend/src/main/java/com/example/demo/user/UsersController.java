@@ -11,6 +11,8 @@ import com.example.demo.user.dto.UpdateUserWantsUpdatesRequest;
 import com.example.demo.user.dto.SendGiftEmailRequest;
 import com.example.demo.user.dto.SendUpdateEmailRequest;
 import com.example.demo.user.dto.UpdateUserWantsGiftRequest;
+import com.example.demo.user.dto.ForgotPasswordRequest;
+import com.example.demo.user.dto.ResetPasswordRequest;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,8 +22,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/users")
@@ -38,6 +42,9 @@ public class UsersController {
 
   @Value("${ADMIN_PASSWORD:Heidi123*}")
   private String adminPassword;
+
+  @Value("${app.public.base-url:https://codesigncompass.au}")
+  private String publicBaseUrl;
 
   public UsersController(
       UserRepository userRepository,
@@ -272,5 +279,53 @@ public class UsersController {
         user.getEmail(),
         "USER"
     ));
+  }
+
+  @PostMapping("/forgot-password")
+  public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest req) {
+    String email = req.getEmail().trim();
+    var userOpt = userRepository.findByEmailIgnoreCase(email);
+
+    // always return 200 to avoid revealing whether the email exists
+    if (userOpt.isPresent()) {
+      User user = userOpt.get();
+      String token = UUID.randomUUID().toString().replace("-", "");
+      user.setPasswordResetToken(token);
+      user.setPasswordResetExpiry(LocalDateTime.now().plusHours(1));
+      userRepository.save(user);
+
+      if (giftEmailService.isConfigured()) {
+        String safeBase = publicBaseUrl == null ? "" : publicBaseUrl.replaceAll("/+$", "");
+        String resetLink = safeBase + "/reset-password/" + token;
+        try {
+          giftEmailService.sendPasswordResetEmail(email, user.getUsername(), resetLink);
+        } catch (Exception ex) {
+          // log but don't expose failure to caller
+          ex.printStackTrace();
+        }
+      }
+    }
+
+    return ResponseEntity.ok(Map.of("message", "If that email is registered, a reset link has been sent."));
+  }
+
+  @PostMapping("/reset-password")
+  public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest req) {
+    var userOpt = userRepository.findByPasswordResetToken(req.getToken());
+    if (userOpt.isEmpty()) {
+      return ResponseEntity.badRequest().body(Map.of("message", "Invalid or expired reset link."));
+    }
+
+    User user = userOpt.get();
+    if (user.getPasswordResetExpiry() == null || LocalDateTime.now().isAfter(user.getPasswordResetExpiry())) {
+      return ResponseEntity.badRequest().body(Map.of("message", "This reset link has expired. Please request a new one."));
+    }
+
+    user.setPasswordHash(passwordEncoder.encode(req.getPassword()));
+    user.setPasswordResetToken(null);
+    user.setPasswordResetExpiry(null);
+    userRepository.save(user);
+
+    return ResponseEntity.ok(Map.of("message", "Password has been reset successfully."));
   }
 }

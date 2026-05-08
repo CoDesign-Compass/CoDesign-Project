@@ -148,8 +148,8 @@ export default function ThankPage() {
         }}
       >
         <p
-          className="m-0 text-compass-yellow text-center font-bold font-poppins leading-snug"
-          style={{ fontSize: 'clamp(15px,2.4vw,20px)', textShadow: 'rgba(0, 0, 0, 0.13) 1px 1px 1px' }}
+          className="m-0 pb-3 text-center font-bold font-poppins leading-snug"
+          style={{ fontSize: 'clamp(14px,2.4vw,18px)', color: '#666' }}
         >
           Thank you for sharing your lived experience. You can leave your email
           below for updates, a voucher, or both.

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, Link } from 'react-router-dom'
 import { useTheme } from '../../context/ThemeContext'
 import { useIssue } from '../../context/IssueContext'
 import { Button } from '../../components/ui/button'
@@ -212,13 +212,23 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <Label
-                htmlFor="password"
-                className="mb-1.5 block text-sm font-medium"
-                style={{ color: textColor }}
-              >
-                Password
-              </Label>
+              <div className="mb-1.5 flex items-center justify-between">
+                <Label
+                  htmlFor="password"
+                  className="text-sm font-medium"
+                  style={{ color: textColor }}
+                >
+                  Password
+                </Label>
+                <Link
+                  to="/forgot-password"
+                  style={{ fontSize: 12, color: '#73bbff', textDecoration: 'none' }}
+                  onMouseEnter={(e) => (e.target.style.textDecoration = 'underline')}
+                  onMouseLeave={(e) => (e.target.style.textDecoration = 'none')}
+                >
+                  Forgot password?
+                </Link>
+              </div>
 
               <div className="relative">
                 <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />

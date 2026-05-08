@@ -155,6 +155,38 @@ public class GiftEmailService {
     return content != null && content.matches("(?s).*<[^>]+>.*");
   }
 
+  public void sendPasswordResetEmail(String toEmail, String userName, String resetLink) {
+    if (!mailConfigured) {
+      throw new IllegalStateException("Email is not configured on the server.");
+    }
+    String safeName = (userName == null || userName.isBlank()) ? "user" : HtmlUtils.htmlEscape(userName.trim());
+    String safeLink = HtmlUtils.htmlEscape(resetLink);
+    String html = "<!doctype html><html><body style=\"margin:0;padding:0;background:#f4f7fb;\">"
+        + "<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"background:#f4f7fb;padding:24px 12px;\">"
+        + "<tr><td align=\"center\">"
+        + "<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"max-width:640px;background:#ffffff;border:1px solid #e6ebf2;border-radius:14px;padding:32px 28px;\">"
+        + "<tr><td style=\"font-family:Arial,sans-serif;font-size:15px;line-height:1.7;color:#1f2937;\">"
+        + "<p>Hi " + safeName + ",</p>"
+        + "<p>We received a request to reset your CoDesign Compass password. Click the button below to set a new password. This link expires in <strong>1 hour</strong>.</p>"
+        + "<p style=\"text-align:center;margin:28px 0;\">"
+        + "<a href=\"" + safeLink + "\" style=\"background:#f5c518;color:#1a1a1a;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:600;font-size:15px;\">Reset Password</a>"
+        + "</p>"
+        + "<p style=\"color:#6b7280;font-size:13px;\">If you didn't request this, you can safely ignore this email. Your password won't change.</p>"
+        + "</td></tr></table></td></tr></table></body></html>";
+    try {
+      MimeMessage message = mailSender.createMimeMessage();
+      MimeMessageHelper helper = new MimeMessageHelper(message, "UTF-8");
+      helper.setFrom(fromAddress);
+      helper.setTo(toEmail);
+      helper.setSubject("Reset your CoDesign Compass password");
+      helper.setText(html, true);
+      log.info("Sending password reset email to={}", toEmail);
+      mailSender.send(message);
+    } catch (MessagingException | MailException ex) {
+      throw new IllegalStateException("Failed to send password reset email.", ex);
+    }
+  }
+
   private String wrapAsHtml(String plainTextContent) {
     String safeText = plainTextContent == null ? "" : HtmlUtils.htmlEscape(plainTextContent);
     String body = safeText

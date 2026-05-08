@@ -17,6 +17,8 @@ import Layout from './components/Layout'
 import LoginPage from './pages/user/LoginPage'
 import CreateAccountPage from './pages/user/CreateAccountPage'
 import ConsentPage from './pages/user/ConsentPage'
+import ForgotPasswordPage from './pages/user/ForgotPasswordPage'
+import ResetPasswordPage from './pages/user/ResetPasswordPage'
 
 // admin
 import AdminLayout from './components/AdminLayout'
@@ -86,6 +88,22 @@ function App() {
               element={
                 <Layout>
                   <CreateAccountPage />
+                </Layout>
+              }
+            />
+            <Route
+              path="/forgot-password"
+              element={
+                <Layout>
+                  <ForgotPasswordPage />
+                </Layout>
+              }
+            />
+            <Route
+              path="/reset-password/:token"
+              element={
+                <Layout>
+                  <ResetPasswordPage />
                 </Layout>
               }
             />
