@@ -30,6 +30,11 @@ public class User {
     @Column(columnDefinition = "boolean default false")
     private boolean wantsGift = false;
 
+    @Column(length = 64)
+    private String passwordResetToken;
+
+    private LocalDateTime passwordResetExpiry;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -68,4 +73,10 @@ public class User {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
+
+    public String getPasswordResetToken() { return passwordResetToken; }
+    public void setPasswordResetToken(String passwordResetToken) { this.passwordResetToken = passwordResetToken; }
+
+    public LocalDateTime getPasswordResetExpiry() { return passwordResetExpiry; }
+    public void setPasswordResetExpiry(LocalDateTime passwordResetExpiry) { this.passwordResetExpiry = passwordResetExpiry; }
 }
