@@ -32,7 +32,7 @@ public class GiftEmailService {
       @Value("${app.mail.from:no-reply@codesign.local}") String fromAddress,
       @Value("${app.mail.subject:Thank you for your response - Your voucher code}") String giftSubject,
       @Value("${app.mail.update-subject:CoDesign Compass issue update}") String updateSubject,
-      @Value("${app.public.base-url:https://co-design-project.vercel.app}") String publicBaseUrl
+      @Value("${app.public.base-url:https://codesigncompass.au}") String publicBaseUrl
   ) {
     this.mailSender = mailSenderProvider.getIfAvailable();
     String safeSmtpHost = smtpHost == null ? "" : smtpHost.trim();
