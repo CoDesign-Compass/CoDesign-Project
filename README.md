@@ -1,5 +1,6 @@
 # CoDesign-Project
-<img width="1297" height="642" alt="Screenshot 2026-03-31 at 21 47 55" src="https://github.com/user-attachments/assets/2cc05456-8073-4d69-8c0c-4980b518a0ca" />
+<img width="1440" height="763" alt="Screenshot 2026-05-10 at 21 50 44" src="https://github.com/user-attachments/assets/3b936828-874a-4539-9043-38a29dc4b49b" />
+
 
 **Public Website**: <https://codesigncompass.au/>
 
