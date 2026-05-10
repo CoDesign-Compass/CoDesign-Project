@@ -1,33 +1,26 @@
 # CoDesign-Project
 <img width="1297" height="642" alt="Screenshot 2026-03-31 at 21 47 55" src="https://github.com/user-attachments/assets/2cc05456-8073-4d69-8c0c-4980b518a0ca" />
 
-**Public Website**: <https://codesign-frontend.onrender.com>
+**Public Website**: <https://codesigncompass.au/>
 
 ## Demo
 **You can watch demo videos by the following youtube links:**
 <br>
-    [User Demo](https://youtu.be/7kRk-Z32Pf8)
+    [User Demo](https://youtu.be/fqgeHGA58yA)
 <br>
-    [Admin Demo](https://youtu.be/5mU47TunATA)
-
-**You can also** 
-[download demo videos](https://github.com/CoDesign-Compass/CoDesign-Project/tree/main/demo)
+    [Admin Demo](https://youtu.be/4en0b2uh_HI)
 
 ## User Guide
 
 ### Admin side
-[Admin User Guide.md](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/User%20Guide/Admin%20User%20Guide.md)<br>
-<br> **You can download the PDF and video using following links:** <br>
-[Admin User Guide.pdf](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/User%20Guide/Admin%20User%20Guide.pdf)<br>
-[Admin User GUide.mp4](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/User%20Guide/Admin%20User%20Guide.mp4)
+[Admin User Guide.pdf](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/User%20Guide/Admin%20User%20Guide.pdf)
 
 
 ### User side
-[User Guide.md](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/User%20Guide/User%20Guide.md)<br>
-<br> **You can download the PDF and video using following links:** <br>
-[User Guide.pdf](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/User%20Guide/User%20Guide.pdf)<br>
-[User GUide.mp4](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/User%20Guide/User%20Guide.mp4)
+[User Guide.pdf](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/User%20Guide/User%20Guide.pdf)
 
+## System Architecture
+<img width="1348" height="620" alt="Screenshot 2026-05-11 at 00 04 53" src="https://github.com/user-attachments/assets/31891fd5-984f-4d49-9d92-5bfdc4bf97a9" />
 
 ## Project Introduction
 ### Background
