@@ -22,6 +22,7 @@ import ResetPasswordPage from './pages/user/ResetPasswordPage'
 
 // admin
 import AdminLayout from './components/AdminLayout'
+import RequireAdmin from './components/RequireAdmin'
 import DashBoard from './pages/admin/DashBoard'
 import CreateNewIssue from './pages/admin/CreateNewIssue'
 import IssueReport from './pages/admin/IssueReport'
@@ -177,7 +178,14 @@ function App() {
             />
 
             {/* ---------- ADMIN ROUTES ---------- */}
-            <Route path="/admin" element={<AdminLayout />}>
+            <Route
+              path="/admin"
+              element={
+                <RequireAdmin>
+                  <AdminLayout />
+                </RequireAdmin>
+              }
+            >
               <Route path="dashboard" element={<DashBoard />} />
               <Route path="new-issue" element={<CreateNewIssue />} />
               <Route path="issue-report" element={<IssueReport />} />
