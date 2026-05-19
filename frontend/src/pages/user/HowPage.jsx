@@ -6,6 +6,14 @@ import { useTheme } from '../../context/ThemeContext'
 
 const TOTAL_QUESTION_STEPS = 5
 
+const HOW_QUESTIONS = [
+  'How do you vision a better outcome for this issue?',
+  'What are the key steps needed to achieve that?',
+  'How could that be improved or implemented?',
+  'Who needs to take action, and what should they do?',
+  'Ultimately, what is the very first small step we can take right now?',
+]
+
 const slideVariants = {
   enter:  (dir) => ({ x: dir * 48, opacity: 0 }),
   center: { x: 0, opacity: 1, transition: { duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94] } },
@@ -23,6 +31,7 @@ export default function HowPage() {
   const [answers, setAnswers]         = useState(Array(TOTAL_QUESTION_STEPS).fill(''))
   const [submitting, setSubmitting]   = useState(false)
   const [hoveredNav, setHoveredNav]   = useState(null)
+  const [isCompactNav, setIsCompactNav] = useState(false)
 
   const inputRef = useRef(null)
   const topRef   = useRef(null)
@@ -37,6 +46,16 @@ export default function HowPage() {
     inputRef.current?.focus()
     topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }, [currentStep])
+
+  useEffect(() => {
+    const updateNavLayout = () => {
+      setIsCompactNav(window.innerWidth < 420)
+    }
+
+    updateNavLayout()
+    window.addEventListener('resize', updateNavLayout)
+    return () => window.removeEventListener('resize', updateNavLayout)
+  }, [])
 
   const submitHow = async () => {
     if (submitting) return
@@ -135,9 +154,7 @@ export default function HowPage() {
         >
           {/* Question label */}
           <p style={{ fontWeight: 600, fontSize: 20, color: textColor, marginBottom: 60 }}>
-            {currentStep === 1
-              ? 'How could this be improved?'
-              : 'How could that be improved?'}
+            {HOW_QUESTIONS[questionIdx]}
           </p>
 
           {/* Info hint */}
@@ -197,7 +214,7 @@ export default function HowPage() {
           />
 
           {/* Navigation row */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 14, gap: 10, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 14, gap: 10, flexWrap: 'nowrap' }}>
 
             {/* Back */}
             <button
@@ -206,15 +223,17 @@ export default function HowPage() {
               onMouseEnter={() => currentStep !== 1 && setHoveredNav('back')}
               onMouseLeave={() => setHoveredNav(null)}
               style={{
-                padding: '10px 18px',
+                padding: isCompactNav ? '9px 12px' : '10px 18px',
                 borderRadius: 10,
                 border: `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : '#ddd'}`,
                 background: hoveredNav === 'back' ? (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)') : 'transparent',
                 color: currentStep === 1 ? (isDark ? 'rgba(255,255,255,0.2)' : '#ccc') : textColor,
                 fontWeight: 600,
-                fontSize: 14,
+                fontSize: isCompactNav ? 13 : 14,
                 fontFamily: 'Poppins, sans-serif',
                 cursor: currentStep === 1 ? 'not-allowed' : 'pointer',
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
                 transition: 'all 0.15s',
               }}
             >
@@ -222,10 +241,10 @@ export default function HowPage() {
             </button>
 
             {/* Right side: I don't know + Next/Finish */}
-            <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: isCompactNav ? 6 : 8, alignItems: 'flex-end', flexWrap: 'nowrap', justifyContent: 'flex-end', minWidth: 0, flex: 1 }}>
               {currentStep >= 2 && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'flex-end' }}>
-                  <span style={{ fontSize: 11, color: subText, maxWidth: 200, textAlign: 'right', lineHeight: 1.4 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'flex-end', minWidth: 0, flexShrink: 1 }}>
+                  <span style={{ display: isCompactNav ? 'none' : 'block', fontSize: 11, color: subText, maxWidth: 200, textAlign: 'right', lineHeight: 1.4 }}>
                     Unsure how to continue? This would end follow-ups.
                   </span>
                   <button
@@ -234,20 +253,22 @@ export default function HowPage() {
                     onMouseEnter={() => !submitting && setHoveredNav('idontknow')}
                     onMouseLeave={() => setHoveredNav(null)}
                     style={{
-                      padding: '10px 18px',
+                      padding: isCompactNav ? '9px 12px' : '10px 18px',
                       borderRadius: 10,
                       border: `1px solid ${isDark ? 'rgba(255,255,255,0.18)' : '#bbb'}`,
                       background: hoveredNav === 'idontknow' ? (isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)') : 'transparent',
                       color: textColor,
                       fontWeight: 600,
-                      fontSize: 14,
+                      fontSize: isCompactNav ? 12 : 14,
                       fontFamily: 'Poppins, sans-serif',
                       cursor: submitting ? 'not-allowed' : 'pointer',
                       opacity: submitting ? 0.6 : 1,
+                      whiteSpace: 'nowrap',
+                      flexShrink: 0,
                       transition: 'all 0.15s',
                     }}
                   >
-                    I don't know
+                    {isCompactNav ? 'Unsure' : "I don't know"}
                   </button>
                 </div>
               )}
@@ -258,7 +279,7 @@ export default function HowPage() {
                 onMouseEnter={() => answers[questionIdx].trim() && !submitting && setHoveredNav('next')}
                 onMouseLeave={() => setHoveredNav(null)}
                 style={{
-                  padding: '10px 22px',
+                  padding: isCompactNav ? '9px 12px' : '10px 22px',
                   borderRadius: 10,
                   border: 'none',
                   background: answers[questionIdx].trim() && !submitting
@@ -266,11 +287,13 @@ export default function HowPage() {
                     : isDark ? 'rgba(255,255,255,0.08)' : '#e0e0e0',
                   color: answers[questionIdx].trim() && !submitting ? '#1a1a1a' : subText,
                   fontWeight: 700,
-                  fontSize: 14,
+                  fontSize: isCompactNav ? 12 : 14,
                   fontFamily: 'Poppins, sans-serif',
                   cursor: answers[questionIdx].trim() && !submitting ? 'pointer' : 'not-allowed',
                   transform: answers[questionIdx].trim() && !submitting && hoveredNav === 'next' ? 'translateY(-1px)' : 'none',
                   boxShadow: answers[questionIdx].trim() && !submitting && hoveredNav === 'next' ? '0 4px 12px rgba(0,0,0,0.12)' : 'none',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
                   transition: 'all 0.15s',
                 }}
               >

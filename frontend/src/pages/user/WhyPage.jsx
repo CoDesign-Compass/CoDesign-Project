@@ -8,6 +8,14 @@ import { useTheme } from '../../context/ThemeContext'
 // Step 0 = stance, steps 1–5 = follow-up questions
 const TOTAL_QUESTION_STEPS = 5
 
+const WHY_QUESTIONS = [
+  'Why does this issue matter to you?',
+  'What is driving that feeling?',
+  'Why do you think that happens?',
+  'Why does that specific root cause concern you the most?',
+  'Ultimately, what is the core belief or value behind your thoughts?',
+]
+
 const STANCE_OPTIONS = [
   { key: 'agree',    base: '#ccf6e2', hover: '#b5ead7', selected: '#7fd3b5', label: 'Agree' },
   { key: 'disagree', base: '#ffd6d6', hover: '#ffc2c2', selected: '#ff8787', label: 'Disagree' },
@@ -33,6 +41,7 @@ export default function WhyPage() {
   const [answers, setAnswers] = useState(Array(TOTAL_QUESTION_STEPS).fill(''))
   const [submitting, setSubmitting] = useState(false)
   const [hoveredNav, setHoveredNav] = useState(null)
+  const [isCompactNav, setIsCompactNav] = useState(false)
 
   const inputRef = useRef(null)
   const topRef   = useRef(null)
@@ -47,6 +56,16 @@ export default function WhyPage() {
     if (currentStep > 0) inputRef.current?.focus()
     topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }, [currentStep])
+
+  useEffect(() => {
+    const updateNavLayout = () => {
+      setIsCompactNav(window.innerWidth < 420)
+    }
+
+    updateNavLayout()
+    window.addEventListener('resize', updateNavLayout)
+    return () => window.removeEventListener('resize', updateNavLayout)
+  }, [])
 
   const submitWhy = async () => {
     if (submitting) return
@@ -274,9 +293,7 @@ export default function WhyPage() {
 
               {/* Question label */}
               <p style={{ fontWeight: 600, fontSize: 20, color: textColor, marginBottom: 60 }}>
-                {currentStep === 1
-                  ? 'Why does this issue matter to you?'
-                  : 'Why does that matter to you?'}
+                {WHY_QUESTIONS[questionIdx]}
               </p>
 
               {/* Info hint */}
@@ -336,7 +353,7 @@ export default function WhyPage() {
               />
 
               {/* Navigation row */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 14, gap: 10, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 14, gap: 10, flexWrap: 'nowrap' }}>
 
                 {/* Back */}
                 <button
@@ -344,15 +361,17 @@ export default function WhyPage() {
                   onMouseEnter={() => setHoveredNav('back')}
                   onMouseLeave={() => setHoveredNav(null)}
                   style={{
-                    padding: '10px 18px',
+                    padding: isCompactNav ? '9px 12px' : '10px 18px',
                     borderRadius: 10,
                     border: `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : '#ddd'}`,
                     background: hoveredNav === 'back' ? (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)') : 'transparent',
                     color: textColor,
                     fontWeight: 600,
-                    fontSize: 14,
+                    fontSize: isCompactNav ? 13 : 14,
                     fontFamily: 'Poppins, sans-serif',
                     cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0,
                     transition: 'all 0.15s',
                   }}
                 >
@@ -360,10 +379,10 @@ export default function WhyPage() {
                 </button>
 
                 {/* Right side: I don't know + Next/Finish */}
-                <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: isCompactNav ? 6 : 8, alignItems: 'flex-end', flexWrap: 'nowrap', justifyContent: 'flex-end', minWidth: 0, flex: 1 }}>
                   {currentStep >= 2 && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'flex-end' }}>
-                      <span style={{ fontSize: 11, color: subText, maxWidth: 150, textAlign: 'right', lineHeight: 1.4 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'flex-end', minWidth: 0, flexShrink: 1 }}>
+                      <span style={{ display: isCompactNav ? 'none' : 'block', fontSize: 11, color: subText, maxWidth: 150, textAlign: 'right', lineHeight: 1.4 }}>
                         Unsure how to continue? This would end follow-ups.
                       </span>
                       <button
@@ -372,20 +391,22 @@ export default function WhyPage() {
                         onMouseEnter={() => !submitting && setHoveredNav('idontknow')}
                         onMouseLeave={() => setHoveredNav(null)}
                         style={{
-                          padding: '10px 18px',
+                          padding: isCompactNav ? '9px 12px' : '10px 18px',
                           borderRadius: 10,
                           border: `1px solid ${isDark ? 'rgba(255,255,255,0.18)' : '#bbb'}`,
                           background: hoveredNav === 'idontknow' ? (isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)') : 'transparent',
                           color: textColor,
                           fontWeight: 600,
-                          fontSize: 14,
+                          fontSize: isCompactNav ? 12 : 14,
                           fontFamily: 'Poppins, sans-serif',
                           cursor: submitting ? 'not-allowed' : 'pointer',
                           opacity: submitting ? 0.6 : 1,
+                          whiteSpace: 'nowrap',
+                          flexShrink: 0,
                           transition: 'all 0.15s',
                         }}
                       >
-                        I don't know
+                        {isCompactNav ? 'Unsure' : "I don't know"}
                       </button>
                     </div>
                   )}
@@ -396,7 +417,7 @@ export default function WhyPage() {
                     onMouseEnter={() => answers[questionIdx].trim() && !submitting && setHoveredNav('next')}
                     onMouseLeave={() => setHoveredNav(null)}
                     style={{
-                      padding: '10px 22px',
+                      padding: isCompactNav ? '9px 12px' : '10px 22px',
                       borderRadius: 10,
                       border: 'none',
                       background: answers[questionIdx].trim() && !submitting
@@ -404,11 +425,13 @@ export default function WhyPage() {
                         : isDark ? 'rgba(255,255,255,0.08)' : '#e0e0e0',
                       color: answers[questionIdx].trim() && !submitting ? '#1a1a1a' : subText,
                       fontWeight: 700,
-                      fontSize: 14,
+                      fontSize: isCompactNav ? 12 : 14,
                       fontFamily: 'Poppins, sans-serif',
                       cursor: answers[questionIdx].trim() && !submitting ? 'pointer' : 'not-allowed',
                       transform: answers[questionIdx].trim() && !submitting && hoveredNav === 'next' ? 'translateY(-1px)' : 'none',
                       boxShadow: answers[questionIdx].trim() && !submitting && hoveredNav === 'next' ? '0 4px 12px rgba(0,0,0,0.12)' : 'none',
+                      whiteSpace: 'nowrap',
+                      flexShrink: 0,
                       transition: 'all 0.15s',
                     }}
                   >
