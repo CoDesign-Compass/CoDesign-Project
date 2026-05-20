@@ -15,9 +15,9 @@ This is the central documentation hub for CoDesign Compass.
 [Product Vision](https://github.com/AriaFung/CoDesign-Project/blob/main/docs/Persona%2C%20Product%20Vison%20and%20Project%20Introduction/Product%20Vision.md)
 
 ## Programming Language
-Frontend: CSS, HTML, React
+Frontend: React
 <br>Backend: Java
-<br>Database: Firebase
+<br>Database: PostgreSQL
 ## Team Members
 |Name|Role|
 |----|----|
@@ -61,7 +61,7 @@ Frontend: CSS, HTML, React
 |Sprint 3|1. Implement frontend UI work without interaction(Admin side)<br>2. Modify the frontend based on the client's feedback|23 Oct 2025|[Sprint 3 Retro](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/Sprint%203%20Retro.md)<br>[Sprint 3 review](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/Sprint%203%20Review.md)||
 |Sprint 4|1. Establish the backend environment with Docker<br>2. Define the API technology stack and documentation tools<br>3. Implement backend and initial APIs integrated with the frontend.|12 March 2026|[Sprint 4 Retro](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/Sprint%204%20Retro.md)<br>[Sprint 4 review](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/Sprint%204%20Review.md)|[Sprint 4 slides](https://www.canva.com/design/DAHDC0efrws/KXlTu1u4qoX7xVbqe59hGw/view?utm_content=DAHDC0efrws&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h33a915251c)|
 |Sprint 5|1. Refine and enhance core system features based on stakeholder feedback, including authentication, email and coupon distribution, data analysis, and report improvements.<br>2. Improve the overall UI/UX to deliver a more intuitive, consistent, and polished user experience.<br>3. Strengthen system infrastructure by integrating persistent database connectivity and advancing AI-powered functionality.<br>4. Implement report export capabilities to support reporting and documentation needs.<br>5. Deploy the full system, including frontend, backend, and database services, to a live online environment.|2 April 2026|[Sprint 5 Retro](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/Sprint%205%20Retro.md)<br>[Sprint 5 review](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/Sprint%205%20Review.md)|[Sprint 5 slides](https://canva.link/5s5t5p03llyq7me)|
-|Sprint 6|1. Testing<br>2. Refine the current functionality<br>3. Add additional feature - AI chatbox client|7 May 2026|||
+|Sprint 6|1. Testing<br>2. Refine the current functionality<br>3. Add additional feature - AI chatbox client|7 May 2026|[Sprint 6 Retro](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/Sprint%206%20Retro.md)<br>[Sprint 6 review](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/Sprint%206%20Review.md)||
 
 ## Meeting Records
 [Scribe Record](https://docs.google.com/spreadsheets/d/1S0wbxD3qdw5VT001IVuKAfbjTX7lGPsIckci2tuJUc4/edit?gid=0#gid=0)
@@ -87,7 +87,7 @@ Frontend: CSS, HTML, React
 |week 6|[S1 Week6 Tutor Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%206%20Tutor%20Meeting.md)<br>[S1 Week6 Team Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%206%20Team%20Meeting.md)|
 |week 7|[S1 Week7 Tutor Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%207%20Tutor%20Meeting.md)<br>[S1 Week7 Team Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%207%20Team%20Meeting.md)<br>[S1 Week7 Client Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%207%20Client%20Meeting.md)|
 |week 8|[S1 Week8 Tutor Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%208%20Tutor%20Meeting.md)<br>[S1 Week8 Team Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%208%20Team%20Meeting.md)<br>[S1 Week8 Client Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%208%20Client%20Meeting.md)|
-|week 9||
+|week 9|[S1 Week9 Tutor Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%209%20Tutor%20Meeting.md)<br>[S1 Week9 Team Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%209%20Team%20Meeting.md)<br>[S1 Week9 Client Meeting](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/Meeting%20minutes/S1%20Week%209%20Client%20Meeting.md)|
 ## Team velocity
 ### Sprint 1
 | Task  | Estimate (Story Points) |
