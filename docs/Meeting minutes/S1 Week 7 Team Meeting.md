@@ -60,7 +60,7 @@ Ricky Chen, Jingwen Zhang, Yu Pan, Jiaxin Li, Shuo Li, Aria Fung, Zhimeng Zhu, B
 | ------------------------------------------------------------ | --------------- | ----------- |
 | Testing report writing                                       | Ricky Chen      | Before submission |
 | Automated email backend completion                           | Jingwen Zhang   | Next week   |
-| Client feedback整理与文档化                                  | Yu Pan          | Next week   |
+| Client feedback organization and documentation                                    | Yu Pan          | Next week   |
 | Deployment options & pricing research                        | Jiaxin Li       | Next week   |
 | API testing & regression testing improvement                 | Shuo Li         | Next week   |
 | Frontend UI/UX optimization                                  | Aria Fung       | Next week   |
