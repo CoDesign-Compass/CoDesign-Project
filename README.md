@@ -14,11 +14,11 @@
 ## User Guide
 
 ### Admin side
-[Admin User Guide.pdf](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/User%20Guide/Admin%20User%20Guide.pdf)
+[Admin User Guide.pdf](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/User%20Guide/Admin%20User%20Guide.pdf)
 
 
 ### User side
-[User Guide.pdf](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/User%20Guide/User%20Guide.pdf)
+[User Guide.pdf](https://github.com/CoDesign-Compass/CoDesign-Project/blob/main/docs/User%20Guide/User%20Guide.md)
 
 ## System Architecture
 <img width="1348" height="620" alt="Screenshot 2026-05-11 at 00 04 53" src="https://github.com/user-attachments/assets/31891fd5-984f-4d49-9d92-5bfdc4bf97a9" />
