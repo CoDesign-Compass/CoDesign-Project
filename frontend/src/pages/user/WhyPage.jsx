@@ -20,7 +20,7 @@ const slideVariants = {
   exit:   (dir) => ({ x: dir * -48, opacity: 0, transition: { duration: 0.18, ease: 'easeIn' } }),
 }
 
-export default function WhyPage() {
+export default function WhyPage({ setOnNext }) {
   const { theme } = useTheme()
   const { shareId: routeShareId } = useParams()
   const { setShareId, issueContent } = useIssue()
@@ -33,6 +33,8 @@ export default function WhyPage() {
   const [answers, setAnswers] = useState(Array(TOTAL_QUESTION_STEPS).fill(''))
   const [submitting, setSubmitting] = useState(false)
   const [hoveredNav, setHoveredNav] = useState(null)
+  const [isCompactNav, setIsCompactNav] = useState(false)
+  const [showIntroModal, setShowIntroModal] = useState(false)
 
   const inputRef = useRef(null)
   const topRef   = useRef(null)
@@ -47,6 +49,16 @@ export default function WhyPage() {
     if (currentStep > 0) inputRef.current?.focus()
     topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }, [currentStep])
+
+  useEffect(() => {
+    const updateNavLayout = () => {
+      setIsCompactNav(window.innerWidth < 480)
+    }
+
+    updateNavLayout()
+    window.addEventListener('resize', updateNavLayout)
+    return () => window.removeEventListener('resize', updateNavLayout)
+  }, [])
 
   const submitWhy = async () => {
     if (submitting) return
@@ -73,8 +85,7 @@ export default function WhyPage() {
   const goNext = async () => {
     if (currentStep === 0) {
       if (!selectedButton) return
-      setDirection(1)
-      setCurrentStep(1)
+      setShowIntroModal(true)
     } else if (currentStep < TOTAL_QUESTION_STEPS) {
       if (!answers[currentStep - 1].trim()) return
       setDirection(1)
@@ -82,6 +93,8 @@ export default function WhyPage() {
     } else {
       await submitWhy()
     }
+
+    return false
   }
 
   const goPrev = () => {
@@ -91,6 +104,19 @@ export default function WhyPage() {
   }
 
   const finishEarly = async () => { await submitWhy() }
+
+  const confirmIntroModal = () => {
+    setShowIntroModal(false)
+    setDirection(1)
+    setCurrentStep(1)
+  }
+
+  useEffect(() => {
+    if (setOnNext) setOnNext(() => goNext)
+    return () => {
+      if (setOnNext) setOnNext(null)
+    }
+  }, [setOnNext, goNext])
 
   // ── stance button style ──────────────────────────────────────────
   const stanceStyle = (key, base, hover, selected) => {
@@ -336,7 +362,7 @@ export default function WhyPage() {
               />
 
               {/* Navigation row */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 14, gap: 10, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 14, gap: 10, flexWrap: 'nowrap' }}>
 
                 {/* Back */}
                 <button
@@ -344,15 +370,17 @@ export default function WhyPage() {
                   onMouseEnter={() => setHoveredNav('back')}
                   onMouseLeave={() => setHoveredNav(null)}
                   style={{
-                    padding: '10px 18px',
+                    padding: isCompactNav ? '9px 12px' : '10px 18px',
                     borderRadius: 10,
                     border: `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : '#ddd'}`,
                     background: hoveredNav === 'back' ? (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)') : 'transparent',
                     color: textColor,
                     fontWeight: 600,
-                    fontSize: 14,
+                    fontSize: isCompactNav ? 12 : 14,
                     fontFamily: 'Poppins, sans-serif',
                     cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0,
                     transition: 'all 0.15s',
                   }}
                 >
@@ -360,10 +388,10 @@ export default function WhyPage() {
                 </button>
 
                 {/* Right side: I don't know + Next/Finish */}
-                <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: isCompactNav ? 6 : 8, alignItems: 'flex-end', flexWrap: 'nowrap', justifyContent: 'flex-end', minWidth: 0, flex: 1 }}>
                   {currentStep >= 2 && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'flex-end' }}>
-                      <span style={{ fontSize: 11, color: subText, maxWidth: 150, textAlign: 'right', lineHeight: 1.4 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'flex-end', minWidth: 0, flexShrink: 1 }}>
+                      <span style={{ display: isCompactNav ? 'none' : 'block', fontSize: 11, color: subText, maxWidth: 150, textAlign: 'right', lineHeight: 1.4 }}>
                         Unsure how to continue? This would end follow-ups.
                       </span>
                       <button
@@ -372,20 +400,22 @@ export default function WhyPage() {
                         onMouseEnter={() => !submitting && setHoveredNav('idontknow')}
                         onMouseLeave={() => setHoveredNav(null)}
                         style={{
-                          padding: '10px 18px',
+                          padding: isCompactNav ? '9px 12px' : '10px 18px',
                           borderRadius: 10,
                           border: `1px solid ${isDark ? 'rgba(255,255,255,0.18)' : '#bbb'}`,
                           background: hoveredNav === 'idontknow' ? (isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)') : 'transparent',
                           color: textColor,
                           fontWeight: 600,
-                          fontSize: 14,
+                          fontSize: isCompactNav ? 12 : 14,
                           fontFamily: 'Poppins, sans-serif',
                           cursor: submitting ? 'not-allowed' : 'pointer',
                           opacity: submitting ? 0.6 : 1,
+                          whiteSpace: 'nowrap',
+                          flexShrink: 0,
                           transition: 'all 0.15s',
                         }}
                       >
-                        I don't know
+                        {isCompactNav ? 'Unsure' : "I don't know"}
                       </button>
                     </div>
                   )}
@@ -396,7 +426,7 @@ export default function WhyPage() {
                     onMouseEnter={() => answers[questionIdx].trim() && !submitting && setHoveredNav('next')}
                     onMouseLeave={() => setHoveredNav(null)}
                     style={{
-                      padding: '10px 22px',
+                      padding: isCompactNav ? '9px 12px' : '10px 22px',
                       borderRadius: 10,
                       border: 'none',
                       background: answers[questionIdx].trim() && !submitting
@@ -404,15 +434,17 @@ export default function WhyPage() {
                         : isDark ? 'rgba(255,255,255,0.08)' : '#e0e0e0',
                       color: answers[questionIdx].trim() && !submitting ? '#1a1a1a' : subText,
                       fontWeight: 700,
-                      fontSize: 14,
+                      fontSize: isCompactNav ? 12 : 14,
                       fontFamily: 'Poppins, sans-serif',
                       cursor: answers[questionIdx].trim() && !submitting ? 'pointer' : 'not-allowed',
                       transform: answers[questionIdx].trim() && !submitting && hoveredNav === 'next' ? 'translateY(-1px)' : 'none',
                       boxShadow: answers[questionIdx].trim() && !submitting && hoveredNav === 'next' ? '0 4px 12px rgba(0,0,0,0.12)' : 'none',
+                      whiteSpace: 'nowrap',
+                      flexShrink: 0,
                       transition: 'all 0.15s',
                     }}
                   >
-                    {submitting ? 'Submitting…' : isLastStep ? 'Finish ✓' : 'Next question →'}
+                    {submitting ? 'Submitting…' : isCompactNav ? (isLastStep ? 'Finish' : 'Next') : (isLastStep ? 'Finish ✓' : 'Next question →')}
                   </button>
                 </div>
               </div>
@@ -420,6 +452,70 @@ export default function WhyPage() {
           )}
 
         </motion.div>
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showIntroModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 50,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'rgba(0, 0, 0, 0.35)',
+              padding: 16,
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.96, y: 12, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.98, y: 8, opacity: 0 }}
+              transition={{ duration: 0.18, ease: 'easeOut' }}
+              style={{
+                width: '100%',
+                maxWidth: 520,
+                borderRadius: 18,
+                padding: 24,
+                background: isDark ? '#1f1f1f' : '#fffdf6',
+                color: textColor,
+                border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#f0e4a6'}`,
+                boxShadow: '0 20px 60px rgba(0,0,0,0.18)',
+              }}
+            >
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 14, padding: '4px 10px', borderRadius: 999, background: isDark ? 'rgba(255,255,255,0.08)' : '#ffe071', color: '#1a1a1a', fontWeight: 700, fontSize: 12 }}>
+                Why/How framework
+              </div>
+              <p style={{ margin: 0, fontSize: 15, lineHeight: 1.65, color: textColor }}>
+                We are using a 5-step framework to dig past surface-level thoughts. The questions will look similar across 5 steps—this is normal and how the system guides you to deeper insights!
+              </p>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 20 }}>
+                <button
+                  type="button"
+                  onClick={confirmIntroModal}
+                  style={{
+                    padding: '10px 18px',
+                    borderRadius: 10,
+                    border: 'none',
+                    background: '#ffe071',
+                    color: '#1a1a1a',
+                    fontWeight: 700,
+                    fontFamily: 'Poppins, sans-serif',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.12)',
+                  }}
+                >
+                  Understood
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
       </AnimatePresence>
 
     </div>
