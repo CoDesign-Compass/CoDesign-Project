@@ -275,11 +275,11 @@ The selected deployment strategy provides:
 
 | Service             |  Cost |
 | ------------------- | -------------- |
-| Backend Hosting     | $7 AUD/month  |
-| PostgreSQL Database | $0.3 AUD/month  |
-| Frontend Hosting    | $3 AUD/month       |
+| Backend Hosting     | ~$7 AUD/month  |
+| PostgreSQL Database | ~$0.3 AUD/month  |
+| Frontend Hosting    | ~$3 AUD/month       |
 | SSL Certificate     | Included       |
-| Total               | $13.6 AUD/month |
+| Total               | ~$13.6 AUD/month |
 
 
 
@@ -289,11 +289,12 @@ The selected deployment strategy provides:
 
 | Service     | Estimated Cost     |
 | ----------- | ------------------ |
-| Hosting     | $163.2 AUD/year     |
-| Domain Name | $15 AUD/year   |
-| Total       | $178.2 AUD/year |
+| Hosting     | ~$163.2 AUD/year     |
+| Domain Name | ~$15 AUD/year   |
+| Total       | ~$178.2 AUD/year |
 
 Billing and subscription management are fully controlled by the client through the client-owned Render account.
+All the cost with a "~" are based on the current plan in May, 2026.
 
 
 

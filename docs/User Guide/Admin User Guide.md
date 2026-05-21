@@ -6,8 +6,6 @@ This platform is designed to support administrators in collecting and analysing 
 
 The system is particularly useful for understanding user perspectives on specific topics, identifying patterns in feedback, and supporting data-driven decision-making.
 
-
-
 ### 2. Key Features Overview
 
 The platform provides three main functionalities for administrators:
@@ -25,11 +23,9 @@ In addition, an integrated AI module helps summarise user responses, making it e
 
 Administrators can send emails to participants, including incentives such as discount coupons. This feature helps improve participation rates and user engagement.
 
-
-
 ### 3. Login
 
-![main](img\main.png)
+![main](img/main.png)
 
 By clicking the "Login to existing account" button to login page.
 
@@ -38,8 +34,6 @@ By clicking the "Login to existing account" button to login page.
 Current Email: compass@purposemediacbr.au
 
 Current Password: Heidi123\*
-
-
 
 ### 4. Create New Issues
 
@@ -50,8 +44,6 @@ After login, you can create an issue by clicking the "New Issue" button.
 Enter the issue you want to ask and click the "Publish Issue" button. Then the new issue will be published to the public and generate a share link which people is gonna to use to answer the questions.
 
 ![create](img/createnewissue.png)
-
-
 
 ### 5. Viewing Responses
 
@@ -73,8 +65,6 @@ Also you can export raw data and final report if you want.
 
 ![export](img/export.png)
 
-
-
 ### 6. Managing Users
 
 In this page you can send coupons to users who provided a valid email address.
@@ -91,8 +81,6 @@ You can choose either send them one by one or in a batch.
 
 ![chosse](img/choose.png)
 
-
-
 ## 7. Conclusion
 
-The platform enables administrators to efficiently manage issues, analyse user feedback, and gain insights through AI support, while ensuring that user responses remain unbiased and authentic. 
+The platform enables administrators to efficiently manage issues, analyse user feedback, and gain insights through AI support, while ensuring that user responses remain unbiased and authentic.
