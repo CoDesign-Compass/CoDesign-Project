@@ -199,6 +199,17 @@ export default function HowPage({ setOnNext }) {
             Why/How ladder complete
           </h1>
 
+          <h2
+            style={{
+              margin: '0 0 10px',
+              fontSize: 20,
+              fontWeight: 800,
+              color: '#1a1a1a',
+            }}
+          >
+            Thank you for sharing your lived wisdom!
+          </h2>
+
           <p
             style={{
               margin: '0 0 20px',
