@@ -57,7 +57,6 @@ export default function WhyPage({ setOnNext }) {
   const [hoveredButton, setHoveredButton] = useState(null)
   const [answers, setAnswers] = useState(Array(TOTAL_QUESTION_STEPS).fill(''))
   const [submitting, setSubmitting] = useState(false)
-  const [completed, setCompleted] = useState(false)
   const [submitError, setSubmitError] = useState('')
   const [hoveredNav, setHoveredNav] = useState(null)
   const [isCompactNav, setIsCompactNav] = useState(false)
@@ -111,7 +110,7 @@ export default function WhyPage({ setOnNext }) {
         }),
       })
       if (!res.ok) throw new Error('Failed to submit')
-      setCompleted(true)
+      navigate(routeShareId ? `/share/${routeShareId}/how` : '/how')
     } catch (err) {
       console.error(err)
       setSubmitError('We could not save your Why responses. Please try again.')
@@ -121,6 +120,7 @@ export default function WhyPage({ setOnNext }) {
   }, [
     API_BASE,
     answers,
+    navigate,
     routeShareId,
     selectedButton,
     submissionId,
@@ -128,11 +128,6 @@ export default function WhyPage({ setOnNext }) {
   ])
 
   const goNext = useCallback(async () => {
-    if (completed) {
-      navigate(routeShareId ? `/share/${routeShareId}/how` : '/how')
-      return false
-    }
-
     if (currentStep === 0) {
       if (!selectedButton) return
       setShowIntroModal(true)
@@ -147,10 +142,7 @@ export default function WhyPage({ setOnNext }) {
     return false
   }, [
     answers,
-    completed,
     currentStep,
-    navigate,
-    routeShareId,
     selectedButton,
     submitWhy,
   ])
@@ -216,105 +208,8 @@ export default function WhyPage({ setOnNext }) {
   const inputBorder = isDark ? 'rgba(255,255,255,0.18)' : '#ced4da'
   const hintBg = isDark ? '#1f1f1f' : '#f8f9fa'
   const hintBorder = isDark ? 'rgba(255,255,255,0.08)' : '#e9ecef'
-  const successBg = '#ffffff'
-  const successLine = '#ffe071'
   const isLastStep = currentStep === TOTAL_QUESTION_STEPS
   const questionIdx = currentStep - 1 // 0-based index into answers[]
-  const howPath = routeShareId ? `/share/${routeShareId}/how` : '/how'
-
-  if (completed) {
-    return (
-      <div
-        ref={topRef}
-        className="max-w-[640px] mx-auto px-4 font-poppins"
-        style={{ color: textColor, paddingBottom: 32 }}
-      >
-        <motion.section
-          initial={{ y: 18, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94] }}
-          style={{
-            border: `1px solid ${successLine}`,
-            background: successBg,
-            borderRadius: 12,
-            padding: '28px 22px',
-            boxShadow: isDark
-              ? '0 10px 28px rgba(0,0,0,0.22)'
-              : '0 10px 28px rgba(0,0,0,0.06)',
-          }}
-        >
-          <div
-            aria-hidden="true"
-            style={{
-              width: 44,
-              height: 44,
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: '#ffe071',
-              color: '#1a1a1a',
-              fontSize: 24,
-              fontWeight: 800,
-              marginBottom: 18,
-            }}
-          >
-            ✓
-          </div>
-
-          <h1
-            style={{
-              margin: '0 0 10px',
-              fontSize: 28,
-              fontWeight: 800,
-              color: '#1a1a1a',
-            }}
-          >
-            Why ladder complete
-          </h1>
-
-          <p
-            style={{
-              margin: '0 0 20px',
-              fontSize: 15,
-              lineHeight: 1.7,
-              color: subText,
-            }}
-          >
-            Your Why responses have been saved. Continue to the How ladder to
-            share ideas for what could improve the issue.
-          </p>
-
-          <button
-            type="button"
-            onClick={() => navigate(howPath)}
-            onMouseEnter={() => setHoveredNav('continue')}
-            onMouseLeave={() => setHoveredNav(null)}
-            style={{
-              padding: '11px 24px',
-              borderRadius: 10,
-              border: 'none',
-              background: hoveredNav === 'continue' ? '#ffd43b' : '#ffe071',
-              color: '#1a1a1a',
-              fontWeight: 700,
-              fontSize: 14,
-              fontFamily: 'Poppins, sans-serif',
-              cursor: 'pointer',
-              transform:
-                hoveredNav === 'continue' ? 'translateY(-1px)' : 'none',
-              boxShadow:
-                hoveredNav === 'continue'
-                  ? '0 4px 12px rgba(0,0,0,0.12)'
-                  : 'none',
-              transition: 'all 0.15s',
-            }}
-          >
-            Continue to How
-          </button>
-        </motion.section>
-      </div>
-    )
-  }
 
   return (
     <div

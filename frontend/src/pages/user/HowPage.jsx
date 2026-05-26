@@ -196,7 +196,7 @@ export default function HowPage({ setOnNext }) {
               color: '#1a1a1a',
             }}
           >
-            How ladder complete
+            Why/How ladder complete
           </h1>
 
           <p
