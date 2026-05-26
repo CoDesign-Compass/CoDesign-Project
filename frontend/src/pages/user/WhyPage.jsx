@@ -1,23 +1,48 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useIssue } from '../../context/IssueContext'
 import { useTheme } from '../../context/ThemeContext'
 
-
 // Step 0 = stance, steps 1–5 = follow-up questions
 const TOTAL_QUESTION_STEPS = 5
 
 const STANCE_OPTIONS = [
-  { key: 'agree',    base: '#ccf6e2', hover: '#b5ead7', selected: '#7fd3b5', label: 'Agree' },
-  { key: 'disagree', base: '#ffd6d6', hover: '#ffc2c2', selected: '#ff8787', label: 'Disagree' },
-  { key: 'unknown',  base: '#f8f9fa', hover: '#f1f3f5', selected: '#dee2e6', label: "I don't know" },
+  {
+    key: 'agree',
+    base: '#ccf6e2',
+    hover: '#b5ead7',
+    selected: '#7fd3b5',
+    label: 'Agree',
+  },
+  {
+    key: 'disagree',
+    base: '#ffd6d6',
+    hover: '#ffc2c2',
+    selected: '#ff8787',
+    label: 'Disagree',
+  },
+  {
+    key: 'unknown',
+    base: '#f8f9fa',
+    hover: '#f1f3f5',
+    selected: '#dee2e6',
+    label: "I don't know",
+  },
 ]
 
 const slideVariants = {
-  enter:  (dir) => ({ x: dir * 48, opacity: 0 }),
-  center: { x: 0, opacity: 1, transition: { duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94] } },
-  exit:   (dir) => ({ x: dir * -48, opacity: 0, transition: { duration: 0.18, ease: 'easeIn' } }),
+  enter: (dir) => ({ x: dir * 48, opacity: 0 }),
+  center: {
+    x: 0,
+    opacity: 1,
+    transition: { duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94] },
+  },
+  exit: (dir) => ({
+    x: dir * -48,
+    opacity: 0,
+    transition: { duration: 0.18, ease: 'easeIn' },
+  }),
 }
 
 export default function WhyPage({ setOnNext }) {
@@ -26,24 +51,30 @@ export default function WhyPage({ setOnNext }) {
   const { setShareId, issueContent } = useIssue()
   const navigate = useNavigate()
 
-  const [currentStep, setCurrentStep] = useState(0)   // 0=stance, 1–5=questions
-  const [direction, setDirection]     = useState(1)
+  const [currentStep, setCurrentStep] = useState(0) // 0=stance, 1–5=questions
+  const [direction, setDirection] = useState(1)
   const [selectedButton, setSelectedButton] = useState(null)
-  const [hoveredButton, setHoveredButton]   = useState(null)
+  const [hoveredButton, setHoveredButton] = useState(null)
   const [answers, setAnswers] = useState(Array(TOTAL_QUESTION_STEPS).fill(''))
   const [submitting, setSubmitting] = useState(false)
+  const [completed, setCompleted] = useState(false)
+  const [submitError, setSubmitError] = useState('')
   const [hoveredNav, setHoveredNav] = useState(null)
   const [isCompactNav, setIsCompactNav] = useState(false)
   const [showIntroModal, setShowIntroModal] = useState(false)
 
   const inputRef = useRef(null)
-  const topRef   = useRef(null)
-  const isDark   = theme === 'dark'
+  const topRef = useRef(null)
+  const isDark = theme === 'dark'
 
   const submissionId = Number(localStorage.getItem('submissionId'))
-  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://codesign-project.onrender.com'
+  const API_BASE =
+    process.env.REACT_APP_API_BASE_URL ||
+    'https://codesign-project.onrender.com'
 
-  useEffect(() => { if (routeShareId) setShareId(routeShareId) }, [routeShareId, setShareId])
+  useEffect(() => {
+    if (routeShareId) setShareId(routeShareId)
+  }, [routeShareId, setShareId])
 
   useEffect(() => {
     if (currentStep > 0) inputRef.current?.focus()
@@ -60,9 +91,10 @@ export default function WhyPage({ setOnNext }) {
     return () => window.removeEventListener('resize', updateNavLayout)
   }, [])
 
-  const submitWhy = async () => {
+  const submitWhy = useCallback(async () => {
     if (submitting) return
     setSubmitting(true)
+    setSubmitError('')
     try {
       const res = await fetch(`${API_BASE}/api/why`, {
         method: 'POST',
@@ -71,18 +103,36 @@ export default function WhyPage({ setOnNext }) {
           submissionId,
           shareId: routeShareId,
           stance: selectedButton,
-          answer1: answers[0], answer2: answers[1], answer3: answers[2],
-          answer4: answers[3], answer5: answers[4],
+          answer1: answers[0],
+          answer2: answers[1],
+          answer3: answers[2],
+          answer4: answers[3],
+          answer5: answers[4],
         }),
       })
       if (!res.ok) throw new Error('Failed to submit')
-      navigate(`/share/${routeShareId}/how`)
+      setCompleted(true)
+    } catch (err) {
+      console.error(err)
+      setSubmitError('We could not save your Why responses. Please try again.')
     } finally {
       setSubmitting(false)
     }
-  }
+  }, [
+    API_BASE,
+    answers,
+    routeShareId,
+    selectedButton,
+    submissionId,
+    submitting,
+  ])
 
-  const goNext = async () => {
+  const goNext = useCallback(async () => {
+    if (completed) {
+      navigate(routeShareId ? `/share/${routeShareId}/how` : '/how')
+      return false
+    }
+
     if (currentStep === 0) {
       if (!selectedButton) return
       setShowIntroModal(true)
@@ -95,7 +145,15 @@ export default function WhyPage({ setOnNext }) {
     }
 
     return false
-  }
+  }, [
+    answers,
+    completed,
+    currentStep,
+    navigate,
+    routeShareId,
+    selectedButton,
+    submitWhy,
+  ])
 
   const goPrev = () => {
     if (currentStep === 0) return
@@ -103,7 +161,9 @@ export default function WhyPage({ setOnNext }) {
     setCurrentStep((s) => s - 1)
   }
 
-  const finishEarly = async () => { await submitWhy() }
+  const finishEarly = async () => {
+    await submitWhy()
+  }
 
   const confirmIntroModal = () => {
     setShowIntroModal(false)
@@ -120,17 +180,23 @@ export default function WhyPage({ setOnNext }) {
 
   // ── stance button style ──────────────────────────────────────────
   const stanceStyle = (key, base, hover, selected) => {
-    const isSelected    = selectedButton === key
-    const isHovered     = hoveredButton === key
+    const isSelected = selectedButton === key
+    const isHovered = hoveredButton === key
     const isOtherDimmed = !!selectedButton && !isSelected
 
     return {
       flex: 1,
       backgroundColor: isSelected ? selected : isHovered ? hover : base,
-      transform: isSelected ? 'translateY(-3px)' : isHovered ? 'translateY(-2px)' : 'translateY(0)',
+      transform: isSelected
+        ? 'translateY(-3px)'
+        : isHovered
+          ? 'translateY(-2px)'
+          : 'translateY(0)',
       boxShadow: isSelected
         ? '0 8px 24px rgba(0,0,0,0.13)'
-        : isHovered ? '0 6px 14px rgba(0,0,0,0.10)' : '0 2px 6px rgba(0,0,0,0.06)',
+        : isHovered
+          ? '0 6px 14px rgba(0,0,0,0.10)'
+          : '0 2px 6px rgba(0,0,0,0.06)',
       opacity: isOtherDimmed ? 0.4 : 1,
       filter: isOtherDimmed ? 'saturate(0.5)' : 'none',
       border: 'none',
@@ -144,14 +210,111 @@ export default function WhyPage({ setOnNext }) {
   }
 
   // ── design tokens ────────────────────────────────────────────────
-  const textColor   = isDark ? '#f0f0f0' : '#1a1a1a'
-  const subText     = isDark ? '#888' : '#888'
-  const inputBg     = isDark ? '#1a1a1a' : '#ffffff'
+  const textColor = isDark ? '#f0f0f0' : '#1a1a1a'
+  const subText = isDark ? '#888' : '#888'
+  const inputBg = isDark ? '#1a1a1a' : '#ffffff'
   const inputBorder = isDark ? 'rgba(255,255,255,0.18)' : '#ced4da'
-  const hintBg      = isDark ? '#1f1f1f' : '#f8f9fa'
-  const hintBorder  = isDark ? 'rgba(255,255,255,0.08)' : '#e9ecef'
-  const isLastStep  = currentStep === TOTAL_QUESTION_STEPS
-  const questionIdx = currentStep - 1   // 0-based index into answers[]
+  const hintBg = isDark ? '#1f1f1f' : '#f8f9fa'
+  const hintBorder = isDark ? 'rgba(255,255,255,0.08)' : '#e9ecef'
+  const successBg = '#ffffff'
+  const successLine = '#ffe071'
+  const isLastStep = currentStep === TOTAL_QUESTION_STEPS
+  const questionIdx = currentStep - 1 // 0-based index into answers[]
+  const howPath = routeShareId ? `/share/${routeShareId}/how` : '/how'
+
+  if (completed) {
+    return (
+      <div
+        ref={topRef}
+        className="max-w-[640px] mx-auto px-4 font-poppins"
+        style={{ color: textColor, paddingBottom: 32 }}
+      >
+        <motion.section
+          initial={{ y: 18, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94] }}
+          style={{
+            border: `1px solid ${successLine}`,
+            background: successBg,
+            borderRadius: 12,
+            padding: '28px 22px',
+            boxShadow: isDark
+              ? '0 10px 28px rgba(0,0,0,0.22)'
+              : '0 10px 28px rgba(0,0,0,0.06)',
+          }}
+        >
+          <div
+            aria-hidden="true"
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: '#ffe071',
+              color: '#1a1a1a',
+              fontSize: 24,
+              fontWeight: 800,
+              marginBottom: 18,
+            }}
+          >
+            ✓
+          </div>
+
+          <h1
+            style={{
+              margin: '0 0 10px',
+              fontSize: 28,
+              fontWeight: 800,
+              color: '#1a1a1a',
+            }}
+          >
+            Why ladder complete
+          </h1>
+
+          <p
+            style={{
+              margin: '0 0 20px',
+              fontSize: 15,
+              lineHeight: 1.7,
+              color: subText,
+            }}
+          >
+            Your Why responses have been saved. Continue to the How ladder to
+            share ideas for what could improve the issue.
+          </p>
+
+          <button
+            type="button"
+            onClick={() => navigate(howPath)}
+            onMouseEnter={() => setHoveredNav('continue')}
+            onMouseLeave={() => setHoveredNav(null)}
+            style={{
+              padding: '11px 24px',
+              borderRadius: 10,
+              border: 'none',
+              background: hoveredNav === 'continue' ? '#ffd43b' : '#ffe071',
+              color: '#1a1a1a',
+              fontWeight: 700,
+              fontSize: 14,
+              fontFamily: 'Poppins, sans-serif',
+              cursor: 'pointer',
+              transform:
+                hoveredNav === 'continue' ? 'translateY(-1px)' : 'none',
+              boxShadow:
+                hoveredNav === 'continue'
+                  ? '0 4px 12px rgba(0,0,0,0.12)'
+                  : 'none',
+              transition: 'all 0.15s',
+            }}
+          >
+            Continue to How
+          </button>
+        </motion.section>
+      </div>
+    )
+  }
 
   return (
     <div
@@ -159,11 +322,24 @@ export default function WhyPage({ setOnNext }) {
       className="max-w-[640px] mx-auto px-4 font-poppins"
       style={{ color: textColor, paddingBottom: 32 }}
     >
-
       {/* ── Progress bar (question steps only) ── */}
       {currentStep > 0 && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 28 }}>
-          <span style={{ fontSize: 12, fontWeight: 600, color: subText, whiteSpace: 'nowrap' }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            marginBottom: 28,
+          }}
+        >
+          <span
+            style={{
+              fontSize: 12,
+              fontWeight: 600,
+              color: subText,
+              whiteSpace: 'nowrap',
+            }}
+          >
             Question {currentStep} of {TOTAL_QUESTION_STEPS}
           </span>
           <div style={{ flex: 1, display: 'flex', gap: 4 }}>
@@ -174,7 +350,12 @@ export default function WhyPage({ setOnNext }) {
                   flex: 1,
                   height: 4,
                   borderRadius: 2,
-                  background: i < currentStep ? '#ffe071' : isDark ? 'rgba(255,255,255,0.1)' : '#e0e0e0',
+                  background:
+                    i < currentStep
+                      ? '#ffe071'
+                      : isDark
+                        ? 'rgba(255,255,255,0.1)'
+                        : '#e0e0e0',
                   transition: 'background 0.25s',
                 }}
               />
@@ -193,11 +374,10 @@ export default function WhyPage({ setOnNext }) {
           animate="center"
           exit="exit"
         >
-
           {/* ── STEP 0: Stance selection ── */}
           {currentStep === 0 && (
             <div>
-              <div style={{display: 'flex', marginBottom: 40}}>
+              <div style={{ display: 'flex', marginBottom: 40 }}>
                 <span
                   style={{
                     display: 'inline-block',
@@ -209,12 +389,19 @@ export default function WhyPage({ setOnNext }) {
                     color: '#000',
                     fontSize: 20,
                     marginBottom: 8,
-                    marginRight: 8
+                    marginRight: 8,
                   }}
                 >
-                Issue
-              </span>
-                <p style={{ lineHeight: 1.65, marginBottom: 24, color: textColor, fontSize: 20 }}>
+                  Issue
+                </span>
+                <p
+                  style={{
+                    lineHeight: 1.65,
+                    marginBottom: 24,
+                    color: textColor,
+                    fontSize: 20,
+                  }}
+                >
                   {issueContent || 'No issue content available.'}
                 </p>
               </div>
@@ -226,7 +413,14 @@ export default function WhyPage({ setOnNext }) {
                 Select one option to continue to the follow-up questions.
               </p>
 
-              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 28 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  gap: 10,
+                  flexWrap: 'wrap',
+                  marginBottom: 28,
+                }}
+              >
                 {STANCE_OPTIONS.map(({ key, base, hover, selected, label }) => (
                   <button
                     key={key}
@@ -236,8 +430,21 @@ export default function WhyPage({ setOnNext }) {
                     onClick={() => setSelectedButton(key)}
                     style={stanceStyle(key, base, hover, selected)}
                   >
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                      {selectedButton === key && <span aria-hidden="true" style={{ fontSize: 13, fontWeight: 900 }}>✓</span>}
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6,
+                      }}
+                    >
+                      {selectedButton === key && (
+                        <span
+                          aria-hidden="true"
+                          style={{ fontSize: 13, fontWeight: 900 }}
+                        >
+                          ✓
+                        </span>
+                      )}
                       {label}
                     </span>
                   </button>
@@ -254,14 +461,26 @@ export default function WhyPage({ setOnNext }) {
                     padding: '10px 24px',
                     borderRadius: 10,
                     border: 'none',
-                    background: selectedButton ? (hoveredNav === 'continue' ? '#ffd43b' : '#ffe071') : isDark ? 'rgba(255,255,255,0.08)' : '#e0e0e0',
+                    background: selectedButton
+                      ? hoveredNav === 'continue'
+                        ? '#ffd43b'
+                        : '#ffe071'
+                      : isDark
+                        ? 'rgba(255,255,255,0.08)'
+                        : '#e0e0e0',
                     color: selectedButton ? '#1a1a1a' : subText,
                     fontWeight: 700,
                     fontSize: 14,
                     fontFamily: 'Poppins, sans-serif',
                     cursor: selectedButton ? 'pointer' : 'not-allowed',
-                    transform: selectedButton && hoveredNav === 'continue' ? 'translateY(-1px)' : 'none',
-                    boxShadow: selectedButton && hoveredNav === 'continue' ? '0 4px 12px rgba(0,0,0,0.12)' : 'none',
+                    transform:
+                      selectedButton && hoveredNav === 'continue'
+                        ? 'translateY(-1px)'
+                        : 'none',
+                    boxShadow:
+                      selectedButton && hoveredNav === 'continue'
+                        ? '0 4px 12px rgba(0,0,0,0.12)'
+                        : 'none',
                     transition: 'all 0.15s',
                   }}
                 >
@@ -277,7 +496,9 @@ export default function WhyPage({ setOnNext }) {
               {/* Stance badge */}
               <div style={{ marginBottom: 20 }}>
                 {(() => {
-                  const opt = STANCE_OPTIONS.find((o) => o.key === selectedButton)
+                  const opt = STANCE_OPTIONS.find(
+                    (o) => o.key === selectedButton,
+                  )
                   return opt ? (
                     <span
                       style={{
@@ -299,7 +520,14 @@ export default function WhyPage({ setOnNext }) {
               </div>
 
               {/* Question label */}
-              <p style={{ fontWeight: 600, fontSize: 20, color: textColor, marginBottom: 60 }}>
+              <p
+                style={{
+                  fontWeight: 600,
+                  fontSize: 20,
+                  color: textColor,
+                  marginBottom: 60,
+                }}
+              >
                 {currentStep === 1
                   ? 'Why does this issue matter to you?'
                   : 'Why does that matter to you?'}
@@ -322,12 +550,22 @@ export default function WhyPage({ setOnNext }) {
                 <span
                   aria-hidden="true"
                   style={{
-                    width: 20, height: 20, minWidth: 20, borderRadius: '50%',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    width: 20,
+                    height: 20,
+                    minWidth: 20,
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     background: isDark ? 'rgba(255,255,255,0.08)' : '#e9ecef',
-                    fontSize: 11, fontWeight: 700, color: textColor, marginTop: 1,
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: textColor,
+                    marginTop: 1,
                   }}
-                >i</span>
+                >
+                  i
+                </span>
                 Write in your own words. No names or identifiers.
               </div>
 
@@ -357,13 +595,43 @@ export default function WhyPage({ setOnNext }) {
                   boxSizing: 'border-box',
                   transition: 'border-color 0.15s',
                 }}
-                onFocus={(e) => { e.target.style.borderColor = '#ffe071' }}
-                onBlur={(e) => { e.target.style.borderColor = inputBorder }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#ffe071'
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = inputBorder
+                }}
               />
 
-              {/* Navigation row */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 14, gap: 10, flexWrap: 'nowrap' }}>
+              {submitError && (
+                <div
+                  role="alert"
+                  style={{
+                    marginTop: 12,
+                    padding: '10px 12px',
+                    borderRadius: 10,
+                    border: `1px solid ${hintBorder}`,
+                    background: isDark ? 'rgba(248,113,113,0.10)' : '#fff5f5',
+                    color: isDark ? '#fecaca' : '#b42318',
+                    fontSize: 13,
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {submitError}
+                </div>
+              )}
 
+              {/* Navigation row */}
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-end',
+                  marginTop: 14,
+                  gap: 10,
+                  flexWrap: 'nowrap',
+                }}
+              >
                 {/* Back */}
                 <button
                   onClick={goPrev}
@@ -373,7 +641,12 @@ export default function WhyPage({ setOnNext }) {
                     padding: isCompactNav ? '9px 12px' : '10px 18px',
                     borderRadius: 10,
                     border: `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : '#ddd'}`,
-                    background: hoveredNav === 'back' ? (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)') : 'transparent',
+                    background:
+                      hoveredNav === 'back'
+                        ? isDark
+                          ? 'rgba(255,255,255,0.06)'
+                          : 'rgba(0,0,0,0.04)'
+                        : 'transparent',
                     color: textColor,
                     fontWeight: 600,
                     fontSize: isCompactNav ? 12 : 14,
@@ -388,22 +661,57 @@ export default function WhyPage({ setOnNext }) {
                 </button>
 
                 {/* Right side: I don't know + Next/Finish */}
-                <div style={{ display: 'flex', gap: isCompactNav ? 6 : 8, alignItems: 'flex-end', flexWrap: 'nowrap', justifyContent: 'flex-end', minWidth: 0, flex: 1 }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: isCompactNav ? 6 : 8,
+                    alignItems: 'flex-end',
+                    flexWrap: 'nowrap',
+                    justifyContent: 'flex-end',
+                    minWidth: 0,
+                    flex: 1,
+                  }}
+                >
                   {currentStep >= 2 && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'flex-end', minWidth: 0, flexShrink: 1 }}>
-                      <span style={{ display: isCompactNav ? 'none' : 'block', fontSize: 11, color: subText, maxWidth: 150, textAlign: 'right', lineHeight: 1.4 }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 4,
+                        alignItems: 'flex-end',
+                        minWidth: 0,
+                        flexShrink: 1,
+                      }}
+                    >
+                      <span
+                        style={{
+                          display: isCompactNav ? 'none' : 'block',
+                          fontSize: 11,
+                          color: subText,
+                          maxWidth: 150,
+                          textAlign: 'right',
+                          lineHeight: 1.4,
+                        }}
+                      >
                         Unsure how to continue? This would end follow-ups.
                       </span>
                       <button
                         onClick={finishEarly}
                         disabled={submitting}
-                        onMouseEnter={() => !submitting && setHoveredNav('idontknow')}
+                        onMouseEnter={() =>
+                          !submitting && setHoveredNav('idontknow')
+                        }
                         onMouseLeave={() => setHoveredNav(null)}
                         style={{
                           padding: isCompactNav ? '9px 12px' : '10px 18px',
                           borderRadius: 10,
                           border: `1px solid ${isDark ? 'rgba(255,255,255,0.18)' : '#bbb'}`,
-                          background: hoveredNav === 'idontknow' ? (isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)') : 'transparent',
+                          background:
+                            hoveredNav === 'idontknow'
+                              ? isDark
+                                ? 'rgba(255,255,255,0.08)'
+                                : 'rgba(0,0,0,0.05)'
+                              : 'transparent',
                           color: textColor,
                           fontWeight: 600,
                           fontSize: isCompactNav ? 12 : 14,
@@ -423,34 +731,66 @@ export default function WhyPage({ setOnNext }) {
                   <button
                     onClick={goNext}
                     disabled={submitting || !answers[questionIdx].trim()}
-                    onMouseEnter={() => answers[questionIdx].trim() && !submitting && setHoveredNav('next')}
+                    onMouseEnter={() =>
+                      answers[questionIdx].trim() &&
+                      !submitting &&
+                      setHoveredNav('next')
+                    }
                     onMouseLeave={() => setHoveredNav(null)}
                     style={{
                       padding: isCompactNav ? '9px 12px' : '10px 22px',
                       borderRadius: 10,
                       border: 'none',
-                      background: answers[questionIdx].trim() && !submitting
-                        ? (hoveredNav === 'next' ? '#ffd43b' : '#ffe071')
-                        : isDark ? 'rgba(255,255,255,0.08)' : '#e0e0e0',
-                      color: answers[questionIdx].trim() && !submitting ? '#1a1a1a' : subText,
+                      background:
+                        answers[questionIdx].trim() && !submitting
+                          ? hoveredNav === 'next'
+                            ? '#ffd43b'
+                            : '#ffe071'
+                          : isDark
+                            ? 'rgba(255,255,255,0.08)'
+                            : '#e0e0e0',
+                      color:
+                        answers[questionIdx].trim() && !submitting
+                          ? '#1a1a1a'
+                          : subText,
                       fontWeight: 700,
                       fontSize: isCompactNav ? 12 : 14,
                       fontFamily: 'Poppins, sans-serif',
-                      cursor: answers[questionIdx].trim() && !submitting ? 'pointer' : 'not-allowed',
-                      transform: answers[questionIdx].trim() && !submitting && hoveredNav === 'next' ? 'translateY(-1px)' : 'none',
-                      boxShadow: answers[questionIdx].trim() && !submitting && hoveredNav === 'next' ? '0 4px 12px rgba(0,0,0,0.12)' : 'none',
+                      cursor:
+                        answers[questionIdx].trim() && !submitting
+                          ? 'pointer'
+                          : 'not-allowed',
+                      transform:
+                        answers[questionIdx].trim() &&
+                        !submitting &&
+                        hoveredNav === 'next'
+                          ? 'translateY(-1px)'
+                          : 'none',
+                      boxShadow:
+                        answers[questionIdx].trim() &&
+                        !submitting &&
+                        hoveredNav === 'next'
+                          ? '0 4px 12px rgba(0,0,0,0.12)'
+                          : 'none',
                       whiteSpace: 'nowrap',
                       flexShrink: 0,
                       transition: 'all 0.15s',
                     }}
                   >
-                    {submitting ? 'Submitting…' : isCompactNav ? (isLastStep ? 'Finish' : 'Next') : (isLastStep ? 'Finish ✓' : 'Next question →')}
+                    {submitting
+                      ? 'Submitting…'
+                      : isCompactNav
+                        ? isLastStep
+                          ? 'Finish'
+                          : 'Next'
+                        : isLastStep
+                          ? 'Finish ✓'
+                          : 'Next question →'}
                   </button>
                 </div>
               </div>
             </div>
           )}
-
         </motion.div>
       </AnimatePresence>
 
@@ -487,14 +827,42 @@ export default function WhyPage({ setOnNext }) {
                 boxShadow: '0 20px 60px rgba(0,0,0,0.18)',
               }}
             >
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 14, padding: '4px 10px', borderRadius: 999, background: isDark ? 'rgba(255,255,255,0.08)' : '#ffe071', color: '#1a1a1a', fontWeight: 700, fontSize: 12 }}>
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  marginBottom: 14,
+                  padding: '4px 10px',
+                  borderRadius: 999,
+                  background: isDark ? 'rgba(255,255,255,0.08)' : '#ffe071',
+                  color: '#1a1a1a',
+                  fontWeight: 700,
+                  fontSize: 12,
+                }}
+              >
                 Why/How framework
               </div>
-              <p style={{ margin: 0, fontSize: 15, lineHeight: 1.65, color: textColor }}>
-                We are using a 5-step framework to dig past surface-level thoughts. The questions will look similar across 5 steps—this is normal and how the system guides you to deeper insights!
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: 15,
+                  lineHeight: 1.65,
+                  color: textColor,
+                }}
+              >
+                We are using a 5-step framework to dig past surface-level
+                thoughts. The questions will look similar across 5 steps—this is
+                normal and how the system guides you to deeper insights!
               </p>
 
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 20 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  marginTop: 20,
+                }}
+              >
                 <button
                   type="button"
                   onClick={confirmIntroModal}
@@ -517,7 +885,6 @@ export default function WhyPage({ setOnNext }) {
           </motion.div>
         )}
       </AnimatePresence>
-
     </div>
   )
 }
